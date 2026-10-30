@@ -48143,6 +48143,43 @@ function tenangoCdm(x, y, w, h, seed) {
 })();
 
 
+ 
+(function spritesPoses() {
+  try {
+    if (window.__spritesPosesOk) return;
+    window.__spritesPosesOk = true;
+
+    const POSES_SPRITES = {
+      _xb25645: "·xf674f5",
+      _xd3d24d: "·xf3d81f",
+      luna: "·xfd4353",
+      abrazo: "·xb29d36",
+    };
+
+    const cache = {};
+    function cargarImg(src) {
+      if (cache[src]) return cache[src];
+      const im = new Image();
+      im.src = src;
+      cache[src] = im;
+      return im;
+    }
+    for (const k in POSES_SPRITES) cargarImg(POSES_SPRITES[k]);
+
+    globalThis.poseSprite = name => {
+      const src = POSES_SPRITES[name]; if (!src) return null;
+      const im = cache[src]; return (im && im.complete && im.naturalWidth) ? im : null;
+    };
+
+    
+    const _xddd3d1 = _x4bbb92;
+    _x4bbb92 = function (...a) {};
+
+    console.log("·x5199ab");
+  } catch (e) { console.warn("·x8db6be", e); }
+})();
+
+
 // Textos retirados de la versión pública: no se dibujan.
 const TOKEN_PUBLICO = /(?:·x|_x)[0-9a-f]{6}/;
 const _textPublico = text;
