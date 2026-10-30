@@ -10655,7 +10655,7 @@ function drawHUD() {
   const items = Object.keys(ITEM_NAME).filter(k => S.inv[k] > 0);
   UI.invRect = null;
   if (items.length && !CEL) {
-    const cols = 4, cs = 38, show = items.slice(0, VW < 640 ? 4 : 8), pw = cols*cs + 16, ph = Math.ceil(show.length/cols)*cs + 34;
+    const cols = 4, cs = 38, show = items.slice(0, VW < 640 ? 4 : 8), pw = cols*cs + 16, ph = Math.ceil(show.length/cols)*cs + 40;
     panel(10, 10, pw, ph); UI.invRect = { x:10, y:10, w:pw, h:ph };
     let tip = null;
     show.forEach((k, i) => {
@@ -10667,7 +10667,7 @@ function drawHUD() {
       text(n, cx + 14, cy + 16, 11, '#fff6d0', 'right');
       if (mouse.x > cx - 17 && mouse.x < cx + 17 && mouse.y > cy - 17 && mouse.y < cy + 17) tip = [k, cx, cy];
     });
-    text(items.length > show.length ? `+${items.length - show.length} más · Tab = bolsa` : 'Tab = bolsa', 10 + pw/2, 10 + ph - 11, 11, '#7a5530', 'center', false);
+    text(items.length > show.length ? `+${items.length - show.length} más · ${UI.touch ? 'toca' : 'Tab'} = bolsa` : (UI.touch ? 'toca = bolsa' : 'Tab = bolsa'), 10 + pw/2, 10 + ph - 14, 11, '#7a5530', 'center', false);
     if (tip) { 
       const [k, cx, cy] = tip, label = `${ITEM_NAME[k]} ×${S.inv[k]}`; ctx.font = `bold 12px ${FONT}`;
       const lw = ctx.measureText(label).width + 14;
@@ -45836,7 +45836,7 @@ touchButtons = function () {
 
 
 
-const VERSION_JUEGO = '30 oct · celular 4';
+const VERSION_JUEGO = '30 oct · celular 5';
 if (esCelular()) {
   const dprReal = devicePixelRatio || 1;
   try { Object.defineProperty(window, 'devicePixelRatio', { configurable:true, get:() => UI.menu === 'title' ? dprReal : 1 }); } catch (e) {} 
@@ -45896,29 +45896,22 @@ pointerDown = function (px, py, button) {
   return _pointerDownBolsa(px, py, button);
 };
 
-const AVISO_TECNICO = /^(⚡ R28|🖼 Grading|✨ Postprocesado|R28 )/;
+const AVISO_TECNICO = /^(⚡ R2[0-9]|⚡ R3[0-9]|🖼 Grading|✨ Postprocesado|R2[0-9] |R3[0-9] )/;
 const _toastTecnico = toast;
 toast = function (msg, ...a) { if (AVISO_TECNICO.test(String(msg))) return; return _toastTecnico(msg, ...a); };
 UI.toasts = (UI.toasts || []).filter(t => !AVISO_TECNICO.test(String(t.msg)));
 
 if (typeof R28 !== 'undefined') R28.activo = false;
 
-// Textos retirados de la versión pública: no se dibujan.
-const TOKEN_PUBLICO = /(?:·x|_x)[0-9a-f]{6}/;
-const _textPublico = text;
-const _openMenuPublico = openMenu;
-openMenu = function (...a) { // los menús cuyo título se retiró no se abren
-  const r = _openMenuPublico(...a);
-  if (UI.menu === 'shop' && UI.shopId) {
-    const sh = SHOPS[UI.shopId]; let t = '';
-    try { t = String(typeof sh?.title === 'function' ? sh.title() : sh?.title ?? ''); } catch (e) {}
-    if (TOKEN_PUBLICO.test(t) || ['chicas', 'fray', 'ngplus', 'tatuador', 'tatuajes', 'r37Intimidad', 'r39Casa', 'r39Elige', 'itzelMenu', 'escapada', 'seducirElige', 'misionesAmante', 'amanteTribu'].includes(UI.shopId)) { UI.menu = null; UI.shopId = null; }
+
+addEventListener('pointerdown', e => {
+  const r = UI.invRect; if (UI.menu || !r || !S?.player) return;
+  if (e.clientX >= r.x && e.clientX <= r.x + r.w && e.clientY >= r.y && e.clientY <= r.y + r.h) {
+    openMenu('bolsa'); e.stopImmediatePropagation(); e.preventDefault();
   }
-  return r;
-};
-text = function (s, ...r) { if (typeof s === 'string' && TOKEN_PUBLICO.test(s)) { s = s.replace(/(?:·x|_x)[0-9a-f]{6}/g, '').trim(); if (!s) return; } return _textPublico(s, ...r); };
-</script>
-<script>
+}, true);
+
+
 const TINTA = '#1a1410';
 function garzaCdm(x, y, s) {
   ctx.save(); ctx.translate(x, y); ctx.scale(s, s); ctx.lineJoin = 'round'; ctx.lineCap = 'round';
@@ -45941,15 +45934,15 @@ function pantliCdm(x, y, hgt, cols) {
 function tecpanCdm(px, py, w, h) {
   const base = py + h, night = S.time > 18*60 || S.time < 6*60, cx = px + w / 2;
   ell('rgba(30,22,16,.22)', cx, base + 2, w / 2 + 10, 8);
-  // basamento: talud de piedra y tablero rojo con greca
+  
   ctx.fillStyle = '#a89c86'; ctx.beginPath(); ctx.moveTo(px - 8, base); ctx.lineTo(px + w + 8, base); ctx.lineTo(px + w + 2, base - 14); ctx.lineTo(px - 2, base - 14); ctx.fill();
   for (let i = 0; i < 3; i++) rect('rgba(60,45,30,.18)', px, base - 12 + i * 4, w, 1);
   rect('#3a2416', px - 4, base - 36, w + 8, 23); rect('#b5352a', px - 2, base - 34, w + 4, 19); greca(px, base - 30, w, '#f4ecd8', '#b5352a');
-  // escalinata con alfardas
+  
   const sx = cx - 30, sw = 60;
   rect('#d6ccb6', sx, base - 36, sw, 36); for (let yy = base - 33; yy < base; yy += 5) rect('rgba(60,45,30,.25)', sx, yy, sw, 1);
   rect('#b5352a', sx - 6, base - 38, 6, 38); rect('#b5352a', sx + sw, base - 38, 6, 38); rect('#f2c84a', sx - 6, base - 38, 6, 3); rect('#f2c84a', sx + sw, base - 38, 6, 3);
-  // cuerpo: muro de aplanado, pórtico en sombra y pilares pintados
+  
   const top = py + 40, bot = base - 36;
   rect('#efe4cc', px + 6, top, w - 12, bot - top);
   rect('#3a2416', px + 22, top + 14, w - 44, bot - top - 14);
@@ -45957,19 +45950,19 @@ function tecpanCdm(px, py, w, h) {
   const n = 6, gap = (w - 44) / (n - 1);
   for (let i = 0; i < n; i++) { const x = px + 22 + i * gap - 6; rect('#efe4cc', x, top + 12, 12, bot - top - 12); rect('#b5352a', x + 3, top + 22, 6, bot - top - 32); rect('#2f6aa8', x, top + 12, 12, 5); rect('rgba(26,20,16,.6)', x + 11, top + 12, 1, bot - top - 12); }
   rect('#b5352a', px + 6, bot - 8, w - 12, 8);
-  // friso, cornisa y almenas
+  
   rect('#3a2416', px + 2, top - 4, w - 4, 5);
   rect('#b5352a', px + 4, top + 1, w - 8, 13); greca(px + 4, top + 4, w - 8, '#f4ecd8', '#b5352a');
   for (let x = px + 6; x <= px + w - 18; x += 16) { rect('#efe4cc', x, top - 18, 12, 14); rect('#efe4cc', x + 3, top - 23, 6, 5); circ('#b5352a', x + 6, top - 12, 2.4); rect('rgba(26,20,16,.35)', x + 11, top - 18, 1, 14); }
   ctx.strokeStyle = 'rgba(26,20,16,.8)'; ctx.lineWidth = 1.6; ctx.strokeRect(px + 6.5, top - 3.5, w - 13, bot - top + 3);
-  // estandarte central con la garza blanca de Tizatlán y estandartes de pluma a los lados
+  
   rect('#5a3a1e', cx - 1.5, top - 62, 3, 44);
   const sw2 = Math.sin(T * 1.6) * 1.5;
   ctx.fillStyle = '#b5352a'; ctx.strokeStyle = TINTA; ctx.lineWidth = 1.3; ctx.beginPath(); ctx.moveTo(cx + 2, top - 62); ctx.lineTo(cx + 34, top - 62 + sw2); ctx.lineTo(cx + 34, top - 30 + sw2); ctx.lineTo(cx + 18, top - 36); ctx.lineTo(cx + 2, top - 30); ctx.closePath(); ctx.fill(); ctx.stroke();
   garzaCdm(cx + 17, top - 44, 0.72);
   pantliCdm(px + 10, top - 50, 32, ['#2f8a5a', '#f2c84a', '#b5352a', '#2f6aa8']);
   pantliCdm(px + w - 16, top - 50, 32, ['#2f6aa8', '#b5352a', '#f2c84a', '#2f8a5a']);
-  // braseros
+  
   for (const bx of [sx - 16, sx + sw + 16]) { rect('#6d6660', bx - 6, base - 50, 12, 12); ctx.fillStyle = '#ff8c28'; ctx.beginPath(); ctx.moveTo(bx - 6, base - 50); ctx.quadraticCurveTo(bx, base - 64 + Math.sin(T * 12 + bx) * 2, bx + 6, base - 50); ctx.fill(); }
 }
 function edifMuroCdm(e, b, W, wall) {
@@ -45978,10 +45971,10 @@ function edifMuroCdm(e, b, W, wall) {
   const g = ctx.createLinearGradient(0, 0, 0, F); g.addColorStop(0, 'rgba(255,250,235,.18)'); g.addColorStop(1, 'rgba(90,50,25,.12)'); ctx.fillStyle = g; ctx.fillRect(0, 0, W, F);
   for (let i = 0; i < 60; i++) rect(i % 3 ? 'rgba(90,50,25,.07)' : 'rgba(255,255,255,.12)', hash(i, b.x) * W, 34 + hash(b.y, i) * (F - 40), 3 + hash(i, 5) * 10, 1.5);
   if (esp || k === 'tipi' || k === 'wickiup') return;
-  // vigas del techo
+  
   rect('#4a2f18', 0, 0, W, 12); rect('#6b4423', 0, 12, W, 4);
   for (let x = 18; x < W; x += 46) { rect('#5a3a1e', x - 7, 0, 14, 26); rect('#7a4a28', x - 7, 0, 3, 26); ctx.fillStyle = '#3a2416'; ctx.beginPath(); ctx.ellipse(x, 24, 7, 3, 0, 0, 7); ctx.fill(); }
-  // mural del palacio: franja azul con chalchihuites y grecas rojas
+  
   if (k === 'palacio') {
     const my = 44, mh = F - 44 - 34;
     rect('#16306e', 0, my - 2, W, mh + 4); rect('#2f7fa8', 0, my, W, mh);
@@ -45990,7 +45983,7 @@ function edifMuroCdm(e, b, W, wall) {
       else { ctx.strokeStyle = '#b5352a'; ctx.lineWidth = 4; ctx.beginPath(); ctx.moveTo(x - 14, my + mh - 8); ctx.lineTo(x - 14, my + 10); ctx.lineTo(x + 8, my + 10); ctx.lineTo(x + 8, my + mh / 2 + 4); ctx.lineTo(x - 4, my + mh / 2 + 4); ctx.stroke(); }
     }
   }
-  // guardapolvo rojo
+  
   rect('#a8392b', 0, F - 30, W, 30); rect('#d39a26', 0, F - 32, W, 2);
 }
 function edifPisoCdm(W, H) {
@@ -46011,14 +46004,14 @@ function salaPalacioCdm(W, H) {
   for (const x of [56, W - 56]) pantliCdm(x, 60, 80, ['#2f8a5a', '#f2c84a', '#b5352a', '#2f6aa8', '#f2c84a', '#2f8a5a']);
   const ch = ESTADO_GLIFOS.chimalli;
   for (const x of [128, W - 128]) if (ch && ch.complete && ch.naturalWidth) ctx.drawImage(ch, x - 24, 64, 48, 48);
-  // icpalli: respaldo de tule con piel de jaguar
+  
   const cx = W / 2;
   rect('#3a2416', cx - 46, 92, 92, 84); rect('#c8a050', cx - 43, 95, 86, 78);
   for (let yy = 99; yy < 172; yy += 6) rect('rgba(120,80,30,.35)', cx - 43, yy, 86, 1.5);
   ctx.fillStyle = '#e0a030'; ctx.strokeStyle = TINTA; ctx.lineWidth = 1.4; ctx.beginPath(); ctx.moveTo(cx - 30, 100); ctx.lineTo(cx + 30, 100); ctx.lineTo(cx + 34, 160); ctx.lineTo(cx - 34, 160); ctx.closePath(); ctx.fill(); ctx.stroke();
   for (let i = 0; i < 16; i++) { const sx = cx - 26 + hash(i, 3) * 52, sy = 106 + hash(3, i) * 48; ctx.strokeStyle = '#3a2416'; ctx.lineWidth = 1.6; ctx.beginPath(); ctx.arc(sx, sy, 3, 0, 7); ctx.stroke(); circ('#3a2416', sx, sy, 1.1); }
   rect('#b5352a', cx - 50, 160, 100, 14); greca(cx - 50, 163, 100, '#f4ecd8', '#b5352a');
-  // petate largo
+  
   rect('#a88a52', cx - 38, 190, 76, H - 190); rect('#d8b878', cx - 35, 190, 70, H - 190);
   for (let yy = 194; yy < H; yy += 8) for (let xx = cx - 35 + ((yy / 8) % 2) * 7; xx < cx + 35; xx += 14) rect('rgba(120,80,30,.3)', xx, yy, 7, 4);
 }
@@ -46094,6 +46087,23 @@ function barrasTal(ex, ey, eh) {
     }
   });
 }
+
+// Textos retirados de la versión pública: no se dibujan.
+const TOKEN_PUBLICO = /(?:·x|_x)[0-9a-f]{6}/;
+const _textPublico = text;
+const _openMenuPublico = openMenu;
+openMenu = function (...a) { // los menús cuyo título se retiró no se abren
+  const r = _openMenuPublico(...a);
+  if (UI.menu === 'shop' && UI.shopId) {
+    const sh = SHOPS[UI.shopId]; let t = '';
+    try { t = String(typeof sh?.title === 'function' ? sh.title() : sh?.title ?? ''); } catch (e) {}
+    if (TOKEN_PUBLICO.test(t) || ['chicas', 'fray', 'ngplus', 'tatuador', 'tatuajes', 'r37Intimidad', 'r39Casa', 'r39Elige', 'itzelMenu', 'escapada', 'seducirElige', 'misionesAmante', 'amanteTribu'].includes(UI.shopId)) { UI.menu = null; UI.shopId = null; }
+  }
+  return r;
+};
+text = function (s, ...r) { if (typeof s === 'string' && TOKEN_PUBLICO.test(s)) { s = s.replace(/(?:·x|_x)[0-9a-f]{6}/g, '').trim(); if (!s) return; } return _textPublico(s, ...r); };
+// El mapa no marca a las chicas ni a las amantes.
+if (typeof _drawMapChicas === 'function') drawMap = _drawMapChicas;
 </script>
 </body>
 </html>
