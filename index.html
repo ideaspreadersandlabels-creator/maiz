@@ -65,8 +65,23 @@ const MINES = [
   { name:'Mina de Oro',    ex:122, ey:62, x0:53, need:2, ores:[['oro', 0.07], ['obsidiana', 0.04], ['carbon', 0.05]] },
 ];
 for (const m of MINES) if (m.ex >= FARM_OLD) m.ex += DX;
-const zone = (x, y) => y >= WORLD_H ? 'mine' : x >= NORTE_X0 ? 'norte' : x >= CHICHIMECA_X0 ? 'chichimeca' : x >= MAR_END ? 'maya' : x >= COSTA_END ? 'mar' : x >= NIEVE_END ? 'costa' : x >= OTOMI_END ? (y < SNOW_H + 2 ? 'nieve' : 'selva') : x >= OTOMI_X ? 'otomi' : y >= DESERT_Y ? (x >= AZ_X ? 'sierra' : 'desert')
-  : x < FARM_W ? 'farm' : x < TOWN_X - 1 ? 'wild' : x < WILD_X ? 'town' : x >= AZ_X && inCity(x, y) ? 'city' : 'wild';
+
+let _zoneMap = null, _zoneMapMW = 0, _zoneMapMH = 0;
+function rebuildZoneMap() {
+  if (!_zoneMap || _zoneMapMW !== MW || _zoneMapMH !== MH) {
+    _zoneMap = new Array(MW * MH);
+    _zoneMapMW = MW; _zoneMapMH = MH;
+  }
+  for (let y = 0; y < MH; y++) for (let x = 0; x < MW; x++) {
+    _zoneMap[y * MW + x] = y >= WORLD_H ? 'mine' : x >= NORTE_X0 ? 'norte' : x >= CHICHIMECA_X0 ? 'chichimeca' : x >= MAR_END ? 'maya' : x >= COSTA_END ? 'mar' : x >= NIEVE_END ? 'costa' : x >= OTOMI_END ? (y < SNOW_H + 2 ? 'nieve' : 'selva') : x >= OTOMI_X ? 'otomi' : y >= DESERT_Y ? (x >= AZ_X ? 'sierra' : 'desert')
+      : x < FARM_W ? 'farm' : x < TOWN_X - 1 ? 'wild' : x < WILD_X ? 'town' : x >= AZ_X && inCity(x, y) ? 'city' : 'wild';
+  }
+}
+const zone = (x, y) => {
+  if (!_zoneMap || _zoneMapMW !== MW || _zoneMapMH !== MH) rebuildZoneMap();
+  if (x < 0 || y < 0 || x >= MW || y >= MH) return 'mine';
+  return _zoneMap[y * MW + x];
+};
 
 const FONT = '"Nunito", "Trebuchet MS", Verdana, sans-serif';
 const SAVE_KEY = 'granjaClaude_v1';
@@ -580,9 +595,35 @@ const FURNACE = { t:'furnace', x:12, y:4, w:2, h:2 };
 const FURNACE_PRICE = 200, FURNACE_STONE = 15, COAL_PRICE = 30;
 
 const TINACAL = { t:'tinacal', x:23, y:3, w:3, h:3 };
-let builds = () => !S ? BUILD : [...BUILD, ...(S.coop ? [COOP] : []), ...(S.hutch ? [HUTCH] : []), ...(S.duckhouse ? [DUCKHOUSE] : []), ...(S.furnace ? [FURNACE] : []), ...(S.tinacal ? [TINACAL] : []),
-  ...(S.def?.tower ? [TOWER] : []), ...(S.hive ? [HIVE] : []), ...(S.day && festivalToday() ? [FIESTA] : []), ...(S.shrines || []).map(s => ({ t:'shrine', x:s.x, y:s.y, w:SHRINE.size, h:SHRINE.size, god:s.god, s }))];
-const buildingAt = (x, y) => builds().find(b => x >= b.x && x < b.x+b.w && y >= b.y && y < b.y+b.h);
+let _buildsCache = null, _buildsCacheFrame = -1;
+let builds = () => {
+  if (_buildsCacheFrame === T && _buildsCache) return _buildsCache;
+  _buildsCacheFrame = T;
+  _buildsCache = !S ? BUILD : [...BUILD, ...(S.coop ? [COOP] : []), ...(S.hutch ? [HUTCH] : []), ...(S.duckhouse ? [DUCKHOUSE] : []), ...(S.furnace ? [FURNACE] : []), ...(S.tinacal ? [TINACAL] : []),
+    ...(S.def?.tower ? [TOWER] : []), ...(S.hive ? [HIVE] : []), ...(S.day && festivalToday() ? [FIESTA] : []), ...(S.shrines || []).map(s => ({ t:'shrine', x:s.x, y:s.y, w:SHRINE.size, h:SHRINE.size, god:s.god, s }))];
+  return _buildsCache;
+};
+
+let _buildGrid = null, _buildGridCache = null;
+function rebuildBuildGrid() {
+  const bs = builds();
+  if (_buildGridCache === bs) return;
+  _buildGridCache = bs;
+  const grid = new Map();
+  for (let i = 0; i < bs.length; i++) {
+    const b = bs[i];
+    for (let y = b.y; y < b.y + b.h; y++) for (let x = b.x; x < b.x + b.w; x++) grid.set(y * MW + x, i);
+  }
+  _buildGrid = { bs, grid };
+}
+const buildingAt = (x, y) => {
+  if (!_buildGrid) rebuildBuildGrid();
+  
+  const bs = builds();
+  if (bs !== _buildGrid.bs) rebuildBuildGrid();
+  const idx = _buildGrid.grid.get(y * MW + x);
+  return idx != null ? _buildGrid.bs[idx] : undefined;
+};
 
 const grid = v => Array.from({ length:MH }, () => new Array(MW).fill(v));
 
@@ -1064,8 +1105,12 @@ function unstick(p) {
   }
 }
 function interactFacing() { UI.keyAct = true; try { interact(); } finally { UI.keyAct = false; } }
+let _playerTileCache = null, _playerTileFrame = -1;
 function playerTile() {
-  return [Math.floor(S.player.x/TS), Math.floor((S.player.y-4)/TS)];
+  if (_playerTileFrame === T && _playerTileCache) return _playerTileCache;
+  _playerTileFrame = T;
+  _playerTileCache = [Math.floor(S.player.x/TS), Math.floor((S.player.y-4)/TS)];
+  return _playerTileCache;
 }
 function target() {
   const [px, py] = playerTile();
@@ -7627,7 +7672,7 @@ function updateFx(dt) {
     const x = Math.floor(vx0 + Math.random()*vw), y = Math.floor(vy0 + Math.random()*vh);
     if (S.ground[y]?.[x] === G.WATER && S.ground[y]?.[x+1] === G.WATER) {
       const fx = x*TS + 10, fy = y*TS + 18, dir = Math.random() < 0.5 ? -1 : 1;
-      PARTS.push({ x:fx, y:fy, vx:dir*28, vy:-95, g:230, life:0.82, t:0, size:4, col:Math.random() < 0.5 ? '#c0c8d0' : '#e8a050', glow:false, kind:'fish', seed:0 });
+      if (PARTS.length < MAX_PARTS) PARTS.push({ x:fx, y:fy, vx:dir*28, vy:-95, g:230, life:0.82, t:0, size:4, col:Math.random() < 0.5 ? '#c0c8d0' : '#e8a050', glow:false, kind:'fish', seed:0 });
       puff(fx, fy + 4, 1, { col:'rgba(220,240,255,.9)', kind:'splash', grav:0, spd:0, life:0.5, size:8 });
       if (Math.hypot(fx - p.x, fy - p.y) < 300) sfx('splash');
       setTimeout(() => puff(fx + dir*23, fy + 4, 1, { col:'rgba(220,240,255,.9)', kind:'splash', grav:0, spd:0, life:0.5, size:8 }), 800);
@@ -11753,7 +11798,7 @@ function spriteCanvas(name, swap) {
 }
 function drawSprite(name, x, y, swap) {
   if (SMOOTH_ICON[name]) return SMOOTH_ICON[name](x, y); 
-  const s = ctx.imageSmoothingEnabled; ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
+  const s = ctx.imageSmoothingEnabled; ctx.imageSmoothingEnabled = false; 
   ctx.drawImage(spriteCanvas(name, swap), Math.round(x - 12), Math.round(y - 13), 24, 24);
   ctx.imageSmoothingEnabled = s;
 }
@@ -45210,7 +45255,8 @@ function estadoEncargo(x, y, w) {
     };
     const FONDOS = {
       cuarto: "·x4e7a21",
-      recamara: "·x4e7a21",
+      recamara: "·x386d71",
+      recamara2: "·x4e7a21",
       milpa: "·x4db9d8",
       temazcal: "·x20d64c",
       lago: "·xc9d03b",
