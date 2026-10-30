@@ -69,7 +69,7 @@ const zone = (x, y) => y >= WORLD_H ? 'mine' : x >= NORTE_X0 ? 'norte' : x >= CH
   : x < FARM_W ? 'farm' : x < TOWN_X - 1 ? 'wild' : x < WILD_X ? 'town' : x >= AZ_X && inCity(x, y) ? 'city' : 'wild';
 
 const FONT = '"Nunito", "Trebuchet MS", Verdana, sans-serif';
-const SAVE_KEY = 'corazonMaiz_publico_v1'; 
+const SAVE_KEY = 'granjaClaude_v1';
 
 const CROPS = [
   { id:'frijol',   name:'Frijol',    seed:20, sell:35,  days:4,  fruit:'#5a2a3a', leaf:'#6fbf4a', shape:'pod' },
@@ -7343,8 +7343,8 @@ function update(dt) {
 
 
 const PREFS = { vol:1, music:1, sfx:1, msg:1, auto:true };
-try { Object.assign(PREFS, JSON.parse(localStorage.getItem('corazonMaiz_publico_prefs') || '{}')); } catch (e) {}
-function savePrefs() { try { localStorage.setItem('corazonMaiz_publico_prefs', JSON.stringify(PREFS)); } catch (e) {} }
+try { Object.assign(PREFS, JSON.parse(localStorage.getItem('tlaxcallan_prefs') || '{}')); } catch (e) {}
+function savePrefs() { try { localStorage.setItem('tlaxcallan_prefs', JSON.stringify(PREFS)); } catch (e) {} }
 function applyVolumes() {
   if (!SND.ctx) return;
   const t = SND.ctx.currentTime, fx = SND.on ? PREFS.sfx : 0;
@@ -7353,8 +7353,8 @@ function applyVolumes() {
   SND.music.gain.setTargetAtTime(SND.musicOn ? 0.32 * PREFS.music : 0, t, 0.2);
 }
 const SND = { ctx:null, on:true, musicOn:true, mode:'milpa', nextNote:0, step:0, mel:4 };
-try { const pref = JSON.parse(localStorage.getItem('corazonMaiz_publico_audio') || '{}'); SND.on = pref.on ?? true; SND.musicOn = pref.music ?? true; } catch (e) {}
-function saveAudioPref() { try { localStorage.setItem('corazonMaiz_publico_audio', JSON.stringify({ on:SND.on, music:SND.musicOn })); } catch (e) {} }
+try { const pref = JSON.parse(localStorage.getItem('tlaxcallan_audio') || '{}'); SND.on = pref.on ?? true; SND.musicOn = pref.music ?? true; } catch (e) {}
+function saveAudioPref() { try { localStorage.setItem('tlaxcallan_audio', JSON.stringify({ on:SND.on, music:SND.musicOn })); } catch (e) {} }
 function audioInit() {
   if (SND.ctx) { if (SND.ctx.state === 'suspended') SND.ctx.resume(); return; }
   const A = window.AudioContext || window.webkitAudioContext;
@@ -29900,7 +29900,7 @@ for (const [nom, fn] of [['acceptItzel', acceptItzel], ['rejectItzel', rejectItz
    
   let hist28 = [], idb28 = null;
   try {
-    const rq = indexedDB.open('corazonMaiz_publico_hist', 1);
+    const rq = indexedDB.open('tlaxcallan_hist', 1);
     rq.onupgradeneeded = () => rq.result.createObjectStore('h', { keyPath:'at' });
     rq.onsuccess = () => {
       idb28 = rq.result;
@@ -44587,83 +44587,6 @@ FISH_TABLE.norte = [['arenque', 45], ['bacalao', 35], ['salmon', 20]];
 
 
 
-
-const _x04bb34 = {
-  explicito:/(?:·x|_x)[0-9a-f]{6}/i,
-  
-  menu:/(?:·x|_x)[0-9a-f]{6}/i,
-  menusCerrados:new Set(['r32Cierre', "_xf04c77", "_x52279f", 'cajon', "_x81a806", 'maratonElige', 'mercado', 'subasta', 'ropaIntima', 'r40Cuarto', "_x89be67", 'peleaTrans', "_x2383cc", "_xa45f5c", "_xf46228", 'especialidades', 'travesura']),
-};
-const esExplicito = t => typeof t === 'string' && _x04bb34.explicito.test(t);
-
-const _toastFamiliar = toast;
-toast = function (msg, col, t) { if (esExplicito(typeof msg === 'string' ? msg : '')) return; return _toastFamiliar(msg, col, t); };
-const _sayLineFamiliar = sayLine;
-sayLine = function (s, ...a) { if (esExplicito(s) || UI._x0ddf56) return; return _sayLineFamiliar(s, ...a); };
-
-for (const [id, sh] of Object.entries(SHOPS)) if (typeof sh?.rows === 'function') {
-  const base = sh.rows;
-  sh.rows = function (...a) { const r = base.apply(this, a); const mal = t => esExplicito(t) || (typeof t === 'string' && _x04bb34.menu.test(t)); return Array.isArray(r) ? r.filter(x => !mal(x?.name) && !mal(x?.desc)) : r; };
-}
-const _openMenuFamiliar = openMenu;
-openMenu = function (id, ...a) { if (_x04bb34.menusCerrados.has(id)) return toast("·xe2ac24", '#ffd9a8', 3); return _openMenuFamiliar(id, ...a); };
-
-const _xedfc75 = 4.2;
-const _xafeb83 = _x08c229;
-_x08c229 = function (...a) {
-  const r = _xafeb83(...a);
-  const m = UI.menu, pareja = (m === 'night' || m === 'love') && S.spouse ? VILLAGERS.find(v => v.name === S.spouse)?.look : null;
-  UI._x0ddf56 = { t:0, yo:NPC_LOOK.player, ella:pareja || (typeof _x601af7 === 'function' ? _x601af7()?.look : null) || NPC_LOOK.player, menu:m };
-  return r;
-};
-function _x77e05e() {
-  const c = UI._x0ddf56; if (!c) return; UI._x0ddf56 = null;
-  UI.herCame = true; UI.together = true;
-  try { if (UI._x0c7a68) _xace719(); } catch (e) { console.warn("·xffdf2c", e); }
-  if (["_x871ab5", 'night', 'love', 'affair'].includes(UI.menu) || UI._x0c7a68 || (UI.menu === 'shop' && _x04bb34.menusCerrados.has(UI.shopId))) { UI._x0c7a68 = null; UI.menu = null; }
-  _toastFamiliar("·x880a07", '#ffd0e0', 4);
-}
-function _x257cb0(dt) {
-  const c = UI._x0ddf56; c.t += dt;
-  const k = Math.min(1, c.t / _xedfc75), W = VW, H = VH, cx = W / 2, piso = H * 0.72;
-  rect('#1a1830', 0, 0, W, H); rect('#2a2440', 0, piso, W, H - piso);
-  rect('#3a3458', cx + 120, H * 0.18, 120, 100); rect('#c8d0f0', cx + 130, H * 0.2, 100, 80); circ('#fff6d0', cx + 200, H * 0.26, 16); rect('#3a3458', cx + 178, H * 0.2, 4, 80); 
-  const bx = cx - 40, by = piso - 10;
-  rect('#5a3a22', bx - 90, by - 60, 12, 70); rect('#5a3a22', bx + 78, by - 30, 12, 40); rect('#e8dcc4', bx - 80, by - 34, 170, 26); rect('#f4ecd8', bx - 74, by - 46, 44, 16); 
-  const camino = Math.min(1, k / 0.55), dentro = k > 0.6;
-  if (!dentro) for (const [look, off] of [[c.yo, -18], [c.ella, 18]]) {
-    const x = W * 0.12 + (bx - W * 0.12 - 20) * camino + off, paso = camino < 1 ? Math.sin(c.t * 12 + off) : 0;
-    ctx.save(); ctx.translate(x, piso + 6); ctx.scale(2.2, 2.2); drawPerson(0, 0, look, 'right', paso, ''); ctx.restore();
-  } else {
-    for (const [look, off] of [[c.yo, -44], [c.ella, -16]]) { ctx.save(); ctx.translate(bx + off, by + 22); ctx.scale(1.6, 1.6); ctx.beginPath(); ctx.rect(-16, -52, 32, 24); ctx.clip(); drawPerson(0, 0, look, 'down', 0, '', 0.01); ctx.restore(); } 
-    rect('#c0392b', bx - 78, by - 26, 166, 22); rect('#a02a20', bx - 78, by - 6, 166, 4); rect("·x33d107", bx - 78, by - 26, 166, 3); 
-    for (let i = 0; i < 3; i++) { const t = (c.t * 0.6 + i / 3) % 1; text('z', bx + 40 + t * 30, by - 60 - t * 40, 12 + t * 10, "·xd7f268", 'center'); }
-    circ('#ff8ab0', bx - 16, by - 70 + Math.sin(c.t * 3) * 3, 6); text('❤', bx - 16, by - 66, 12, '#ff8ab0', 'center');
-  }
-  if (k > 0.8) { ctx.fillStyle = "·xba0e0b"; ctx.fillRect(0, 0, W, H); }      
-  text("·x6b620e", cx, H * 0.1, 18, '#fff6e0', 'center');
-  text("·xf8036b", W - 16, H - 16, 12, "·x524851", 'right', false);
-  if (c.t >= _xedfc75) _x77e05e();
-}
-let _x535f50 = 0;
-const _drawMenusFamiliar = drawMenus;
-drawMenus = function (...a) {
-  if (UI.menu === 'shop' && _x04bb34.menusCerrados.has(UI.shopId)) UI.menu = null; 
-  if (!UI._x0ddf56) return _drawMenusFamiliar(...a);
-  const now = performance.now(), dt = Math.min(0.05, (now - (_x535f50 || now)) / 1000); _x535f50 = now;
-  ctx.save(); _x257cb0(dt); ctx.restore();
-};
-
-addEventListener('keydown', e => { if (!UI._x0ddf56) return; e.preventDefault(); e.stopImmediatePropagation(); if (!e.repeat && ['Enter', 'Escape', ' '].includes(e.key)) _x77e05e(); }, true);
-addEventListener('keyup', e => { if (UI._x0ddf56) { e.preventDefault(); e.stopImmediatePropagation(); } }, true);
-addEventListener('pointerdown', e => { if (!UI._x0ddf56) return; e.stopImmediatePropagation(); }, true);
-
-const _updateFamiliar = update;
-update = function (dt) { if (UI._x0ddf56) return; return _updateFamiliar(dt); };
-
-
-
-
 const TITULO_JUEGO = 'Corazón de Maíz';
 document.title = TITULO_JUEGO + (document.title.includes("·x66dc47") ? "·x734262" : '');
 const NOMBRES_LUGARES = [ 
@@ -45024,7 +44947,6 @@ drawPortrait = function (look, cx, cy, r) {
 
 
 
-
 const INTRO_ARCHIVO = 'corazon-de-maiz-intro.html';
 function verIntro(alTerminar) {
   if (document.getElementById('introCDM')) return;
@@ -45165,6 +45087,385 @@ function estadoEncargo(x, y, w) {
 }
 
 
+ 
+(function _x05e3c7() {
+  try {
+    if (window._x5f9266) return;
+    window._x5f9266 = true;
+
+    
+    const _caraCalor = caraBonita;
+    caraBonita = function (look, f, ex, ey, o) {
+      const r = _caraCalor(look, f, ex, ey, o);
+      try {
+        if (inking || !(UI._x0c7a68 || UI._x22f2b0) || !o || !o.fem) return r;
+        const P = UI._xc28808 || { her:0 };
+        const heat = Math.min(1, (P.her || 0) / 76) + Math.min(0.32, (UI.herPeak || 0) * 0.32);
+        if (heat <= 0.04) return r;
+        const a = Math.min(0.46, heat * 0.4) * (0.84 + 0.16 * Math.sin(T * 2.3));
+        const halo = (cx, cy, rad, col) => {
+          const g = ctx.createRadialGradient(cx, cy, 0.05, cx, cy, rad);
+          g.addColorStop(0, 'rgba(' + col + ',' + a + ')'); g.addColorStop(1, 'rgba(' + col + ',0)');
+          ctx.fillStyle = g; ctx.beginPath(); ctx.arc(cx, cy, rad, 0, Math.PI * 2); ctx.fill();
+        };
+        halo(f * 3.15, 2.75, 2.7, '255,92,108');
+        halo(f * 5.25, 2.3, 1.8, '255,108,108');
+        halo(-f * 1.15, 1.15, 1.7, '255,102,102');
+        if (heat > 0.42) halo(f * 1.35, 0.1, 5.4, '255,118,92');
+        ctx.fillStyle = "·x88a4b6" + (0.09 + heat * 0.2) + ')';
+        ctx.beginPath(); ctx.ellipse(f * 1.15, -2.7, 1.9, 0.55, -0.25, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.ellipse(f * 3.95, 1.25, 1.15, 0.42, 0.3, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.ellipse(f * 5.15, 0.45, 0.42, 1.05, 0, 0, Math.PI * 2); ctx.fill();
+      } catch (e) { console.warn("·x5e2177", e); }
+      return r;
+    };
+
+    
+    const _peloCalor = peloSuelto;
+    peloSuelto = function (look, x, f) {
+      const r = _peloCalor(look, x, f);
+      try {
+        if (inking || !look || !look.hair || look.goddess) return r;
+        const hr = look.hair;
+        const A = globalThis.ANIM_VIVA_ESTADO || {};
+        const hy = (A.hair && A.hair.y) || 0, hv = (A.hair && A.hair.v) || 0;
+        const pk = Math.max(0, Math.min(2, UI.herPeak || 0));
+        ctx.save();
+        ctx.lineCap = 'round';
+        for (let i = 0; i < 4; i++) {
+          const bx = -f * (2.4 + i * 1.2), by = -3.4 + i * 1.55;
+          const sw = Math.sin(T * 1.75 + i * 1.35 + x * 0.12) * 1.15 + hy * (1.35 + i * 0.25) + hv * 0.42;
+          const drop = 6.2 + i * 1.7 + pk * (1.6 + i * 0.5) + Math.abs(hy) * 0.8;
+          ctx.strokeStyle = anMix(hr, -0.12 - i * 0.03); ctx.lineWidth = 1.15 - i * 0.16;
+          ctx.beginPath(); ctx.moveTo(bx, by);
+          ctx.quadraticCurveTo(bx - f * (1.15 + i * 0.35) + sw * 0.55, by + drop * 0.55, bx - f * (1.6 + i * 0.55) + sw, by + drop);
+          ctx.stroke();
+          ctx.strokeStyle = "·x0a4ef9"; ctx.lineWidth = 0.32;
+          ctx.beginPath(); ctx.moveTo(bx - f * 0.25, by + 0.4);
+          ctx.quadraticCurveTo(bx - f * (1.15 + i * 0.35) + sw * 0.55, by + drop * 0.55, bx - f * (1.5 + i * 0.5) + sw * 0.92, by + drop * 0.9);
+          ctx.stroke();
+        }
+        if (pk > 0.22) for (let i = 0; i < 3; i++) {
+          const a2 = Math.min(0.5, pk * 0.34), sx = -f * (2 + i * 2.1), sy = -4.2 - i * 1.1 - pk * i * 0.7;
+          ctx.strokeStyle = 'rgba(' + (i % 2 ? '255,236,214' : '240,214,190') + ',' + (a2 * (0.5 + 0.3 * Math.sin(T * 3 + i * 2))) + ')';
+          ctx.lineWidth = 0.55;
+          ctx.beginPath(); ctx.moveTo(sx, sy);
+          ctx.quadraticCurveTo(sx - f * (2.2 + i), sy - 1.6 - pk, sx - f * (3.4 + i * 1.2) - Math.sin(T * 4 + i) * 1.2, sy - 2.4 - pk * 1.7);
+          ctx.stroke();
+        }
+        ctx.restore();
+      } catch (e) { console.warn("·x1ef939", e); }
+      return r;
+    };
+
+    const _animPelo = globalThis.ANIM_PELO;
+    globalThis.ANIM_PELO = look => {
+      const b = _animPelo ? _animPelo(look) : 0;
+      return b * 1.28 + Math.sin(T * 2.1) * 0.16 + (UI.herPeak || 0) * 0.5;
+    };
+
+    
+    const _x1c8bc0 = _x4bbb92;
+    _x4bbb92 = function (...a) {};
+  } catch (e) { console.warn("·xa61cfc", e); }
+})();
+
+
+
+ 
+(function iconosYFondos() {
+  try {
+    if (window.__iconosYFondosOk) return;
+    window.__iconosYFondosOk = true;
+
+    const ICONOS = {
+      maiz: "·x9715ee",
+      frijol: "·x5d4e0a",
+      chile: "·xb900c6",
+      calabaza: "·x46e0f7",
+    };
+    const FONDOS = {
+      cuarto: "·x4e7a21",
+      recamara: "·x4e7a21",
+      milpa: "·x4db9d8",
+      temazcal: "·x20d64c",
+      lago: "·xc9d03b",
+      templo: "·xce6331",
+      palacio: "·x3ec95c",
+      mictlan: "·xf42c59",
+      castillo: "·x4ae952",
+      jardinHumo: "·x9177ec",
+      tumba: "·xe50d63",
+      tormenta: "·xae6b48",
+      cdmx: "·xaefaae",
+    };
+
+    const cache = {};
+    function cargarImg(src) {
+      if (cache[src]) return cache[src];
+      const im = new Image();
+      im.src = src;
+      cache[src] = im;
+      return im;
+    }
+    
+    for (const k in ICONOS) cargarImg(ICONOS[k]);
+    for (const k in FONDOS) cargarImg(FONDOS[k]);
+
+    globalThis.iconoDe = id => {
+      const src = ICONOS[id]; if (!src) return null;
+      const im = cache[src]; return (im && im.complete && im.naturalWidth) ? im : null;
+    };
+    globalThis.fondoDe = place => {
+      const src = FONDOS[place]; if (!src) return null;
+      const im = cache[src]; return (im && im.complete && im.naturalWidth) ? im : null;
+    };
+
+    
+    const _xfff20d = _x4bbb92;
+    _x4bbb92 = function (...a) {};
+
+    
+    const _drawTitleBackdropFondo = drawTitleBackdrop;
+    drawTitleBackdrop = function () {
+      _drawTitleBackdropFondo();
+      try {
+        const im = null; 
+        if (!im || !im.complete || !im.naturalWidth) return;
+        ctx.save();
+        ctx.globalAlpha = 0.25;
+        ctx.globalCompositeOperation = 'screen';
+        const iw = im.naturalWidth, ih = im.naturalHeight;
+        const k = Math.max(VW / iw, VH / ih);
+        const dw = iw * k, dh = ih * k;
+        ctx.drawImage(im, (VW - dw) / 2, (VH - dh) / 2, dw, dh);
+        ctx.restore();
+      } catch (e) { console.warn("·x7375e5", e); }
+    };
+
+    console.log("·x30a16c" + Object.keys(ICONOS).length + "·x9be227" + Object.keys(FONDOS).length + "·x3103c4");
+  } catch (e) { console.warn("·xb2ea59", e); }
+})();
+
+
+
+ 
+(function texturasPielTela() {
+  try {
+    if (window.__texturasPielTelaOk) return;
+    window.__texturasPielTelaOk = true;
+
+    const IMGS = { piel: "·x443fb2", tela: "·xa807e8" };
+    const cache = {};
+    function cargar(src) {
+      if (cache[src]) return cache[src];
+      const im = new Image(); im.src = src; cache[src] = im; return im;
+    }
+    for (const k in IMGS) cargar(IMGS[k]);
+
+    globalThis.texturaPiel = () => { const im = cache[IMGS.piel]; return (im && im.complete && im.naturalWidth) ? im : null; };
+    globalThis.texturaTela = () => { const im = cache[IMGS.tela]; return (im && im.complete && im.naturalWidth) ? im : null; };
+
+    
+    const _xff1d26 = _x4bbb92;
+    _x4bbb92 = function (...a) {};
+    console.log("·xc84fa8");
+  } catch (e) { console.warn('[TEXTURAS]', e); }
+})();
+
+
+
+ 
+(function sudorMicroOnda() {
+  try {
+    if (window.__sudorMicroOndaOk) return;
+    window.__sudorMicroOndaOk = true;
+
+    
+    const _caraMicro = caraBonita;
+    caraBonita = function (look, f, ex, ey, o) {
+      const r = _caraMicro(look, f, ex, ey, o);
+      try {
+        if (inking || !(UI._x0c7a68 || UI._x22f2b0) || !o || !o.fem) return r;
+        const P = UI._xc28808 || { her:0 };
+        const hot = Math.min(1, (P.her || 0) / 100);
+        const peak = Math.min(1, UI.herPeak || 0);
+        
+        if (hot > 0.2) {
+          ctx.save();
+          ctx.globalAlpha = hot * 0.6;
+          ctx.strokeStyle = anMix(look.hair || '#1a1410', 0.1);
+          ctx.lineWidth = 0.35;
+          ctx.beginPath();
+          ctx.moveTo(ex - f * 1.5, -2.65 - hot * 0.6);
+          ctx.quadraticCurveTo(ex, -3.1 - hot * 0.8, ex + f * 1.75, -2.7 - hot * 0.5);
+          ctx.stroke();
+          ctx.restore();
+        }
+        
+        if (hot > 0.4 && !o.open) {
+          ctx.save();
+          ctx.globalAlpha = (hot - 0.4) * 0.5;
+          ctx.fillStyle = '#3a0e10';
+          ctx.beginPath();
+          ctx.ellipse(f * 5.0, 4.2, 0.45 + hot * 0.2, 0.2 + hot * 0.15, 0, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        }
+        
+        if (peak > 0.3) {
+          ctx.save();
+          ctx.globalAlpha = peak * 0.4;
+          ctx.fillStyle = "·x454e68";
+          ctx.beginPath();
+          ctx.arc(f * 3.2 + f * 0.22, -0.6, 0.9 + peak * 0.3, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        }
+        
+        if (peak > 0.6) {
+          ctx.save();
+          ctx.globalAlpha = (peak - 0.6) * 0.5;
+          ctx.strokeStyle = "·x24b563";
+          ctx.lineWidth = 0.3;
+          ctx.beginPath();
+          ctx.moveTo(f * 1.8, -2.9); ctx.lineTo(f * 2.5, -2.6);
+          ctx.moveTo(f * 4.5, -2.7); ctx.lineTo(f * 3.8, -2.4);
+          ctx.stroke();
+          ctx.restore();
+        }
+      } catch (e) { console.warn('[MICRO-EXP]', e); }
+      return r;
+    };
+
+    
+    const sudorImg = new Image(); sudorImg.src = "·xf96c31";
+    const gotas = [];
+    let ultimaGota = 0;
+
+    const _xff90e3 = _x4bbb92;
+    _x4bbb92 = function (...a) {};
+
+    
+    const ondaImg = new Image(); ondaImg.src = "·x42d712";
+    let ondaT = 0, ondaActiva = false;
+
+    
+    const _animPersonOnda = globalThis.ANIM_PERSON;
+    globalThis.ANIM_PERSON = (look, J, main) => {
+      if (_animPersonOnda) J = _animPersonOnda(look, J, main);
+      try {
+        if (UI.herPeak > 0 && !ondaActiva) { ondaActiva = true; ondaT = T; }
+        if (ondaActiva && T - ondaT > 2) ondaActiva = false;
+      } catch (e) {}
+      return J;
+    };
+
+    
+    const _x99a4e7 = _x4bbb92;
+    _x4bbb92 = function (...a) {};
+
+    console.log("·x4f217d");
+  } catch (e) { console.warn("·x56a45b", e); }
+})();
+
+
+
+ 
+(function mejorasCodigo() {
+  try {
+    if (window.__mejorasCodigoOk) return;
+    window.__mejorasCodigoOk = true;
+
+    
+    
+    const _animPersonResp = globalThis.ANIM_PERSON;
+    globalThis.ANIM_PERSON = (look, J, main) => {
+      if (_animPersonResp) J = _animPersonResp(look, J, main);
+      try {
+        if (!J || !J.sh || !J.hip || !main) return J;
+        const P = UI._xc28808 || { her:0 };
+        const hot = Math.min(1, (P.her || 0) / 100);
+        const peak = Math.min(1, UI.herPeak || 0);
+        
+        const amp = 0.16 + hot * 0.25 + peak * 0.15;
+        const breath = Math.sin((UI._x69476e || 0) * 0.5 + (look === (UI._x601af7?.look) ? 0 : Math.PI)) * amp;
+        if (breath && J.sh && J.hip) {
+          const shift = (pt) => pt && [pt[0], pt[1] + breath, ...pt.slice(2)];
+          J.sh = shift(J.sh); J.hip = shift(J.hip); J.head = shift(J.head);
+          if (J.butt) J.butt = shift(J.butt);
+          for (const k of ['armF', 'armN', 'legF', 'legN']) if (J[k]) J[k] = J[k].map(shift);
+          if (J.bustJ !== undefined) J.bustJ = (J.bustJ || 0) + breath * 0.6;
+        }
+      } catch (e) {}
+      return J;
+    };
+
+    
+    const _caraOjos = caraBonita;
+    caraBonita = function (look, f, ex, ey, o) {
+      const r = _caraOjos(look, f, ex, ey, o);
+      try {
+        if (inking || !(UI._x0c7a68 || UI._x22f2b0) || !o || !o.fem || o.closed) return r;
+        
+        const shiftX = f * (0.08 + Math.min(0.15, ((UI._xc28808 && UI._xc28808.her) || 0) / 400));
+        
+        const irisX = f * 3.2 + f * 0.22 + shiftX;
+        ctx.save();
+        ctx.globalAlpha = 0.25;
+        ctx.fillStyle = "·x380a83";
+        ctx.beginPath(); ctx.arc(irisX, -0.65, 0.18, 0, Math.PI * 2); ctx.fill();
+        ctx.restore();
+      } catch (e) {}
+      return r;
+    };
+
+    
+    const _animFrameShake = globalThis.ANIM_FRAME;
+    globalThis.ANIM_FRAME = act => {
+      if (_animFrameShake) _animFrameShake(act);
+      try {
+        if (!UI._x24aaa9 || !UI._x0c7a68) return;
+        const P = UI._xc28808 || { her:0 };
+        const hot = Math.min(1, (P.her || 0) / 100);
+        const peak = Math.min(1, UI.herPeak || 0);
+        
+        const intensity = hot * 0.4 + peak * 1.2;
+        if (intensity > 0.1) {
+          const sx = (Math.random() - 0.5) * intensity * 1.5;
+          const sy = (Math.random() - 0.5) * intensity * 1.2;
+          UI._x24aaa9.x = (UI._x24aaa9.x || 0) + sx * 0.3;
+          UI._x24aaa9.y = (UI._x24aaa9.y || 0) + sy * 0.3;
+        }
+      } catch (e) {}
+    };
+
+    
+    const _x7b3495 = _x4bbb92;
+    _x4bbb92 = function (...a) {};
+
+    console.log("·xf59544");
+  } catch (e) { console.warn("·x1ac3a7", e); }
+})();
+
+
+
+ 
+(function mejorasAltaPrioridad() {
+  try {
+    if (window.__mejorasAltaPrioridadOk) return;
+    window.__mejorasAltaPrioridadOk = true;
+
+    const st = UI._x61a217 ??= { me:0, her:0, shake:0 };
+
+    const _x6ad877 = _x4bbb92;
+    _x4bbb92 = function (...a) {};
+    console.log("·xcb8d67");
+  } catch (e) { console.warn("·x60299f", e); }
+})();
+
+
+
 
 
 
@@ -45185,6 +45486,7 @@ function estadoEncargo(x, y, w) {
   
   Promise.all(Object.values(IMG).map(im => im.decode?.().catch(() => {}))).then(() => { if (typeof ITEM_ICON_CACHE !== 'undefined') ITEM_ICON_CACHE.clear(); });
 })();
+
 
 
 
@@ -46737,6 +47039,390 @@ drawBuilding = function (b) {
   _drawBuildingPueblos(b);
   if (b.t === 'fountain' && regionCdm(b.x, b.y) === 'tlax') momoztliExtraCdm(b);
 };
+
+ 
+(function mejorasRecuperadasConsolidado() {
+  try {
+    if (window.__mejorasRecuperadasConsolidadoOk) return;
+    window.__mejorasRecuperadasConsolidadoOk = true;
+
+    
+    const respParticulas = [];
+    let ultimaResp = 0;
+    const _xc0c9bb = _x4bbb92;
+    _x4bbb92 = function (...a) {};
+
+    
+    const _drawPersonSombra = drawPerson;
+    drawPerson = function (x, y, o, dir, step, name, bob) {
+      const r = _drawPersonSombra(x, y, o, dir, step, name, bob);
+      try {
+        if (inking || !o || !name || UI.menu || UI._x0c7a68 || UI._x22f2b0) return r;
+        const hora = (S.time || 12 * 60) / 60;
+        const t = Math.max(0, Math.min(1, (hora - 6) / 12));
+        const elev = Math.sin(t * Math.PI);
+        const shadowLen = 4 + (1 - Math.max(0, elev)) * 10;
+        const shadowAlpha = 0.12 + (1 - Math.max(0, elev)) * 0.08;
+        const warm = Math.max(0, 1 - elev * 2);
+        const sc = warm > 0.5 ? "·x843ef9" : "·x5bf097";
+        ctx.save(); ctx.translate(x, y + 2); ctx.scale(1, 0.3);
+        ctx.fillStyle = sc + shadowAlpha + ')';
+        ctx.beginPath(); ctx.ellipse(0, 0, 10 + shadowLen * 0.3, 6, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.restore();
+      } catch (e) {}
+      return r;
+    };
+
+    
+    const _drawPersonIdle = drawPerson;
+    drawPerson = function (x, y, o, dir, step, name, bob) {
+      let idleBob = 0;
+      try {
+        if (o && name && !inking && !UI.menu && !(UI._x0c7a68 || UI._x22f2b0)) {
+          const phase = T * 1.5 + (name.charCodeAt(0) || 0) * 0.7;
+          idleBob = Math.sin(phase) * 0.8 + Math.sin(phase * 0.7) * 0.4;
+        }
+      } catch (e) {}
+      return _drawPersonIdle(x, y + idleBob, o, dir, step, name, bob);
+    };
+
+    
+    const _drawWorldClima = drawWorld;
+    drawWorld = function (...a) {
+      const r = _drawWorldClima(...a);
+      try {
+        if (inking || !S || !S.player || UI.menu === 'prologo') return r;
+        const [tx, ty] = playerTile();
+        const zone = (typeof globalThis.zone === 'function') ? globalThis.zone(tx, ty) : '';
+        const isNorte = zone === 'norte';
+        const isLluvia = S.rainToday;
+        ctx.save(); ctx.setTransform(cv.width / VW, 0, 0, cv.width / VW, 0, 0);
+        if (isLluvia && !isNorte) {
+          for (let i = 0; i < 60; i++) {
+            const x = (i * 97.3 + Math.sin(T * 0.5 + i) * 30) % VW;
+            const y = (i * 53.7 + T * (200 + i % 5 * 30)) % VH;
+            ctx.strokeStyle = 'rgba(180,200,230,0.3)'; ctx.lineWidth = 1;
+            ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x - 2, y + 8); ctx.stroke();
+          }
+        }
+        if (isNorte) {
+          for (let i = 0; i < 100; i++) {
+            const sp = 30 + (i % 7) * 8;
+            const x = (i * 97.3 + Math.sin(T * 0.8 + i) * 18) % VW;
+            const y = (i * 53.7 + T * sp) % VH;
+            ctx.fillStyle = 'rgba(255,255,255,0.7)';
+            ctx.beginPath(); ctx.arc(x, y, 1 + (i % 3) * 0.5, 0, Math.PI * 2); ctx.fill();
+          }
+        }
+        if (S.windStorm) {
+          for (let i = 0; i < 30; i++) {
+            const x = (i * 137.3 + T * 200) % VW;
+            const y = (i * 73.7) % VH;
+            ctx.strokeStyle = 'rgba(200,220,255,0.2)'; ctx.lineWidth = 1;
+            ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + 15, y + 2); ctx.stroke();
+          }
+        }
+        ctx.restore();
+      } catch (e) {}
+      return r;
+    };
+
+    
+    if (!S.visited) S.visited = {};
+    const _updateNiebla = update;
+    update = function (dt) {
+      const r = _updateNiebla(dt);
+      try {
+        if (!S || !S.player) return r;
+        const tx = Math.floor(S.player.x / TS), ty = Math.floor(S.player.y / TS);
+        for (let dy = -6; dy <= 6; dy++) for (let dx = -6; dx <= 6; dx++) {
+          const x = tx + dx, y = ty + dy;
+          if (x >= 0 && y >= 0 && x < MW && y < WORLD_H) S.visited[x + ',' + y] = true;
+        }
+      } catch (e) {}
+      return r;
+    };
+
+    
+    if (UI.photoMode === undefined) UI.photoMode = false;
+    if (UI.photoFilter === undefined) UI.photoFilter = 0;
+    const FILTROS_FOTO = ['normal', 'sepia', 'blanco y negro', 'viñeta', 'cálido'];
+    const FILTRO_CSS = ['', 'sepia(0.9)', 'grayscale(1)', 'contrast(1.1) brightness(0.95)', 'sepia(0.3) saturate(1.4) brightness(1.05)'];
+    addEventListener('keydown', e => {
+      if (e.key === 'F8') {
+        if (UI.menu) return;
+        e.preventDefault();
+        UI.photoMode = !UI.photoMode;
+        toast(UI.photoMode ? '📸 Modo foto: 1-5 filtro · Enter capturar · Esc salir' : '📸 Modo foto desactivado', '#ffd9a8', 4);
+      }
+      if (!UI.photoMode) return;
+      if (e.key >= '1' && e.key <= '5') { UI.photoFilter = parseInt(e.key) - 1; toast('📸 Filtro: ' + FILTROS_FOTO[UI.photoFilter], '#ffd9a8', 2); }
+      if (e.key === 'Escape') { UI.photoMode = false; toast('📸 Modo foto desactivado', '#ffd9a8', 2); }
+      if (e.key === 'Enter') {
+        const canvas = document.querySelector('canvas');
+        if (!canvas) return;
+        const off = document.createElement('canvas');
+        off.width = canvas.width; off.height = canvas.height;
+        const octx = off.getContext('2d');
+        octx.filter = FILTRO_CSS[UI.photoFilter] || '';
+        octx.drawImage(canvas, 0, 0);
+        octx.filter = 'none';
+        if (UI.photoFilter === 3) {
+          const g = octx.createRadialGradient(off.width/2, off.height/2, off.width*0.3, off.width/2, off.height/2, off.width*0.7);
+          g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(1, 'rgba(0,0,0,0.55)');
+          octx.fillStyle = g; octx.fillRect(0, 0, off.width, off.height);
+        }
+        off.toBlob(b => {
+          const url = URL.createObjectURL(b);
+          const a = document.createElement('a');
+          a.href = url; a.download = 'tlaxcallan_foto_' + S.day + '_' + Date.now() + '.png';
+          a.click(); URL.revokeObjectURL(url);
+          toast('📸 Foto guardada', '#c8f7a0', 3);
+        });
+      }
+    });
+
+    
+    function objetivoCercano() {
+      const px = S.player.x, py = S.player.y;
+      let best = null, bestD = Infinity;
+      for (const sh of (S.shrines || [])) {
+        if (sh.found) continue;
+        const cx = (sh.x + 1.5) * TS, cy = (sh.y + 1.5) * TS;
+        const d = (cx - px) ** 2 + (cy - py) ** 2;
+        if (d < bestD) { bestD = d; best = { x: cx, y: cy, label: 'Santuario' }; }
+      }
+      if (!best) best = { x: (FARM_OLD + 5) * TS, y: 8 * TS, label: 'Tlaxcallan' };
+      return best;
+    }
+    const _drawWorldInd = drawWorld;
+    drawWorld = function (...a) {
+      const r = _drawWorldInd(...a);
+      try {
+        if (inking || UI.menu || UI.home || UI.edif || UI._x0c7a68 || UI._x22f2b0) return r;
+        if (!S || !S.player) return r;
+        const obj = objetivoCercano();
+        if (!obj) return r;
+        const px = S.player.x, py = S.player.y;
+        const dx = obj.x - px, dy = obj.y - py;
+        const dist = Math.hypot(dx, dy);
+        if (dist < 120) return r;
+        const ang = Math.atan2(dy, dx);
+        const cx = VW / 2, cy = VH / 2;
+        const rEdge = Math.min(VW, VH) / 2 - 30;
+        const ax = cx + Math.cos(ang) * rEdge;
+        const ay = cy + Math.sin(ang) * rEdge;
+        ctx.save(); ctx.setTransform(cv.width / VW, 0, 0, cv.width / VW, 0, 0);
+        ctx.translate(ax, ay); ctx.rotate(ang);
+        ctx.fillStyle = 'rgba(255,220,120,0.9)';
+        ctx.beginPath(); ctx.moveTo(14, 0); ctx.lineTo(-8, -8); ctx.lineTo(-4, 0); ctx.lineTo(-8, 8); ctx.closePath(); ctx.fill();
+        ctx.restore();
+        ctx.save(); ctx.setTransform(cv.width / VW, 0, 0, cv.width / VW, 0, 0);
+        ctx.fillStyle = 'rgba(0,0,0,0.6)';
+        const tw = ctx.measureText(obj.label).width + 12;
+        ctx.fillRect(ax - tw/2, ay + 14, tw, 16);
+        ctx.fillStyle = '#ffd9a8'; ctx.font = 'bold 11px ' + FONT; ctx.textAlign = 'center';
+        ctx.fillText(obj.label, ax, ay + 26);
+        ctx.restore();
+      } catch (e) {}
+      return r;
+    };
+
+    
+    const _drawWorldAura = drawWorld;
+    drawWorld = function (...a) {
+      const r = _drawWorldAura(...a);
+      try {
+        if (inking || !S || UI.menu || UI.home || UI.edif || UI._x0c7a68 || UI._x22f2b0) return r;
+        if (typeof hijasActivas !== 'function') return r;
+        const list = hijasActivas();
+        ctx.save(); ctx.setTransform(cv.width / VW, 0, 0, cv.width / VW, 0, 0);
+        for (const d of list) {
+          const col = d.col || '#c080ff';
+          const g = ctx.createRadialGradient(d.x, d.y - 10, 2, d.x, d.y - 10, 30);
+          g.addColorStop(0, col + '55'); g.addColorStop(1, col + '00');
+          ctx.fillStyle = g; ctx.beginPath(); ctx.arc(d.x, d.y - 10, 30, 0, Math.PI * 2); ctx.fill();
+          for (let i = 0; i < 4; i++) {
+            const ang = T * 1.5 + i * Math.PI / 2 + (d.i || 0);
+            const rad = 14 + Math.sin(T * 2 + i) * 4;
+            const px = d.x + Math.cos(ang) * rad;
+            const py = d.y - 10 + Math.sin(ang) * rad * 0.5;
+            ctx.fillStyle = col; ctx.globalAlpha = 0.5 + 0.5 * Math.sin(T * 3 + i);
+            ctx.beginPath(); ctx.arc(px, py, 1.5, 0, Math.PI * 2); ctx.fill();
+          }
+          ctx.globalAlpha = 1;
+        }
+        ctx.restore();
+      } catch (e) {}
+      return r;
+    };
+
+    
+    let ultimoPaso = { x:0, y:0, t:0 };
+    const _updatePasos = update;
+    update = function (dt) {
+      const r = _updatePasos(dt);
+      try {
+        if (!SND.ctx || !SND.on || !S || !S.player) return r;
+        if (UI.menu || UI.paused || UI._x0c7a68 || UI._x22f2b0) return r;
+        const p = S.player;
+        const dist = Math.hypot(p.x - ultimoPaso.x, p.y - ultimoPaso.y);
+        if (dist < 18) return r;
+        if (T - ultimoPaso.t < 0.28) return r;
+        ultimoPaso = { x: p.x, y: p.y, t: T };
+        const tx = Math.floor(p.x / TS), ty = Math.floor(p.y / TS);
+        const g = S.ground?.[ty]?.[tx];
+        const z = (typeof globalThis.zone === 'function') ? globalThis.zone(tx, ty) : '';
+        let vol = 0.05, freq = 180, type = 'triangle', dur = 0.06;
+        if (g === 2 || g === 13) { vol = 0.07; freq = 600; type = 'sine'; dur = 0.08; }
+        else if (g === 4 || g === 3 || g === 5 || g === 6) { vol = 0.06; freq = 260; type = 'square'; dur = 0.05; }
+        else if (g === 7) { vol = 0.04; freq = 400; type = 'sawtooth'; dur = 0.07; }
+        else if (g === 10 || g === 12 || z === 'nieve') { vol = 0.03; freq = 900; type = 'sine'; dur = 0.1; }
+        else { vol = 0.045; freq = 220; type = 'triangle'; dur = 0.06; }
+        if (SND.on) tone(freq + Math.random() * 40, dur, { type, vol, bus: SND.sfx });
+      } catch (e) {}
+      return r;
+    };
+
+    
+    const _drawAnimeCard = drawAnimeCard;
+    drawAnimeCard = function (x, y, w, h, c) {
+      ctx.save();
+      const breath = 1 + Math.sin(T * 1.6 + (c?.name?.charCodeAt(0) || 0) * 0.7) * 0.008;
+      const bob = Math.sin(T * 1.6 + (c?.name?.charCodeAt(0) || 0) * 0.7) * 1.2;
+      ctx.translate(x + w/2, y + h/2); ctx.scale(breath, breath);
+      ctx.translate(-(x + w/2), -(y + h/2) + bob);
+      const r = _drawAnimeCard(x, y, w, h, c);
+      ctx.restore();
+      try {
+        const im = portraitOf(c?.name, !!c?.look?.goddess);
+        if (im && Math.sin(T * 0.15 + (c?.name?.charCodeAt(0) || 0)) > 0.985) {
+          ctx.save(); ctx.globalAlpha = 0.35; ctx.fillStyle = '#1a1424';
+          const eyeY = y + h * 0.32;
+          ctx.fillRect(x + w*0.25, eyeY, w*0.18, 3);
+          ctx.fillRect(x + w*0.57, eyeY, w*0.18, 3);
+          ctx.restore();
+        }
+      } catch (e) {}
+      return r;
+    };
+
+    
+    if (S.pet && !Array.isArray(S.pet.tricks)) S.pet.tricks = [];
+    const TRUCOS_PET = ['sentado', 'dar la pata', 'traer', 'voltereta'];
+    let trucoActivo = null, trucoHasta = 0;
+    addEventListener('keydown', e => {
+      if (e.key === 'F9' && !UI.menu && S.pet) {
+        const p = S.player, pt = S.pet;
+        if (Math.hypot(p.x - pt.x, p.y - pt.y) > 60) { toast('Acércate a tu mascota', '#ffd9a8', 2); return; }
+        e.preventDefault();
+        const learned = S.pet.tricks || [];
+        const next = TRUCOS_PET.find(t => !learned.includes(t));
+        if (next) { learned.push(next); S.pet.tricks = learned; toast('🐾 ¡' + S.pet.name + ' aprendió "' + next + '"!', '#c8f7a0', 4); }
+        else { const t = TRUCOS_PET[Math.floor(Math.random() * TRUCOS_PET.length)]; trucoActivo = t; trucoHasta = T + 2.5; toast('🐾 ' + S.pet.name + ' hace "' + t + '"', '#ffd0e0', 2); }
+      }
+    });
+
+    
+    if (S.epidemiaActiva === undefined) S.epidemiaActiva = false;
+    if (S.epidemiaCurada === undefined) S.epidemiaCurada = false;
+    const _updateEpi = update;
+    update = function (dt) {
+      const r = _updateEpi(dt);
+      try {
+        if (!S || !S.time || UI.menu) return r;
+        if (!S.epidemiaCurada && !S.epidemiaActiva && S.day >= 15 && S.day % 30 === 0 && S.time >= 9 * 60 && S.time < 9 * 60 + 10) {
+          S.epidemiaActiva = true;
+          toast('🤒 ¡Una plaga golpea el pueblo! Consigue hierbas en el bosque.', '#ffb3b3', 8);
+          try { sfx('thunder'); } catch (e) {}
+        }
+        if (S.epidemiaActiva && !S.epidemiaPenalizada && S.maxE > 100) { S.epidemiaPenalizada = true; S.maxE = Math.max(100, S.maxE - 60); }
+        if (S.epidemiaActiva && (S.inv?.hierba_med || 0) >= 3) {
+          S.inv.hierba_med -= 3; S.epidemiaActiva = false; S.epidemiaCurada = true; S.epidemiaPenalizada = false;
+          S.maxE = Math.min(270, S.maxE + 60); S.money += 200;
+          addHonor(5, 'curaste la plaga del pueblo');
+          toast('🌿 ¡Curaste la plaga con hierbas! +200 cacao', '#c8f7a0', 7);
+        }
+      } catch (e) {}
+      return r;
+    };
+
+    
+    if (!Array.isArray(UI.mapPins)) UI.mapPins = [];
+    const _pointerDownPin = pointerDown;
+    pointerDown = function (px, py, button) {
+      if (UI.menu === 'map' && button === 2 && window.event?.shiftKey) {
+        const w = VW - 30, sc = Math.min((w - 40)/MW, (VH - 140)/WORLD_H), mw = MW*sc, mh = WORLD_H*sc;
+        const [x, y] = dialog(w, mh + 130), mx = x + (w - mw)/2, my = y + 56;
+        const tx = Math.floor((px - mx)/sc), ty = Math.floor((py - my)/sc);
+        if (tx >= 0 && ty >= 0 && tx < MW && ty < WORLD_H) {
+          UI.mapPins.push({ x: tx, y: ty, color: '#ff6b6b', label: 'Pin ' + (UI.mapPins.length + 1) });
+          toast('📌 Pin colocado en (' + tx + ', ' + ty + ')', '#c8f7a0', 2);
+          return;
+        }
+      }
+      return _pointerDownPin(px, py, button);
+    };
+
+    
+    const PREFS_A11Y_KEY = 'tlaxcallan_a11y';
+    function loadA11y() { try { return JSON.parse(localStorage.getItem(PREFS_A11Y_KEY) || '{}'); } catch (e) { return {}; } }
+    function saveA11y(p) { try { localStorage.setItem(PREFS_A11Y_KEY, JSON.stringify(p)); } catch (e) {} }
+    const a11y = Object.assign({ colorblind: 'none', highContrast: false }, loadA11y());
+    if (!document.getElementById('a11y-svg-filters')) {
+      const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      svg.id = 'a11y-svg-filters'; svg.setAttribute('style', 'position:absolute;width:0;height:0');
+      svg.innerHTML = '<defs><filter id="cb-protanopia"><feColorMatrix type="matrix" values="0.567,0.433,0,0,0  0.558,0.442,0,0,0  0,0.242,0.758,0,0  0,0,0,1,0"/></filter><filter id="cb-deuteranopia"><feColorMatrix type="matrix" values="0.625,0.375,0,0,0  0.7,0.3,0,0,0  0,0.3,0.7,0,0  0,0,0,1,0"/></filter><filter id="cb-tritanopia"><feColorMatrix type="matrix" values="0.95,0.05,0,0,0  0,0.433,0.567,0,0  0,0.475,0.525,0,0  0,0,0,1,0"/></filter></defs>';
+      document.body.appendChild(svg);
+    }
+    function aplicarA11y() {
+      const canvas = document.querySelector('canvas');
+      if (!canvas) return;
+      const FILTROS_CB = { none: '', protanopia: 'url(#cb-protanopia)', deuteranopia: 'url(#cb-deuteranopia)', tritanopia: 'url(#cb-tritanopia)' };
+      let f = FILTROS_CB[a11y.colorblind] || '';
+      if (a11y.highContrast) f = (f ? f + ' ' : '') + 'contrast(1.35) saturate(1.2)';
+      canvas.style.filter = f;
+      saveA11y(a11y);
+    }
+    aplicarA11y();
+    const MODOS_CB = ['none', 'protanopia', 'deuteranopia', 'tritanopia'];
+    addEventListener('keydown', e => {
+      if (e.key === 'F6') { const i = MODOS_CB.indexOf(a11y.colorblind); a11y.colorblind = MODOS_CB[(i + 1) % MODOS_CB.length]; aplicarA11y(); toast('👁 Daltonismo: ' + a11y.colorblind, '#c8f7a0', 3); }
+      if (e.key === 'F7') { a11y.highContrast = !a11y.highContrast; aplicarA11y(); toast('👁 Alto contraste: ' + (a11y.highContrast ? 'ON' : 'OFF'), '#c8f7a0', 3); }
+    });
+
+    
+    const LOGROS = [
+      { id:'primera_cosecha', nombre:'Primera cosecha', desc:'Cosecha tu primer cultivo', cond:() => (S.cosechas || 0) >= 1, icono:'🌽' },
+      { id:'cien_cosechas', nombre:'Cien cosechas', desc:'Cosecha 100 cultivos', cond:() => (S.cosechas || 0) >= 100, icono:'🌾' },
+      { id:'primer_amor', nombre:'Primer amor', desc:'Consigue tu primera esposa', cond:() => !!S.spouse, icono:'❤️' },
+      { id:'cien_cacao', nombre:'Rico', desc:'Acumula 1000 cacao', cond:() => (S.money || 0) >= 1000, icono:'💰' },
+      { id:'origen_elegido', nombre:'Origen', desc:'Elige tu origen', cond:() => !!S.origen, icono:'🌱' },
+    ];
+    const LOGROS_KEY = 'tlaxcallan_logros';
+    function logrosDesbloqueados() { try { return JSON.parse(localStorage.getItem(LOGROS_KEY) || '[]'); } catch (e) { return []; } }
+    function guardarLogros(ids) { try { localStorage.setItem(LOGROS_KEY, JSON.stringify(ids)); } catch (e) {} }
+    function revisarLogros() {
+      const desbloqueados = logrosDesbloqueados();
+      const nuevos = [];
+      for (const l of LOGROS) {
+        if (desbloqueados.includes(l.id)) continue;
+        try { if (l.cond()) { desbloqueados.push(l.id); nuevos.push(l); } } catch (e) {}
+      }
+      if (nuevos.length) { guardarLogros(desbloqueados); for (const l of nuevos) toast(l.icono + ' ¡Logro desbloqueado: ' + l.nombre + '!', '#ffd060', 5); }
+    }
+    let _logrosT = 0;
+    const _updateLogros = update;
+    update = function (dt) {
+      const r = _updateLogros(dt);
+      try { _logrosT += dt; if (_logrosT > 5) { _logrosT = 0; revisarLogros(); } } catch (e) {}
+      return r;
+    };
+
+    console.log('[MEJORAS RECUPERADAS CONSOLIDADO] cargado');
+  } catch (e) { console.warn('[MEJORAS RECUPERADAS CONSOLIDADO]', e); }
+})();
+
 
 // Textos retirados de la versión pública: no se dibujan.
 const TOKEN_PUBLICO = /(?:·x|_x)[0-9a-f]{6}/;
