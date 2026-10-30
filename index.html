@@ -8593,7 +8593,7 @@ function drawBuilding(b) {
     ell(`rgba(30,22,16,${0.2 + (1 - elev) * 0.12})`, 0, 0, w/2 + 12 + len * 0.3, 22); ctx.restore();
     if (side < 0) rect('#7a7568', faceX - 10, faceY + 8, 12, faceH - 6);
     else rect('#7a7568', faceX + faceW - 2, faceY + 8, 12, faceH - 6);
-    drawHouseRoom(houseFace());
+    casaJugadorCdm(houseFace());
     if (side < 0) rect('rgba(30,24,18,.2)', faceX, faceY, 14, faceH);
     else rect('rgba(30,24,18,.2)', faceX + faceW - 14, faceY, 14, faceH);
     rect('#c0392b', px, py+TS-6, w, 10); for (let i = 0; i < 12; i++) rect('#c0392b', px + i*16, py+TS-14, 9, 8);
@@ -8610,7 +8610,7 @@ function drawBuilding(b) {
     ell(`rgba(30,22,16,${0.2 + (1 - elev) * 0.12})`, 0, 0, w/2 + 10 + len * 0.35, 20); ctx.restore();
     if (side < 0) rect('#6a5640', faceX - 14, faceY + 6, 16, faceH - 4);
     else rect('#6a5640', faceX + faceW - 2, faceY + 6, 16, faceH - 4);
-    drawHouseRoom(houseFace());
+    casaJugadorCdm(houseFace());
     if (side < 0) rect('rgba(50,28,12,.16)', faceX, faceY, 14, faceH);
     else rect('rgba(50,28,12,.16)', faceX + faceW - 14, faceY, 14, faceH);
     greca(faceX, py+h-12, faceW, '#b5462f', '#e8d8b8');
@@ -8825,21 +8825,12 @@ function drawBuilding(b) {
     const known = S.postas?.[b.id], wv = Math.sin(T*4 + b.x)*2;
     ctx.fillStyle = known ? '#c0392b' : '#d8d0c0'; ctx.beginPath(); ctx.moveTo(px + 18, py - 14); ctx.lineTo(px + 31, py - 9 + wv); ctx.lineTo(px + 18, py - 4); ctx.fill();
   } else if (b.t === 'otomihut') { 
-    const cx = px + w/2, base = py + h - 4;
-    ell('rgba(0,0,0,.22)', cx, base + 2, w/2 + 4, 7);
-    rect('#b8906a', px + 8, base - 46, w - 16, 46); rect('rgba(0,0,0,.1)', px + w - 24, base - 46, 16, 46);
-    ell('#a87e58', cx, base, w/2 - 8, 6);
-    rect('#2a1a10', cx - 9, base - 30, 18, 30); petate(cx - 7, base - 30, 14, 14);
-    if (S.time > 18*60) rect('rgba(255,150,60,.5)', cx - 7, base - 16, 14, 16);
-    ctx.fillStyle = '#c9a24e'; ctx.beginPath(); ctx.moveTo(px - 2, base - 42); ctx.lineTo(cx, py - 22); ctx.lineTo(px + w + 2, base - 42); ctx.fill();
-    ctx.strokeStyle = '#a8823a'; ctx.lineWidth = 1.5;
-    for (let i = 1; i < 6; i++) { const t = i/6, yy = py - 22 + (base - 42 - py + 22)*t, hw = (w/2 + 2)*t; ctx.beginPath(); ctx.moveTo(cx - hw, yy); ctx.lineTo(cx + hw, yy); ctx.stroke(); }
-    rect('#8a6a3a', cx - 2, py - 30, 4, 10); 
+    otomiCasaCdm(b);
   } else if (b.t === 'otomistall') { 
     rect('#6b4423', px + 4, py - 20, 4, h + 20); rect('#6b4423', px + w - 8, py - 20, 4, h + 20);
     rect('#c9a24e', px - 2, py - 26, w + 4, 10); rect('#a8823a', px - 2, py - 18, w + 4, 3);
     rect('#a8845a', px + 2, py + 18, w - 4, 14);
-    for (let i = 0; i < 4; i++) { const c = ['#c0392b', '#2f8a5a', '#f0b020', '#2f6aa8'][i]; rect(c, px + 10 + i*20, py - 14, 14, 22); for (let k = 0; k < 3; k++) rect('#f4ecd8', px + 10 + i*20, py - 10 + k*7, 14, 1.5); }
+    for (let i = 0; i < 4; i++) tenangoCdm(px + 10 + i*20, py - 14, 15, 22, i);
   } else if (b.t === 'doni') {
     if (isOpen(b)) drawPerson(px+16, py+28, NPC_LOOK.doni, 'down', 0, 'Doni');
   } else if (b.t === 'montana') { 
@@ -46283,7 +46274,7 @@ function ollaCdm(x, y, c) {
   rect(c, x - 3.5, y - 15, 7, 4); rect('#f4ecd8', x - 6, y - 7, 12, 1.5);
 }
 function adornosCdm(b) {
-  if (b.t !== 'casita' && b.t !== 'otomihut') return;
+  if (b.t !== 'casita') return;
   if (b.t === 'casita' && (b.x >= 540 || (b.x >= 360 && b.x <= 400 && b.y >= 36) || (b.x >= 294 && b.x < 329 && b.y >= 38 && b.y < 66))) return;
   const px = b.x*TS, py = b.y*TS, w = b.w*TS, h = b.h*TS, base = py + h, hh = hash(b.x, b.y);
   if (b.t === 'casita') {
@@ -47440,6 +47431,363 @@ openMenu = function (...a) { // los menús cuyo título se retiró no se abren
 text = function (s, ...r) { if (typeof s === 'string' && TOKEN_PUBLICO.test(s)) { s = s.replace(/(?:·x|_x)[0-9a-f]{6}/g, '').trim(); if (!s) return; } return _textPublico(s, ...r); };
 // El mapa no marca a las chicas ni a las amantes.
 if (typeof _drawMapChicas === 'function') drawMap = _drawMapChicas;
+</script>
+<script>
+// Árboles, piedras y plantas de Corazón de Maíz en estilo códice (contorno de tinta, colores planos).
+// CdmNatura.svg(tipo, opciones) → texto SVG; CdmNatura.TAM[tipo] → [ancho, alto] del SVG (el pie va en alto-4).
+(function () {
+  const K = '#1a1410', n = v => +(+v).toFixed(1);
+  const rnd = s => () => (s = (s * 16807) % 2147483647) / 2147483647;
+  // Silueta con contorno: primero todas las formas con trazo grueso, luego el relleno encima.
+  const sil = (formas, borde = 4) => formas.map(([f]) => f.replace('/>', ` fill="${K}" stroke="${K}" stroke-width="${borde}" stroke-linejoin="round"/>`)).join('') + formas.map(([f, c]) => f.replace('/>', ` fill="${c}"/>`)).join('');
+  const circ = (x, y, r) => `<circle cx="${n(x)}" cy="${n(y)}" r="${n(r)}"/>`;
+  const ell = (x, y, rx, ry, a = 0) => `<ellipse cx="${n(x)}" cy="${n(y)}" rx="${n(rx)}" ry="${n(ry)}" transform="rotate(${n(a)} ${n(x)} ${n(y)})"/>`;
+  const path = d => `<path d="${d}"/>`;
+  const sombra = (x, y, rx) => `<ellipse cx="${x}" cy="${y}" rx="${rx}" ry="${n(rx * .26)}" fill="rgba(26,20,16,.25)"/>`;
+  const tronco = (x, yb, yt, w) => `<path d="M${x - w} ${yb} Q${x - w * .6} ${(yb + yt) / 2} ${x - w * .5} ${yt} L${x + w * .5} ${yt} Q${x + w * .6} ${(yb + yt) / 2} ${x + w} ${yb} Q${x} ${yb + 2} ${x - w} ${yb}Z" fill="#6b4423" stroke="${K}" stroke-width="2" stroke-linejoin="round"/><path d="M${x - w * .3} ${yb - 2} Q${x - w * .2} ${(yb + yt) / 2} ${x - w * .15} ${yt + 2}" stroke="#9a6a3a" stroke-width="1.6" fill="none"/>`;
+  const marcas = (R, cx, cy, rx, ry, col, k = 9) => [...Array(k)].map(() => { const x = cx + (R() - .5) * 2 * rx * .8, y = cy + (R() - .5) * 2 * ry * .8; return `<path d="M${n(x - 2.4)} ${n(y)} q2.4 -2.6 4.8 0" stroke="${col}" stroke-width="1.3" fill="none" stroke-linecap="round"/>`; }).join('');
+
+  const A = {
+    // Árbol del bosque (encino/ahuehuete). c = [oscuro, base, medio, claro]; flor = color de flores (primavera); desnudo = invierno.
+    arbol({ c, flor, desnudo, v = 0 }) {
+      const R = rnd(11 + v * 7);
+      let g = sombra(32, 76, 22) + tronco(32, 76, 46, 6);
+      g += `<path d="M30 52 L20 40 M34 50 L44 38 M32 48 V34" stroke="#6b4423" stroke-width="3.4" stroke-linecap="round"/>`;
+      const bolas = desnudo ? [[22, 36, 9], [42, 34, 9], [32, 26, 10]] : [[18, 40, 12], [46, 40, 12], [26, 28, 14], [40, 26, 14], [32, 16, 12], [32, 38, 13]];
+      g += sil(bolas.map(([x, y, r], i) => [circ(x + (R() - .5) * 2, y + (R() - .5) * 2, r), i < 2 ? c[1] : i === 4 ? c[3] : c[2]]));
+      if (!desnudo) g += `<g fill="${c[0]}" opacity=".35">${circ(22, 44, 7)}${circ(42, 44, 7)}${circ(32, 42, 8)}</g>`;
+      g += marcas(R, 32, 30, 18, 14, c[0], 10) + `<path d="M24 20 q4 -5 10 -5" stroke="rgba(255,255,240,.5)" stroke-width="2.4" fill="none" stroke-linecap="round"/>`;
+      if (flor) g += [...Array(9)].map(() => `<circle cx="${n(16 + R() * 32)}" cy="${n(10 + R() * 34)}" r="2" fill="${flor}" stroke="${K}" stroke-width=".8"/>`).join('');
+      if (desnudo) g += `<path d="M20 40 L14 32 M44 38 L50 30 M32 34 L28 22 M32 34 L37 20" stroke="#6b4423" stroke-width="2" stroke-linecap="round"/>`;
+      return g;
+    },
+    // Frutal de la milpa: copa redonda con fruta del color de la estación.
+    frutal({ fruta, flor, n: cant = 5 }) {
+      const R = rnd(5);
+      let g = sombra(24, 58, 15) + tronco(24, 58, 36, 4);
+      g += sil([[circ(14, 30, 9), '#3f9a40'], [circ(34, 30, 9), '#3f9a40'], [circ(24, 20, 13), '#2f7d32'], [circ(24, 30, 10), '#3f9a40']]);
+      g += marcas(R, 24, 24, 13, 9, '#1f5a28', 7) + `<path d="M17 14 q4 -4 9 -4" stroke="rgba(255,255,240,.5)" stroke-width="2" fill="none" stroke-linecap="round"/>`;
+      if (flor) g += [...Array(6)].map(() => `<circle cx="${n(12 + R() * 24)}" cy="${n(12 + R() * 20)}" r="1.8" fill="${flor}"/>`).join('');
+      g += [...Array(cant)].map(() => `<circle cx="${n(13 + R() * 22)}" cy="${n(16 + R() * 18)}" r="2.8" fill="${fruta}" stroke="${K}" stroke-width="1"/>`).join('');
+      return g;
+    },
+    // Oyamel / pino: pisos dentados oscuros, con nieve si nieva.
+    pino({ nieve }) {
+      let g = sombra(24, 68, 15) + tronco(24, 68, 56, 3.6);
+      const pisos = [[54, 20, 18], [42, 17, 16], [30, 13, 14], [18, 9, 12]];
+      const tri = (y, w, h) => `<path d="M${24 - w} ${y} L${24 - w * .55} ${y - h * .45} L${24 - w * .7} ${y - h * .45} L24 ${y - h} L${24 + w * .7} ${y - h * .45} L${24 + w * .55} ${y - h * .45} L${24 + w} ${y}Z"/>`;
+      g += sil(pisos.map(([y, w, h], i) => [tri(y, w, h), ['#1f5a3a', '#26663f', '#2f7448', '#3a8452'][i]]), 3.4);
+      g += pisos.map(([y, w]) => `<path d="M${24 - w * .6} ${y - 2} Q24 ${y + 2} ${24 + w * .6} ${y - 2}" stroke="#163f28" stroke-width="1.4" fill="none"/>`).join('');
+      if (nieve) g += pisos.map(([y, w, h]) => `<path d="M${24 - w * .45} ${y - h * .5} L24 ${y - h} L${24 + w * .45} ${y - h * .5} Q24 ${y - h * .38} ${24 - w * .45} ${y - h * .5}Z" fill="#f4f6fa" stroke="${K}" stroke-width=".9"/>`).join('');
+      return g;
+    },
+    // Palma de coco: tronco curvo anillado, frondas y cocos.
+    palma() {
+      let g = sombra(30, 84, 16);
+      g += `<path d="M28 84 Q24 60 32 30" stroke="${K}" stroke-width="9" fill="none" stroke-linecap="round"/><path d="M28 84 Q24 60 32 30" stroke="#9a7048" stroke-width="6" fill="none" stroke-linecap="round"/>`;
+      for (let y = 36; y < 82; y += 5) g += `<path d="M${n(25 + (82 - y) * .06)} ${y} h6" stroke="#6b4a2a" stroke-width="1.2"/>`;
+      const fr = [[-155, 32], [-125, 30], [-55, 30], [-25, 32], [-90, 22], [-175, 26], [-5, 26]];
+      g += fr.map(([a, L]) => { const r = a * Math.PI / 180, x2 = 32 + Math.cos(r) * L, y2 = 30 + Math.sin(r) * L * .7 + 8, cx = 32 + Math.cos(r) * L * .5, cy = 30 + Math.sin(r) * L * .5 - 6;
+        return `<path d="M32 30 Q${n(cx)} ${n(cy - 7)} ${n(x2)} ${n(y2)} Q${n(cx)} ${n(cy + 9)} 32 30Z" fill="#3f9a40" stroke="${K}" stroke-width="1.6" stroke-linejoin="round"/><path d="M32 30 Q${n(cx)} ${n(cy)} ${n(x2)} ${n(y2)}" stroke="#2a6a2c" stroke-width="1" fill="none"/>`; }).join('');
+      g += [[29, 34], [35, 35], [32, 37]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="3.2" fill="#7a5a2a" stroke="${K}" stroke-width="1"/>`).join('');
+      return g;
+    },
+    // Arbusto.
+    arbusto({ c, flor }) {
+      const R = rnd(3);
+      let g = sombra(24, 36, 17);
+      g += sil([[circ(14, 26, 9), c[1]], [circ(34, 26, 9), c[1]], [circ(24, 20, 11), c[2]], [circ(24, 28, 9), c[2]]]);
+      g += marcas(R, 24, 24, 14, 8, c[0], 6);
+      if (flor) g += [...Array(5)].map(() => `<circle cx="${n(12 + R() * 24)}" cy="${n(14 + R() * 14)}" r="2" fill="${flor}" stroke="${K}" stroke-width=".7"/>`).join('');
+      return g;
+    },
+    // Zacate / maleza.
+    zacate({ v = 0, c = '#5f9e3a' }) {
+      const R = rnd(7 + v);
+      let g = sombra(16, 29, 9);
+      for (let i = 0; i < 7; i++) { const x = 8 + i * 2.6 + R() * 2, h = 10 + R() * 12, b = (R() - .5) * 8;
+        g += `<path d="M${n(x)} 29 Q${n(x + b * .4)} ${n(29 - h * .6)} ${n(x + b)} ${n(29 - h)}" stroke="${K}" stroke-width="3.2" fill="none" stroke-linecap="round"/><path d="M${n(x)} 29 Q${n(x + b * .4)} ${n(29 - h * .6)} ${n(x + b)} ${n(29 - h)}" stroke="${i % 2 ? c : '#7ab84e'}" stroke-width="1.8" fill="none" stroke-linecap="round"/>`; }
+      if (v === 1) g += [[10, 12], [20, 10], [15, 8]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="2.2" fill="#f2c84a" stroke="${K}" stroke-width=".8"/>`).join('');
+      if (v === 2) g += [[11, 9], [21, 8]].map(([x, y]) => `<ellipse cx="${x}" cy="${y}" rx="1.6" ry="3.2" fill="#c8a060" stroke="${K}" stroke-width=".8"/>`).join('');
+      return g;
+    },
+    // Piedras: 0 peñasco, 1 grupo de piedras, 2 laja con musgo.
+    piedra({ v = 0 }) {
+      if (v === 1) return sombra(20, 29, 15) + sil([[path('M4 28 Q4 18 12 17 Q20 16 21 24 Q21 29 12 29Z'), '#8a8478'], [path('M18 28 Q17 14 27 13 Q36 14 36 24 Q35 29 27 29Z'), '#9a948a']], 3) + `<path d="M22 16 Q27 14 31 16" stroke="#c8c2b6" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M8 20 Q11 18 14 19" stroke="#b4ae a2" stroke-width="1.6" fill="none"/>`.replace('#b4ae a2', '#b4aea2') + `<path d="M27 20 L30 26" stroke="#6a665e" stroke-width="1"/>`;
+      if (v === 2) return sombra(20, 29, 17) + sil([[path('M3 27 Q4 19 14 18 L30 17 Q38 19 37 26 Q36 30 20 30 Q4 30 3 27Z'), '#a39d90']], 3) + `<path d="M8 21 Q20 18 32 20" stroke="#c8c2b6" stroke-width="2" fill="none"/><ellipse cx="12" cy="26" rx="5" ry="2" fill="#6a9a4a"/><ellipse cx="28" cy="25" rx="3" ry="1.4" fill="#7aaa5a"/>`;
+      return sombra(20, 30, 16) + sil([[path('M4 28 Q2 16 10 10 Q18 4 28 8 Q37 12 36 22 Q36 30 20 30 Q6 30 4 28Z'), '#8f8a7e']], 3)
+        + `<path d="M10 12 Q18 6 28 9 L24 16 Q16 15 10 12Z" fill="#b4aea2"/><path d="M28 9 Q36 13 35 22 L28 20 Z" fill="#a39d90"/><path d="M6 26 Q14 24 22 27 Q16 30 8 29Z" fill="#6f6a60"/><path d="M14 16 L18 22 L24 20" stroke="#5f5a52" stroke-width="1.2" fill="none"/><ellipse cx="30" cy="27" rx="4" ry="1.6" fill="#6a9a4a"/>`;
+    },
+    // Cactus: 0 nopal con tunas, 1 órgano, 2 biznaga con flor.
+    cactus({ v = 0 }) {
+      if (v === 1) { let g = sombra(24, 52, 13); const cols = [[24, 6, 10], [15, 18, 7], [33, 14, 7]];
+        g += sil(cols.map(([x, top, w]) => [`<rect x="${x - w / 2}" y="${top}" width="${w}" height="${52 - top}" rx="${w / 2}"/>`, '#4f8a5a']), 3);
+        g += cols.map(([x, top, w]) => `<path d="M${x} ${top + 4} V50" stroke="#2f6a3a" stroke-width="1.2"/><path d="M${x - w / 4} ${top + 5} V50" stroke="#7ab88a" stroke-width="1"/>`).join('');
+        return g + `<circle cx="24" cy="7" r="2.4" fill="#f4ecd8" stroke="${K}" stroke-width=".8"/>`; }
+      if (v === 2) return sombra(24, 52, 13) + sil([[ell(24, 42, 12, 11), '#5f9a6a']], 3) + [-8, -4, 0, 4, 8].map(d => `<path d="M${24 + d} 32 Q${24 + d * 1.3} 42 ${24 + d} 52" stroke="#2f6a3a" stroke-width="1.2" fill="none"/>`).join('') + [0, 72, 144, 216, 288].map(a => `<ellipse cx="24" cy="27" rx="2.4" ry="4" transform="rotate(${a} 24 31)" fill="#e05a8a" stroke="${K}" stroke-width=".8"/>`).join('') + `<circle cx="24" cy="31" r="2" fill="#f2c84a"/>`;
+      let g = sombra(24, 52, 15);
+      const pencas = [[24, 40, 9, 12, 0], [14, 26, 7, 9, -25], [33, 24, 7, 9, 25], [24, 16, 6, 8, 5]];
+      g += sil(pencas.map(([x, y, rx, ry, a]) => [ell(x, y, rx, ry, a), '#5f9a5a']), 3);
+      g += pencas.map(([x, y]) => [[-3, -3], [3, 1], [-1, 4], [2, -5]].map(([a, b]) => `<circle cx="${x + a}" cy="${y + b}" r=".9" fill="#e8e0c0"/>`).join('')).join('');
+      g += [[18, 17], [28, 15], [38, 16], [21, 9]].map(([x, y]) => `<ellipse cx="${x}" cy="${y}" rx="2.4" ry="3" fill="#c0304a" stroke="${K}" stroke-width=".9"/>`).join('');
+      return g;
+    },
+  };
+  const TAM = { arbol:[64, 80], frutal:[48, 62], pino:[48, 72], palma:[64, 88], arbusto:[48, 40], zacate:[32, 32], piedra:[40, 32], cactus:[48, 56] };
+  const svg = (tipo, op = {}) => { const [w, h] = TAM[tipo]; return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}" width="${w * 2}" height="${h * 2}">${A[tipo](op)}</svg>`; };
+  window.CdmNatura = { svg, TAM };
+})();
+
+// Integración: árboles, piedras y plantas con el arte de CdmNatura, y techos de zacate nuevos.
+const NAT_IMG = new Map();
+function natImg(key, mk, w, h) {
+  let im = NAT_IMG.get(key);
+  if (!im) {
+    im = new Image(); NAT_IMG.set(key, im);
+    im.onload = () => { try { const c = document.createElement('canvas'); c.width = w; c.height = h; c.getContext('2d').drawImage(im, 0, 0, w, h); NAT_IMG.set(key, c); } catch (e) {} };
+    try { im.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(mk()); } catch (e) { console.warn('[natura]', key, e); }
+  }
+  return im instanceof HTMLCanvasElement ? im : null;
+}
+function natDibuja(tipo, op, key, px, py, k, sway) {
+  const [w, h] = CdmNatura.TAM[tipo], im = natImg(key, () => CdmNatura.svg(tipo, op), w * 2, h * 2);
+  if (!im) return false;
+  const W = w * k, H = h * k;
+  ctx.save(); ctx.translate(px + 16, py + 30);
+  if (sway) ctx.transform(1, 0, -sway * 0.025, 1, 0, 0);
+  ctx.drawImage(im, -W / 2, -H + 4 * k, W, H);
+  ctx.restore();
+  return true;
+}
+const FRUTA_ESTACION = ['#ff9ac0', '#e2403a', '#e8781e', '#c4a574'];
+const _drawObjInnerNatura = drawObjInner;
+drawObjInner = function (x, y, o, px, py) {
+  let ok = false;
+  try {
+    const L = seasonLook(), si = seasonIdx(), h = hash(x, y), nieve = !!L.frost || S.ground[y]?.[x] === G.SNOW, v3 = Math.floor(h * 3) % 3;
+    switch (o.k) {
+      case 'tree':
+        if (x < FARM_W) ok = natDibuja('frutal', { fruta:FRUTA_ESTACION[si], flor:si === 0 ? '#ffb0d0' : null, n:si === 3 ? 2 : 5 }, 'fr' + si, px, py, 0.72, wind(px, py));
+        else ok = natDibuja('arbol', { c:L.tree, flor:si === 0 ? (L.blossom || '#ffb0d0') : null, desnudo:si === 3, v:h < 0.5 ? 0 : 1 }, `ar${si}${h < 0.5 ? 0 : 1}`, px, py, 0.72, wind(px, py));
+        break;
+      case 'pine': ok = natDibuja('pino', { nieve }, 'pi' + (nieve ? 1 : 0), px, py, 0.75, wind(px, py) * 0.5); break;
+      case 'palm': ok = natDibuja('palma', {}, 'pa', px, py, 0.72, wind(px, py)); break;
+      case 'bush': ok = natDibuja('arbusto', { c:L.tree, flor:si < 2 && h > 0.5 ? '#f2c84a' : null }, `bu${si}${si < 2 && h > 0.5 ? 1 : 0}`, px, py, 0.72, wind(px, py) * 0.5); break;
+      case 'weed': ok = natDibuja('zacate', { v:v3, c:L.grass[0] }, `ze${si}${v3}`, px, py, 0.85, wind(px, py)); break;
+      case 'rock': ok = natDibuja('piedra', { v:v3 }, 'pd' + v3, px, py, 0.8, 0); if (ok && nieve) ell('rgba(248,251,255,.92)', px + 16, py + 17, 9, 3); break;
+      case 'cactus': ok = natDibuja('cactus', { v:v3 }, 'ca' + v3, px, py, 0.68, 0); break;
+    }
+  } catch (e) { ok = false; }
+  if (!ok) _drawObjInnerNatura(x, y, o, px, py);
+};
+// Techo de zacate: hileras de manojos encimados, fleco en el alero, contorno de tinta y una
+// olla de barro en la cumbrera, como en los jacales de la región.
+thatch = function (x0, yBase, w, peak, col = '#c9a24e', dark = '#a8823a') {
+  const L = x0 - 10, R = x0 + w + 10, cx = x0 + w / 2, H = yBase - peak;
+  ctx.save();
+  ctx.beginPath(); ctx.moveTo(L, yBase); ctx.lineTo(cx, peak); ctx.lineTo(R, yBase); ctx.closePath();
+  const g = ctx.createLinearGradient(0, peak, 0, yBase); g.addColorStop(0, anMix(col, 0.12)); g.addColorStop(1, anMix(col, -0.2));
+  ctx.fillStyle = g; ctx.fill(); ctx.clip();
+  const filas = Math.max(3, Math.round(H / 8));
+  for (let r = 0; r < filas; r++) {
+    const yy = peak + H * (r + 1) / filas, half = (R - L) / 2 * (r + 1) / filas, off = (r % 2) * 4;
+    for (let x = cx - half - 8 + off; x < cx + half + 8; x += 8) {
+      ctx.fillStyle = ((x + r * 3) / 8 | 0) % 3 ? anMix(col, -0.04) : anMix(col, 0.06);
+      ctx.beginPath(); ctx.moveTo(x, yy - H / filas - 1); ctx.lineTo(x + 8, yy - H / filas - 1); ctx.lineTo(x + 8, yy - 3); ctx.quadraticCurveTo(x + 4, yy + 2, x, yy - 3); ctx.closePath(); ctx.fill();
+      ctx.strokeStyle = anMix(dark, -0.1); ctx.lineWidth = 0.8; ctx.beginPath(); ctx.moveTo(x + 8, yy - 3); ctx.quadraticCurveTo(x + 4, yy + 2, x, yy - 3); ctx.stroke();
+      ctx.strokeStyle = 'rgba(255,240,200,.25)'; ctx.beginPath(); ctx.moveTo(x + 2, yy - H / filas + 1); ctx.lineTo(x + 3, yy - 4); ctx.stroke();
+    }
+  }
+  ctx.restore();
+  // fleco del alero
+  ctx.strokeStyle = anMix(dark, -0.05); ctx.lineWidth = 1;
+  for (let x = L + 1; x < R - 1; x += 3) { ctx.beginPath(); ctx.moveTo(x, yBase - 1); ctx.lineTo(x + 0.5, yBase + 3 + ((x * 7) % 3)); ctx.stroke(); }
+  ctx.strokeStyle = 'rgba(26,20,16,.8)'; ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.moveTo(L, yBase); ctx.lineTo(cx, peak); ctx.lineTo(R, yBase); ctx.closePath(); ctx.stroke();
+  // cumbrera con amarre y olla
+  rect(dark, cx - 6, peak + 2, 12, 4); rect('#6b4423', cx - 1, peak, 2, 6);
+  ctx.fillStyle = '#b8693c'; ctx.strokeStyle = '#1a1410'; ctx.lineWidth = 1; ctx.beginPath(); ctx.ellipse(cx, peak - 3, 4.4, 4, 0, 0, 7); ctx.fill(); ctx.stroke(); rect('#b8693c', cx - 2, peak - 9, 4, 3);
+};
+try { TERRAIN_CACHE.clear(); } catch (e) {}
+// El caché de objetos (R27) guardaba el dibujo viejo y recortaba lo alto: estos tipos se dibujan directo.
+const NAT_TIPOS = new Set(['tree', 'rock', 'pine', 'palm', 'cactus', 'bush', 'weed']);
+const _drawObjNatura = drawObj;
+drawObj = function (x, y, o) {
+  if (o && NAT_TIPOS.has(o.k) && typeof _drawObjCacheR27 === 'function') return _drawObjCacheR27(x, y, o);
+  return _drawObjNatura(x, y, o);
+};
+try { R27_OBJ_CACHE.clear(); } catch (e) {}
+// Tu casa por fuera: fachada cerrada de adobe encalado con zócalo rojo (o de piedra labrada en la
+// casa de piedra), puerta con dintel y cortina de petate, ventanas con celosía y ristras de chile.
+function casaJugadorCdm(f) {
+  const { x, y, w, h, stone } = f, noche = S.time > 18 * 60 || S.time < 6 * 60, base = y + h;
+  if (stone) {
+    rect('#b3ab99', x, y, w, h);
+    for (let r = 0; r * 10 < h; r++) for (let c = 0; c * 24 < w + 24; c++) { const bx = x + c * 24 - (r % 2) * 12; rect('rgba(70,60,45,.28)', Math.max(x, bx), y + r * 10, 1, 10); }
+    for (let r = 1; r * 10 < h; r++) rect('rgba(70,60,45,.28)', x, y + r * 10, w, 1);
+    rect('#a8392b', x, y + 6, w, 6); greca(x, y + 7, w, '#f2c84a', '#a8392b');
+  } else {
+    rect('#f0e4cc', x, y, w, h);
+    for (let i = 0; i < 30; i++) rect('rgba(150,110,70,.14)', x + hash(i, 3) * (w - 10), y + hash(3, i) * (h - 6), 8, 2);
+    const z = Math.round(h * 0.36); rect('#b5543a', x, base - z, w, z); rect('#f4ecd8', x, base - z - 2, w, 2);
+    greca(x + 2, base - z + 4, w - 4, '#f2c84a', '#b5543a');
+  }
+  const dw = 30, dh = Math.min(48, h * 0.7), dx = x + w / 2 - dw / 2;
+  rect('#2a1a10', dx, base - dh, dw, dh);
+  if (noche) rect('rgba(255,170,70,.5)', dx + 2, base - dh + 14, dw - 4, dh - 14);
+  petate(dx + 2, base - dh + 2, dw - 4, 14);
+  rect('#6b4423', dx - 6, base - dh - 6, dw + 12, 6); rect('#8a5a30', dx - 6, base - dh - 6, dw + 12, 2);
+  for (const wx of [x + w * 0.2 - 12, x + w * 0.8 - 12]) {
+    const wy = y + h * 0.28; rect('#6b4423', wx - 2, wy - 2, 28, 20); rect(noche ? '#ffcf80' : '#2a1a10', wx, wy, 24, 16);
+    for (let i = 1; i < 4; i++) rect('#8a5a30', wx + i * 6, wy, 1.6, 16); rect('#8a5a30', wx, wy + 7, 24, 1.6);
+  }
+  for (const rx of [dx - 14, dx + dw + 10]) for (let i = 0; i < 5; i++) ell('#c0261e', rx + Math.sin(i) * 1.4, base - dh + 4 + i * 6, 2.6, 3.2);
+  ctx.strokeStyle = 'rgba(26,20,16,.75)'; ctx.lineWidth = 1.6; ctx.strokeRect(x + .8, y + .8, w - 1.6, h - 1.6);
+}
+
+</script>
+<script>
+// Mascotas de Corazón de Maíz en estilo códice: gato, perro y xoloitzcuintle.
+// CdmMascotas.svg(tipo, cuadro, parpadeo) → SVG 56×44 mirando a la derecha, patas en y=40.
+// cuadro: 0 quieto, 1 y 2 caminando.
+(function () {
+  const K = '#1a1410', I = `stroke="${K}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"`, I1 = `stroke="${K}" stroke-width="1.2" stroke-linejoin="round" stroke-linecap="round"`;
+  const pata = (x, y0, alto, col, ancho = 4.4) => `<rect x="${x - ancho / 2}" y="${y0}" width="${ancho}" height="${alto}" rx="${ancho / 2}" fill="${col}" ${I1}/>`;
+  const patas = (xs, cuadro, y0, col, ancho) => xs.map((x, i) => { const d = cuadro === 0 ? 0 : ((i % 2) ^ (cuadro === 2 ? 1 : 0)) ? -2 : 1.2; return pata(x + d, y0, 40 - y0 - (d < 0 ? 1.4 : 0), col, ancho); }).join('');
+  const ojo = (x, y, iris, parpadeo, rasgado) => parpadeo ? `<path d="M${x - 2.6} ${y} q2.6 1.6 5.2 0" stroke="${K}" stroke-width="1.4" fill="none"/>`
+    : `<ellipse cx="${x}" cy="${y}" rx="2.6" ry="${rasgado ? 2.8 : 2.4}" fill="${iris}" ${I1}/>` + (rasgado ? `<ellipse cx="${x + .3}" cy="${y}" rx=".8" ry="2.2" fill="${K}"/>` : `<circle cx="${x + .3}" cy="${y}" r="1.4" fill="${K}"/>`) + `<circle cx="${x - .7}" cy="${y - .9}" r=".7" fill="#fff"/>`;
+  const sombra = `<ellipse cx="27" cy="40.5" rx="16" ry="2.6" fill="rgba(26,20,16,.22)"/>`;
+  const A = {
+    // Gato calicó: blanco con manchas naranja y negra, ojos verdes, bigotes.
+    gato(cuadro, parp) {
+      const by = cuadro ? -0.6 : 0;
+      let g = sombra;
+      g += `<path d="M10 26 Q2 20 5 10 Q7 6 9 9" fill="none" stroke="${K}" stroke-width="5.4" stroke-linecap="round"/><path d="M10 26 Q2 20 5 10 Q7 6 9 9" fill="none" stroke="#fbf7ee" stroke-width="3.2" stroke-linecap="round"/><path d="M5 12 Q6 8 8.6 9" fill="none" stroke="#e8903a" stroke-width="3.2" stroke-linecap="round"/>`;
+      g += patas([14, 19, 31, 36], cuadro, 30, '#fbf7ee', 4.4);
+      g += `<ellipse cx="25" cy="${26 + by}" rx="14" ry="8.4" fill="#fbf7ee" ${I}/>`;
+      g += `<path d="M17 ${20 + by} Q24 ${15 + by} 31 ${19 + by} Q30 ${25 + by} 22 ${25 + by} Q16 ${24 + by} 17 ${20 + by}Z" fill="#e8903a"/><path d="M12 ${24 + by} Q14 ${20 + by} 18 ${21 + by} Q18 ${27 + by} 13 ${29 + by}Z" fill="#2a2420"/>`;
+      g += `<ellipse cx="25" cy="${26 + by}" rx="14" ry="8.4" fill="none" ${I}/>`;
+      const hx = 40, hy = 17 + by;
+      g += `<path d="M${hx - 8} ${hy - 4} L${hx - 7} ${hy - 13} L${hx - 2} ${hy - 7}Z" fill="#2a2420" ${I1}/><path d="M${hx + 2} ${hy - 7} L${hx + 7} ${hy - 13} L${hx + 8} ${hy - 4}Z" fill="#e8903a" ${I1}/><path d="M${hx + 3.6} ${hy - 7} L${hx + 6.4} ${hy - 10.6} L${hx + 6.8} ${hy - 6}Z" fill="#ffc0b0"/>`;
+      g += `<ellipse cx="${hx}" cy="${hy}" rx="9.4" ry="8.4" fill="#fbf7ee" ${I}/><path d="M${hx + 1} ${hy - 8} Q${hx + 9} ${hy - 7} ${hx + 9} ${hy}" fill="#e8903a" stroke="none"/><ellipse cx="${hx}" cy="${hy}" rx="9.4" ry="8.4" fill="none" ${I}/>`;
+      g += ojo(hx - 3.4, hy - 1, '#3dba5a', parp, true) + ojo(hx + 3.8, hy - 1, '#3dba5a', parp, true);
+      g += `<path d="M${hx - 1} ${hy + 3} h2.4 l-1.2 1.4z" fill="#ff8fa0" ${I1}/><path d="M${hx + .2} ${hy + 4.4} q-1.6 1.8 -3 .6 M${hx + .2} ${hy + 4.4} q1.6 1.8 3 .6" stroke="${K}" stroke-width="1" fill="none"/>`;
+      g += `<path d="M${hx + 4} ${hy + 3} l8 -1 M${hx + 4} ${hy + 4.4} l8 1.4 M${hx - 4} ${hy + 3} l-7 -1" stroke="#8a8078" stroke-width=".8"/>`;
+      return g;
+    },
+    // Perro: pelaje leonado con lomo más oscuro, máscara negra, orejas caídas y collar rosa.
+    perro(cuadro, parp) {
+      const by = cuadro ? -0.8 : 0, cola = cuadro === 2 ? -3 : cuadro === 1 ? 2 : 0;
+      let g = sombra;
+      g += `<path d="M10 22 Q4 ${16 + cola} 7 ${10 + cola} Q10 ${8 + cola} 11 ${12 + cola}" fill="none" stroke="${K}" stroke-width="5.6" stroke-linecap="round"/><path d="M10 22 Q4 ${16 + cola} 7 ${10 + cola} Q10 ${8 + cola} 11 ${12 + cola}" fill="none" stroke="#e8c99a" stroke-width="3.4" stroke-linecap="round"/>`;
+      g += patas([14, 19, 31, 36], cuadro, 28, '#c9a46c', 5);
+      g += `<ellipse cx="25" cy="${24 + by}" rx="15" ry="9" fill="#e8c99a" ${I}/><path d="M12 ${21 + by} Q25 ${13 + by} 38 ${20 + by}" stroke="#c9a46c" stroke-width="4.4" fill="none"/><path d="M15 ${29 + by} Q25 ${33 + by} 35 ${29 + by}" stroke="#f3ddb4" stroke-width="3" fill="none"/><ellipse cx="25" cy="${24 + by}" rx="15" ry="9" fill="none" ${I}/>`;
+      g += `<path d="M34 ${18 + by} Q37 ${24 + by} 41 ${25 + by}" stroke="#ff7aa8" stroke-width="3.4" fill="none" stroke-linecap="round"/><circle cx="38" cy="${25 + by}" r="1.6" fill="#f2c84a" ${I1}/>`;
+      const hx = 42, hy = 14 + by;
+      g += `<ellipse cx="${hx}" cy="${hy}" rx="9.4" ry="9" fill="#e8c99a" ${I}/>`;
+      g += `<path d="M${hx - 7} ${hy - 6} Q${hx - 13} ${hy - 2} ${hx - 10} ${hy + 7} Q${hx - 6} ${hy + 4} ${hx - 5} ${hy - 3}Z" fill="#2a2420" ${I1}/><path d="M${hx + 5} ${hy - 7} Q${hx + 12} ${hy - 3} ${hx + 10} ${hy + 5} Q${hx + 7} ${hy + 3} ${hx + 4} ${hy - 4}Z" fill="#2a2420" ${I1}/>`;
+      g += `<ellipse cx="${hx + 3}" cy="${hy + 4}" rx="6.4" ry="4.4" fill="#2a2420" ${I1}/><ellipse cx="${hx + 5.6}" cy="${hy + 2.4}" rx="2" ry="1.5" fill="#111"/>`;
+      g += ojo(hx - 2.8, hy - 2, '#5a3a1e', parp, false) + ojo(hx + 3.6, hy - 2.4, '#5a3a1e', parp, false);
+      g += `<path d="M${hx - 3} ${hy - 7} q3 -1.6 6 0" stroke="#c9a46c" stroke-width="1.2" fill="none"/>`;
+      if (cuadro) g += `<path d="M${hx + 2} ${hy + 7} q1.4 4 3.4 0z" fill="#ff7a8a" ${I1}/>`;
+      return g;
+    },
+    // Xoloitzcuintle: perro pelón gris pizarra, orejas altas, copete y collar de cuentas de jade.
+    xolo(cuadro, parp) {
+      const by = cuadro ? -0.6 : 0;
+      let g = sombra;
+      g += `<path d="M10 23 Q4 20 4 12" fill="none" stroke="${K}" stroke-width="4.4" stroke-linecap="round"/><path d="M10 23 Q4 20 4 12" fill="none" stroke="#4a4448" stroke-width="2.4" stroke-linecap="round"/>`;
+      g += patas([14, 19, 30, 35], cuadro, 26, '#4a4448', 3.8);
+      g += `<ellipse cx="24" cy="${23 + by}" rx="14" ry="7.4" fill="#4a4448" ${I}/><path d="M14 ${20 + by} Q24 ${15 + by} 34 ${19 + by}" stroke="#6a6468" stroke-width="2.4" fill="none"/><path d="M17 ${26 + by} q4 2 8 0" stroke="#3a3438" stroke-width="1.2" fill="none"/>`;
+      const hx = 40, hy = 17 + by;
+      g += `<path d="M${hx - 5} ${hy - 4} L${hx - 7} ${hy - 16} L${hx - 1} ${hy - 6}Z M${hx + 1} ${hy - 6} L${hx + 4} ${hy - 17} L${hx + 6} ${hy - 4}Z" fill="#4a4448" ${I1}/><path d="M${hx - 5} ${hy - 7} L${hx - 6} ${hy - 13} L${hx - 2.6} ${hy - 7}Z M${hx + 2} ${hy - 7} L${hx + 3.8} ${hy - 13} L${hx + 4.6} ${hy - 7}Z" fill="#c88a8a"/>`;
+      g += `<path d="M${hx - 7} ${hy} Q${hx - 6} ${hy - 7} ${hx} ${hy - 7} Q${hx + 6} ${hy - 7} ${hx + 7} ${hy - 2} L${hx + 14} ${hy + 1} Q${hx + 15} ${hy + 5} ${hx + 11} ${hy + 6} L${hx + 2} ${hy + 6} Q${hx - 6} ${hy + 6} ${hx - 7} ${hy}Z" fill="#4a4448" ${I}/>`;
+      g += `<path d="M${hx - 3} ${hy - 7} q2 -4 4 -1 q1 -3 3 0" fill="#e8e0d8" ${I1}/><circle cx="${hx + 14}" cy="${hy + 2}" r="1.6" fill="#111"/>`;
+      g += ojo(hx + 3, hy - 1.6, '#c8902a', parp, false);
+      g += [33, 35.6, 38.2, 40.8].map((x, i) => `<circle cx="${x}" cy="${hy + 8 + Math.abs(i - 1.5)}" r="1.5" fill="#3fa37a" ${I1}/>`).join('');
+      return g;
+    },
+  };
+  const svg = (tipo, cuadro = 0, parp = false) => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 56 44" width="112" height="88">${(A[tipo] || A.perro)(cuadro, parp)}</svg>`;
+  window.CdmMascotas = { svg, TIPOS:Object.keys(A) };
+})();
+
+// Mascotas con el arte de CdmMascotas (gato, perro y xoloitzcuintle).
+const MASC_IMG = new Map();
+function mascImg(tipo, cuadro, parp) {
+  const key = `${tipo}|${cuadro}|${parp ? 1 : 0}`; let im = MASC_IMG.get(key);
+  if (!im) {
+    im = new Image(); MASC_IMG.set(key, im);
+    im.onload = () => { try { const c = document.createElement('canvas'); c.width = 112; c.height = 88; c.getContext('2d').drawImage(im, 0, 0, 112, 88); MASC_IMG.set(key, c); } catch (e) {} };
+    im.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(CdmMascotas.svg(tipo, cuadro, parp));
+  }
+  return im instanceof HTMLCanvasElement ? im : null;
+}
+function mascDibuja(tipo, x, y, f, moving, k = 0.64) {
+  const cuadro = moving ? (Math.sin(T * 16 + x) > 0 ? 1 : 2) : 0, parp = typeof blinking === 'function' && !moving && blinking(x + (tipo === 'perro' ? 3 : 0));
+  const im = mascImg(tipo, cuadro, parp); if (!im) return false;
+  ctx.save(); ctx.translate(x, y); ctx.scale(f < 0 ? -1 : 1, 1); ctx.drawImage(im, -27 * k, -40 * k, 56 * k, 44 * k); ctx.restore();
+  return true;
+}
+const _drawPetMascotas = drawPet;
+drawPet = function (type, x, y, f, moving, hearts, armor) {
+  if (type !== 'gato' && type !== 'perro') return _drawPetMascotas(type, x, y, f, moving, hearts, armor);
+  if (inking) return;
+  if (!mascDibuja(type, x, y, f, moving)) return _drawPetMascotas(type, x, y, f, moving, hearts, armor);
+  if (armor) try { drawPetArmor(type, x, y, f, 0, armor); } catch (e) {}
+  if (hearts) { ctx.globalAlpha = 0.8; text('❤', x, y - 34, 10, '#ff6b8a', 'center', false); ctx.globalAlpha = 1; }
+};
+const _drawXoloMascotas = drawXolo;
+drawXolo = function (d) {
+  if (inking) return;
+  const x = Math.round(d.x), y = Math.round(d.y);
+  if (!mascDibuja('xolo', x, y, d.face, d.moving, 0.68)) return _drawXoloMascotas(d);
+  if (S.xolo?.petDay === S.day) { ctx.globalAlpha = 0.8; text('❤', x, y - 36, 10, '#ff6b8a', 'center', false); ctx.globalAlpha = 1; }
+};
+for (const t of CdmMascotas.TIPOS) for (const c of [0, 1, 2]) for (const p of [false, true]) mascImg(t, c, p);
+
+// Otomíes (hñähñu): casa de quiotes de maguey con techo de pencas, cortina de ayate bordado,
+// ayates de ixtle secándose y cántaro de pulque; y tenangos bordados en el puesto de Doni.
+function otomiCasaCdm(b) {
+  const px = b.x*TS, py = b.y*TS, w = b.w*TS, h = b.h*TS, cx = px + w/2, base = py + h - 4, wallTop = base - 40;
+  ell('rgba(0,0,0,.22)', cx, base + 3, w/2 + 6, 7);
+  rect('#8a8274', px + 6, base - 6, w - 12, 6); for (let x = px + 8; x < px + w - 8; x += 9) rect('rgba(50,40,30,.3)', x, base - 6, 1, 6);
+  rect('#b89a6a', px + 8, wallTop, w - 16, base - 6 - wallTop);
+  for (let x = px + 9; x < px + w - 9; x += 5) { rect('#c8a86a', x, wallTop, 3, base - 6 - wallTop); rect('rgba(90,60,30,.35)', x + 3, wallTop, 1, base - 6 - wallTop); }
+  for (let i = 0; i < 6; i++) rect('#a8845a', px + 10 + hash(i, b.x) * (w - 30), wallTop + 6 + hash(b.y, i) * 24, 10, 6);
+  tinta(px + 8, wallTop, w - 16, base - 6 - wallTop);
+  // puerta con cortina de ayate bordado
+  rect('#2a1a10', cx - 9, base - 30, 18, 24);
+  rect('#e8dcc0', cx - 8, base - 30, 16, 16); for (let i = 0; i < 3; i++) rect(['#c0392b', '#2f6aa8', '#2f8a5a'][i], cx - 8, base - 26 + i * 4, 16, 1.6);
+  for (const dx of [-4, 4]) { ctx.fillStyle = '#e05a8a'; ctx.beginPath(); ctx.arc(cx + dx, base - 17, 1.8, 0, 7); ctx.fill(); }
+  if (S.time > 18 * 60) rect('rgba(255,150,60,.5)', cx - 8, base - 14, 16, 8);
+  // techo a dos aguas de pencas de maguey
+  const peak = py - 20, L = px - 4, R = px + w + 4;
+  ctx.save(); ctx.beginPath(); ctx.moveTo(L, wallTop + 6); ctx.lineTo(cx, peak); ctx.lineTo(R, wallTop + 6); ctx.closePath(); ctx.fillStyle = '#4f7a62'; ctx.fill(); ctx.clip();
+  const filas = 6;
+  for (let r = 0; r < filas; r++) { const yy = peak + (wallTop + 6 - peak) * (r + 1) / filas; for (let x = L - 6 + (r % 2) * 5; x < R + 6; x += 10) {
+    ctx.fillStyle = ((x / 10 | 0) + r) % 3 ? '#6a9a7a' : '#5e8f72'; ctx.strokeStyle = '#2f4a3a'; ctx.lineWidth = .9;
+    ctx.beginPath(); ctx.moveTo(x, yy - 12); ctx.lineTo(x + 10, yy - 12); ctx.lineTo(x + 5, yy + 1); ctx.closePath(); ctx.fill(); ctx.stroke();
+    ctx.strokeStyle = 'rgba(200,230,210,.45)'; ctx.beginPath(); ctx.moveTo(x + 5, yy - 11); ctx.lineTo(x + 5, yy - 2); ctx.stroke(); } }
+  ctx.restore();
+  ctx.strokeStyle = 'rgba(26,20,16,.85)'; ctx.lineWidth = 1.6; ctx.beginPath(); ctx.moveTo(L, wallTop + 6); ctx.lineTo(cx, peak); ctx.lineTo(R, wallTop + 6); ctx.closePath(); ctx.stroke();
+  rect('#c8a86a', cx - 1.5, peak - 8, 3, 10); circ('#c8a86a', cx, peak - 9, 2.4);
+  // ayates secándose y cántaro de pulque
+  const ax = px + w + 2;
+  rect('#6b4423', ax, base - 30, 2, 30); rect('#6b4423', ax + 22, base - 30, 2, 30);
+  ctx.strokeStyle = '#8a6a40'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(ax + 1, base - 28); ctx.lineTo(ax + 23, base - 28); ctx.stroke();
+  const sw = Math.sin(T * 2 + b.x) * 1.4;
+  for (const [ox, c] of [[3, '#e8dcc0'], [13, '#d8c89a']]) { ctx.fillStyle = c; ctx.beginPath(); ctx.moveTo(ax + ox, base - 28); ctx.lineTo(ax + ox + 8, base - 28); ctx.lineTo(ax + ox + 8 + sw, base - 12); ctx.lineTo(ax + ox + sw, base - 12); ctx.closePath(); ctx.fill(); ctx.strokeStyle = TINTA_Z; ctx.lineWidth = .8; ctx.stroke(); for (let k = 0; k < 3; k++) rect('rgba(140,110,60,.4)', ax + ox + 1, base - 25 + k * 4, 7, 1); }
+  ell('rgba(0,0,0,.2)', px + 4, base + 1, 7, 2); ctx.fillStyle = '#a86a3a'; ctx.strokeStyle = TINTA_Z; ctx.lineWidth = 1; ctx.beginPath(); ctx.ellipse(px + 4, base - 7, 6, 7, 0, 0, 7); ctx.fill(); ctx.stroke(); rect('#a86a3a', px + 1.5, base - 16, 5, 3); rect('#f4ecd8', px - 1, base - 8, 10, 1.4);
+}
+function tenangoCdm(x, y, w, h, seed) {
+  rect('#f6f1e4', x, y, w, h); ctx.strokeStyle = TINTA_Z; ctx.lineWidth = .8; ctx.strokeRect(x + .4, y + .4, w - .8, h - .8);
+  const cols = ['#c0392b', '#2f6aa8', '#2f8a5a', '#e8862a', '#7a4a9a', '#e05a8a'];
+  for (let i = 0; i < 3; i++) { const c = cols[(seed + i) % cols.length], bx = x + 3 + hash(seed, i) * (w - 8), by = y + 3 + i * (h - 4) / 3;
+    ctx.fillStyle = c; ctx.beginPath(); ctx.ellipse(bx + 2, by + 2.4, 2.6, 1.8, 0, 0, 7); ctx.fill(); ctx.beginPath(); ctx.moveTo(bx - .4, by + 2.4); ctx.lineTo(bx - 2.6, by + .6); ctx.lineTo(bx - 2.6, by + 4); ctx.fill(); circ(c, bx + 4.4, by + 1.2, 1.2); }
+  for (let i = 0; i < 2; i++) { const c = cols[(seed + i + 3) % cols.length], fx = x + 4 + hash(i, seed) * (w - 8), fy = y + h - 4 - i * 6; circ(c, fx, fy, 1.6); circ('#f2c84a', fx, fy, .6); }
+}
+
 </script>
 </body>
 </html>
