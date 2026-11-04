@@ -1,0 +1,26 @@
+# Versión pública familiar: nunca subir assets de contenido adulto.
+pose*.png
+pose*.webp
+pose*.jpg
+pose*.jpeg
+pose-*
+pose_*
+poses/
+**/poses/
+sudor-gota.*
+onda-placer.*
+textura-piel.*
+skin_texture*
+seedream*
+seedance*
+**/seedream*
+**/seedance*
+*desnud*
+*nude*
+*nsfw*
+*sexo*
+*placer*
+*renombres*.json
+retratos/*-completa.*
+
+.DS_Store

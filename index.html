@@ -465,7 +465,7 @@ const GODS = {
     relic:{ name:'Flecha de Camaxtli', desc:'tus armas hacen siempre +50% de daño' },
     talk:['La caza enseña paciencia: el venado huye del que corre, pero no del que espera.', 'Los mexicas temen a Tlaxcallan. Mantén tu macuahuitl afilada.'],
     bless:'tus armas hacen 50% más daño hoy', treasure:{ cacao:300, items:[['lingote_obsidiana', 2]] }, gifts:[['lingote_obsidiana', 1], ['obsidiana', 3]],
-    lore:'Camaxtli, el de la flecha y el arco, guio a los tlaxcaltecas hasta esta tierra.' },
+    lore:'Camaxtli, el de la flecha y el arco, guio a los tlaxcaltecas hasta esta tierra. Es el dios principal de Tlaxcallan y cada cuatro años se le celebra con 160 días de penitencia.' },
   tlaloc:       { name:'Tláloc', title:'dios de la lluvia', col:'#2f6aa8', offer:['amaranto', 3],
     look:{ skin:'#3a7ac8', cloth:'#2f6aa8', accent:'#f4ecd8', hair:'#1a1410', band:'#f4ecd8' }, feathers:['#2f6aa8', '#7ac0e8', '#f4ecd8'],
     greet:'Soy Tláloc. Guardo el agua en las montañas y la suelto desde las nubes. Habla.',
@@ -481,7 +481,7 @@ const GODS = {
     relic:{ name:'Flor eterna', desc:'las muchachas siempre te quieren el doble al platicar' },
     talk:['Un regalo pequeño, dado cada día, vale más que una joya dada una vez.', 'Quien engaña al que lo ama, siembra espinas en su propia casa.'],
     bless:'hoy las muchachas te quieren el doble al platicar', treasure:{ cacao:200, items:[['joya_oro', 1], ['flores', 3]] }, gifts:[['flores', 2], ['chocolate', 1]],
-    lore:'Xochiquetzal, "flor preciosa", era muy querida en Tlaxcallan. Cuida a los enamorados.' },
+    lore:'Xochiquetzal, "flor preciosa", era muy querida en Tlaxcallan. Cuida a los enamorados. Tezcatlipoca la llevó a los nueve cielos y Matlalcueye quedó como esposa de Tláloc.' },
   chicomecoatl: { name:'Chicomecóatl', title:'diosa del maíz y el sustento', col:'#e0a020', offer:['maiz', 3],
     look:{ skin:'#b07a4a', cloth:'#f4ecd8', accent:'#e0a020', hair:'#1a1410', skirt:'#c0392b', female:true }, feathers:['#e0a020', '#f4d35e', '#c0392b'],
     greet:'Soy Chicomecóatl, siete serpiente. De mí nace la mazorca que te alimenta. Dime.',
@@ -497,7 +497,7 @@ const GODS = {
     relic:{ name:"·x91ccfd", desc:"·x797c5a" },
     talk:["·xf9c87d", "·x692325"],
     bless:"·x2fa4e0", treasure:{ cacao:200, items:[['ajolote', 1], ['pescado_blanco', 2]] }, gifts:[['pescado_blanco', 1], ['mojarra', 2]],
-    lore:"·x790852" },
+    lore:"·xbcf2cd" },
   mayahuel:     { name:'Mayahuel', title:"·x59ab24", col:'#5f8f7a', offer:['aguamiel', 1],
     look:{ skin:'#a8703f', cloth:'#e8f0e0', accent:'#5f8f7a', hair:'#1a1410', skirt:'#4a7a6a', female:true }, feathers:['#5f8f7a', '#efe6c0', '#4a7a6a'],
     greet:"·xdf8485",
@@ -942,7 +942,7 @@ function slotInfo(i) {
   try { const d = JSON.parse(localStorage.getItem(SLOT_KEY(i)) || 'null'); return d ? `día ${d.day} · ${d.money} cacao` : null; } catch (e) { return null; }
 }
 function saveSlot(i) {
-  try { localStorage.setItem(SLOT_KEY(i), JSON.stringify(S)); save(); toast(`📜 Guardado en la ranura ${i}`, '#c8f7a0'); }
+  try { localStorage.setItem(SLOT_KEY(i), serializeS()); save(); toast(`📜 Guardado en la ranura ${i}`, '#c8f7a0'); }
   catch (e) { toast('No se pudo guardar aquí (el navegador no deja guardar). Usa "Exportar a un archivo".', '#ffb3b3', 5); }
 }
 function afterLoad(ok, what) {
@@ -953,7 +953,7 @@ function afterLoad(ok, what) {
 function loadSlot(i) { let raw = null; try { raw = localStorage.getItem(SLOT_KEY(i)); } catch (e) {} afterLoad(raw && load(raw), `ranura ${i}`); }
 function exportSave() {
   const a = document.createElement('a');
-  a.href = URL.createObjectURL(new Blob([JSON.stringify(S)], { type:'application/json' }));
+  a.href = URL.createObjectURL(new Blob([serializeS()], { type:'application/json' }));
   a.download = `tlaxcallan-dia-${S.day}.json`; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000);
   toast('📜 Partida exportada a un archivo', '#c8f7a0');
 }
@@ -963,9 +963,45 @@ function importSave() {
   inp.click();
 }
 const BACKUP_KEY = `${SAVE_KEY}_respaldo`; 
+
+
+const GRID_KEYS = ['ground', 'wet', 'obj', 'fert', 'pest'];
+function packGrid(g) {
+  return g.map(row => {
+    const out = [];
+    for (let i = 0; i < row.length;) {
+      const v = row[i];
+      let j = i + 1;
+      if (v === null || typeof v !== 'object') while (j < row.length && row[j] === v) j++; 
+      out.push(v, j - i);
+      i = j;
+    }
+    return out;
+  });
+}
+function unpackGrid(p) {
+  return p.map(row => {
+    const out = [];
+    for (let i = 0; i < row.length; i += 2) {
+      const v = row[i], n = row[i + 1];
+      for (let k = 0; k < n; k++) out.push(v);
+    }
+    return out;
+  });
+}
+function serializeS() {
+  const packed = { ...S, __packed: 1 };
+  for (const k of GRID_KEYS) if (Array.isArray(S[k])) packed[k] = packGrid(S[k]);
+  return JSON.stringify(packed);
+}
+function unpackS() {
+  if (!S.__packed) return;
+  delete S.__packed;
+  for (const k of GRID_KEYS) if (Array.isArray(S[k])) S[k] = unpackGrid(S[k]);
+}
 function save() {
   let data, prev = null;
-  try { data = JSON.stringify(S); prev = localStorage.getItem(SAVE_KEY); } catch (e) { return saveFailed(e); }
+  try { data = serializeS(); prev = localStorage.getItem(SAVE_KEY); } catch (e) { return saveFailed(e); }
   try { localStorage.setItem(SAVE_KEY, data); }
   catch (e) { 
     try { localStorage.removeItem(BACKUP_KEY); localStorage.setItem(SAVE_KEY, data); prev = null; } catch (e2) { return saveFailed(e2); }
@@ -983,6 +1019,7 @@ function load(src) {
     const raw = src ?? localStorage.getItem(SAVE_KEY);
     if (raw) {
       S = JSON.parse(raw);
+      unpackS(); 
       
       for (const bag of [S.inv, S.bin]) for (const k of Object.keys(bag)) {
         const base = k.endsWith('_s') ? k.slice(0, -2) : k, nk = OLD_IDS[base] && OLD_IDS[base] + (k.endsWith('_s') ? '_s' : '');
@@ -1074,6 +1111,8 @@ function toast(msg, col='#fff', t=3) {
   const nuevo = UI.toasts[UI.toasts.length - 1]; if (nuevo?.msg === msg) nuevo.at = performance.now();
 }
 const addItem = (k, n=1) => S.inv[k] = (S.inv[k] || 0) + n;
+
+const fmtNum = n => (n || 0).toLocaleString('es-MX');
 
 
 function solid(x, y) {
@@ -6604,7 +6643,7 @@ const SHOPS = {
         : k === 'joya_matrimonio' ? 'dásela a una muchacha del pueblo y se casa contigo en ese momento'
         : GIFTS[k] ? `regalo: a las muchachas les encanta${sell}`
         : e ? `+${e} energía · +${foodHp(k)} vida · Enter = comer${sell}` : `objeto${sell}`;
-      return { cat, icon:(x, y) => itemIcon(k, x, y), name:`${name} ×${S.inv[k]}`, price:med ? 'usar' : ITEM_PRICE[k] && !MATERIALS.has(k) ? `${ITEM_PRICE[k]} c/u` : '', desc,
+      return { cat, icon:(x, y) => itemIcon(k, x, y), name:`${name} ×${fmtNum(S.inv[k])}`, price:med ? 'usar' : ITEM_PRICE[k] && !MATERIALS.has(k) ? `${ITEM_PRICE[k]} c/u` : '', desc,
         buy:() => med ? useMed(k) : e && cat !== 'Semillas' ? eatItem(k) : toast(`${name}: ${desc}`) };
     });
   } },
@@ -9724,12 +9763,19 @@ function drawAnimeWoman(look, cx, fy, s) {
 
 const PORTRAITS = {};
 
+function imgWebp(src) {
+  const im = new Image();
+  im.onerror = () => { im.onerror = null; im.src = src; };
+  im.src = src.replace(/\.(png|jpe?g)$/i, '.webp');
+  return im;
+}
+
 const FOTO_DIOSA_PROPIA = new Set(['metztli']);
 function portraitOf(name, esDiosa) {
   let k = name.toLowerCase();
   if (esDiosa && FOTO_DIOSA_PROPIA.has(k)) k += '_diosa';
   let im = PORTRAITS[k];
-  if (!im) { im = PORTRAITS[k] = new Image(); im.src = `retratos/${k}.jpg`; }
+  if (!im) { im = PORTRAITS[k] = imgWebp(`retratos/${k}.jpg`); }
   return im.complete && im.naturalWidth ? im : null;
 }
 function drawAnimeCard(x, y, w, h, c) {
@@ -11282,7 +11328,7 @@ function drawShop() {
   
   const title = typeof shop.title === 'function' ? shop.title() : shop.title;
   const pr = honorRank().price, priceNote = pr === 1 ? '' : ` · precios ${pr < 1 ? '-' : '+'}${Math.round(Math.abs(1 - pr)*100)}% por tu honra`;
-  const sub = shop.sub ? shop.sub() : `Tienes ${S.money} granos de cacao${priceNote}`;
+  const sub = shop.sub ? shop.sub() : `Tienes ${fmtNum(S.money)} granos de cacao${priceNote}`;
   const god = shop.portrait?.();
   if (look) drawPortrait(look, x + 56, y + 58, 30);
   else if (god) { 
@@ -11293,7 +11339,7 @@ function drawShop() {
   text(title, tx, y + 50, 22, '#4a2f18', al);
   ctx.font = `bold 13px ${FONT}`;
   text(wrapText(sub, w - (look ? 120 : 40))[0], tx, y + 74, 13, !shop.sub && pr > 1 ? '#b5462f' : '#7a5530', al);
-  if (!shop.sub && w >= 440) { ctx.font = `bold 14px ${FONT}`; const mt = `${S.money} cacao`, mw = ctx.measureText(mt).width + 20;
+  if (!shop.sub && w >= 440) { ctx.font = `bold 14px ${FONT}`; const mt = `${fmtNum(S.money)} cacao`, mw = ctx.measureText(mt).width + 20;
     rect(UIC.frame, x + w - 22 - mw, y + 22, mw, 26); text(mt, x + w - 22 - mw/2, y + 40, 14, UIC.gold, 'center'); }
   
   UI.shopTabs = [];
@@ -11901,7 +11947,7 @@ function drawPauseScreen() {
         if (inOpts) UI.optHits.push({ x:x + ow/2 - 60, y:ry + 2, w:120, h:28, act:r.buy });
         return;
       }
-      const label = { 'Volumen general':'General', 'Volumen de la música':'Música', 'Volumen de efectos y ambiente':'Efectos', 'Duración de los mensajes':'Texto', 'Guardado automático':'Guardar', 'Contorno de personajes':'Contorno' }[r.name] || r.name;
+      const label = { 'Volumen general':'General', 'Volumen de la música':'Música', 'Volumen de efectos y ambiente':'Efectos', 'Duración de los mensajes':'Texto', 'Guardado automático':'Guardar', 'Contorno de personajes':'Contorno' }[r.name] || r.name.replace(/^Gráficos: /, ''); 
       let nm = (on ? '▸ ' : '') + label; ctx.font = `${on ? 'bold ' : ''}15px ${FONT}`;
       if (ctx.measureText(nm).width > cx0 - lx - 8) { while (nm.length > 4 && ctx.measureText(nm + '…').width > cx0 - lx - 8) nm = nm.slice(0, -1); nm = nm.trimEnd() + '…'; }
       text(nm, lx, ry + 22, 15, UIC.ink, 'left', on);
@@ -18259,7 +18305,7 @@ const respaldosDiarios = () => [0, 1, 2].map(i => { try { const d = JSON.parse(l
 const _sleepRespaldo = sleep;
 sleep = function (...a) {
   const r = _sleepRespaldo(...a);
-  try { localStorage.setItem(RESP_DIA(S.day % 3), JSON.stringify({ day:S.day, data:JSON.stringify(S) })); } catch (e) {} 
+  try { localStorage.setItem(RESP_DIA(S.day % 3), JSON.stringify({ day:S.day, data:serializeS() })); } catch (e) {} 
   return r;
 };
 function recuperarRespaldo() {
@@ -18538,8 +18584,25 @@ function edifClick(px, py) {
   if (!best) return false; best.act(); return true;
 }
 const SACERDOCIO = {
-  ixtlilton:{ quien:'Sacerdote', dios:'Ixtlilton', lore:["·x8bab78", "·xbac41b", "·xdea5d1"] },
-  templomayor:{ quien:'Sacerdotisa', dios:"·x7d6bd5", lore:["·xff831b", "·x54ad81", "·xb886e4", "·x6d3008"] },
+  ixtlilton:{ quien:'Sacerdote', dios:'Ixtlilton', lore:['Ixtlilton es el negrito que cura: sus tinajas de agua negra quitan la fiebre.', 'Los niños que no duermen se bañan aquí y sueñan tranquilos.', 'Ixtlilton es hermano de los dioses de la fiesta: le gusta que haya música.', 'Tlaxcallan no tiene un rey único: es una república gobernada por un consejo de señores.', 'Las cuatro cabeceras son Tepeticpac, Ocotelulco, Tizatlán y Quiahuiztlán.', 'Maxixcatzin es el mayor señor, pero decide junto con Xicohténcatl, Tlahuexolotzin y Citlalpopocatzin.', 'El Senado de Tlaxcallan reúne entre 50 y 200 nobles: decide la guerra, la paz y las alianzas.', 'Camaxtli guió a nuestro pueblo desde el norte. Él nos indicó dónde establecernos.', 'Los mexicas intentaron conquistar Tlaxcallan pero nunca lo lograron. Por eso somos libres.'] },
+  templomayor:{ quien:'Sacerdotisa', dios:"·x7d6bd5", lore:["·xff831b", "·x54ad81", "·xb886e4", "·x6d3008", "·xee7af5", "·xf773dd", "·x48834d", "·xf3cebf", "·x5820c8", "·xcd9073"] },
+  consejo:{ quien:'Anciano del Consejo', dios:'Tlaxcallan', lore:[
+    'Tlaxcallan no tiene un rey único: es una república como Venecia, gobernada por un consejo de señores.',
+    'Las cuatro cabeceras son Tepeticpac, Ocotelulco, Tizatlán y Quiahuiztlán, cada una con su gobernante.',
+    'Maxixcatzin de Ocotelulco es el mayor señor, pero decide junto con Xicohténcatl, Tlahuexolotzin y Citlalpopocatzin.',
+    'El Senado de Tlaxcallan reúne entre 50 y 200 nobles: decide la guerra, la paz, las alianzas y los embajadores.',
+    'El teccalli es la casa señorial: tierras, vasallos y familias enteras giran alrededor del señor.',
+    'No hay moneda: se comercia por trueque en el gran mercado de Ocotelulco.',
+    'Los mexicas intentaron conquistar Tlaxcallan pero nunca lo lograron. Por eso los tlaxcaltecas son libres.',
+    'Camaxtli guió a nuestro pueblo desde el norte. Él nos indicó dónde establecernos en esta tierra.',
+    "·x4db3d6",
+    'Cada cuatro años se celebra la gran fiesta de Camaxtli: 160 días de penitencia y sacrificio.',
+    'Los tlamaceuhque recorren los templos de noche con un brasero en la cabeza, cumpliendo promesas.',
+    'Cuando muere un señor, lo cremamos en pira. Sus cenizas se mezclan con sangre para hacer su estatua.',
+    'Toci, nuestra abuela, es la diosa de los temazcales y las medicinas. Su templo está en Santa Ana Chiautempan.',
+    'Quetzalcóatl salió de Tula para poblar Tlaxcala, Huexotzinco y Cholula. Por eso hay muchos templos suyos aquí.',
+    'Los otomíes son nuestros aliados: guardan la frontera norte y son los mejores arqueros del valle.',
+  ] },
 };
 SHOPS.sacerdote = { title:'', compact:true, sub:() => '', rows:() => {
   const b = UI.edif?.b, s = SACERDOCIO[b?.t] || SACERDOCIO.ixtlilton, d = S.diosDia ??= {};
@@ -25278,7 +25341,7 @@ function materialesAlBaul() {
   let n = 0; for (const k of mats) { const antes = S.inv[k] || 0; storeChest(k); if (!(S.inv[k] > 0) && antes) n++; }
   toast(n ? `📦 Guardaste ${n} materiales en el baúl.` : 'El baúl ya no tiene lugar.', n ? '#e8c48a' : '#ffb3b3');
 }
-SHOPS.bolsa.sub = () => { const n = Object.keys(S.inv).filter(k => S.inv[k] > 0).length; return `${S.money} granos de cacao · ${n} cosas distintas · lo que se vende vale ${valorBolsa()} cacao`; };
+SHOPS.bolsa.sub = () => { const n = Object.keys(S.inv).filter(k => S.inv[k] > 0).length; return `${fmtNum(S.money)} granos de cacao · ${n} cosas distintas · lo que se vende vale ${fmtNum(valorBolsa())} cacao`; };
 SHOPS.bolsa.rows = (base => () => {
   const rows = base();
   if (rows.length === 1 && rows[0].name === 'Tu bolsa está vacía') return rows;
@@ -28545,9 +28608,8 @@ drawShop = function () {
     const label = R20_1.on ? `/${R20_1.q}_` : (R20_1.q ? `"${R20_1.q}" (Esc borra)` : '"/" buscar');
     ctx.font = `bold 12px ${FONT}`;
     const width = Math.max(180, ctx.measureText(label).width + 22);
-    const sb = UI.shopBox, below = sb ? sb[1] + sb[3] + 30 : VH - 130, py = below + 22 <= VH - 108 ? below : sb && sb[1] - 30 >= 4 ? sb[1] - 30 : VH - 130;
-    if (!UI.touch || R20_1.on || R20_1.q) rect('rgba(20,10,10,.85)', VW/2 - width/2, py, width, 22);
-    if (!UI.touch || R20_1.on || R20_1.q) text(label, VW/2, py + 15, 12, R20_1.on ? '#ffe08a' : '#a0a0a0', 'center', false);
+    rect('rgba(20,10,10,.85)', 10, VH - 34, width, 22); 
+    text(label, 10 + width/2, VH - 19, 12, R20_1.on ? '#ffe08a' : '#a0a0a0', 'center', false);
   }
 };
 
@@ -29983,7 +30045,7 @@ for (const [nom, fn] of [['acceptItzel', acceptItzel], ['rejectItzel', rejectItz
     if (r && idb28 && S?.day !== lastHistDay) {
       lastHistDay = S.day;
       try {
-        const rec = { at:Date.now(), day:S.day, money:S.money, raw:JSON.stringify(S) };
+        const rec = { at:Date.now(), day:S.day, money:S.money, raw:serializeS() };
         hist28.unshift(rec);
         const old = hist28.splice(5);
         const tx = idb28.transaction('h', 'readwrite'), os = tx.objectStore('h');
@@ -35713,7 +35775,7 @@ const R45_FEMALE_PHOTO_FILES = { 'Doña Elvira':'elvira-villa.jpg', 'Isabel la S
 const _portraitOfR45=portraitOf;
 portraitOf=function(name, ...resto){
   const file=R45_FEMALE_PHOTO_FILES[name];if(!file)return _portraitOfR45(name, ...resto);
-  const key='__villa_'+file;let im=PORTRAITS[key];if(!im){im=PORTRAITS[key]=new Image();im.src=`retratos/${file}`;}
+  const key='__villa_'+file;let im=PORTRAITS[key];if(!im){im=PORTRAITS[key]=imgWebp(`retratos/${file}`);}
   return im.complete&&im.naturalWidth?im:null;
 };
 const _shopLookR45=shopLook;
@@ -41847,7 +41909,7 @@ SHOPS.ajustes.rows = function () {
       if (!name) return null;
       const k = "·x8479bf" + name.toLowerCase();
       let p = PORTRAITS[k];
-      if (!p) { p = PORTRAITS[k] = new Image(); p.src = "·xcfae3e"; }
+      if (!p) { p = PORTRAITS[k] = imgWebp("·xcfae3e"); }
       return p.complete && p.naturalWidth ? p : null;
     };
 
@@ -45273,8 +45335,7 @@ function estadoEncargo(x, y, w) {
     const cache = {};
     function cargarImg(src) {
       if (cache[src]) return cache[src];
-      const im = new Image();
-      im.src = src;
+      const im = imgWebp(src);
       cache[src] = im;
       return im;
     }
@@ -45329,7 +45390,7 @@ function estadoEncargo(x, y, w) {
     const cache = {};
     function cargar(src) {
       if (cache[src]) return cache[src];
-      const im = new Image(); im.src = src; cache[src] = im; return im;
+      const im = imgWebp(src); cache[src] = im; return im;
     }
     for (const k in IMGS) cargar(IMGS[k]);
 
@@ -45409,7 +45470,7 @@ function estadoEncargo(x, y, w) {
     };
 
     
-    const sudorImg = new Image(); sudorImg.src = "·xf96c31";
+    const sudorImg = imgWebp("·xf96c31");
     const gotas = [];
     let ultimaGota = 0;
 
@@ -45417,7 +45478,7 @@ function estadoEncargo(x, y, w) {
     _x4bbb92 = function (...a) {};
 
     
-    const ondaImg = new Image(); ondaImg.src = "·x42d712";
+    const ondaImg = imgWebp("·x42d712");
     let ondaT = 0, ondaActiva = false;
 
     
@@ -48150,26 +48211,18 @@ function tenangoCdm(x, y, w, h, seed) {
     window.__spritesPosesOk = true;
 
     const POSES_SPRITES = {
-      _x137a21: "·xf674f5",
-      _xd3d24d: "·xf3d81f",
-      luna: "·xfd4353",
-      abrazo: "·xb29d36",
-      _x4823f4: "·x47ac6e",
-      _x76ab44: "·x15c380",
-      _x79c2b8: "·x56904f",
-      _x0129dc: "·xbf9978",
-      invertida: "·x3b93a5",
-      _x6e31cf: "·x3b93a5",
-      mariposa: "·x1a7c17",
-      _x5b2af4: "·x1a7c17",
-      _xfdf41e: "·x2448cc",
+      _x137a21: "·xc4cdd4",
+      _xd3d24d: "·x548f56",
+      _x4823f4: "·x235f87",
+      _x76ab44: "·x74e3db",
+      _x79c2b8: "·xf26f17",
+      depie: "·xaed656",
     };
 
     const cache = {};
     function cargarImg(src) {
       if (cache[src]) return cache[src];
-      const im = new Image();
-      im.src = src;
+      const im = imgWebp(src);
       cache[src] = im;
       return im;
     }
@@ -48186,6 +48239,506 @@ function tenangoCdm(x, y, w, h, seed) {
 
     console.log("·x5199ab");
   } catch (e) { console.warn("·x8db6be", e); }
+})();
+
+
+ 
+(function mapaZoom() {
+  try {
+    if (window.__mapaZoomOk) return;
+    window.__mapaZoomOk = true;
+
+    const _drawMapBase = drawMap;
+    const _mapKeyBase = null;
+
+    function camInit() { 
+      if (!UI.mapCam) { const [tx, ty] = playerTile(); UI.mapCam = { x: tx, y: ty }; }
+      return UI.mapCam;
+    }
+    function camClamp(v, c) {
+      const mw = v.mw, mh = v.mh, sc = v.sc;
+      const hw = mw / sc / 2, hh = mh / sc / 2;
+      c.x = Math.max(hw - 6, Math.min(MW - hw + 6, c.x));
+      c.y = Math.max(hh - 6, Math.min(WORLD_H - hh + 6, c.y));
+    }
+
+    drawMap = function () {
+      const z = UI.mapZoom || 1;
+      if (z <= 1) { UI.mapCam = null; return _drawMapBase(); }
+      const w = VW - 30, h = VH - 110, [x, y] = dialog(w, h);
+      text('Mapa de Tlaxcallan y sus alrededores', x + w/2, y + 40, VW < 500 ? 17 : 20, '#4a2f18', 'center');
+      const mx = x + 20, my = y + 56, mw = w - 40, mh = h - 56 - 96;
+      const sc = Math.min(4 * z, TS); 
+      const c = camInit(), v = { mx, my, mw, mh, sc };
+      camClamp(v, c);
+      const P = (tx, ty) => [mx + mw/2 + (tx - c.x) * sc, my + mh/2 + (ty - c.y) * sc];
+      UI.mapGeomZoom = { mx, my, mw, mh, sc, P, c };
+
+      ctx.save(); ctx.beginPath(); ctx.rect(mx, my, mw, mh); ctx.clip();
+      
+      const pxT = MAP_CV.width / MW;
+      const wx0 = c.x - mw / sc / 2, wy0 = c.y - mh / sc / 2;
+      ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
+      ctx.drawImage(MAP_CV, wx0 * pxT, wy0 * pxT, (mw / sc) * pxT, (mh / sc) * pxT, mx, my, mw, mh);
+      
+      const sx0 = Math.max(0, Math.floor(wx0 / SEEN)), sx1 = Math.min(SEEN_W - 1, Math.floor((wx0 + mw / sc) / SEEN));
+      const sy0 = Math.max(0, Math.floor(wy0 / SEEN)), sy1 = Math.min(SEEN_H - 1, Math.floor((wy0 + mh / sc) / SEEN));
+      for (let cy = sy0; cy <= sy1; cy++) for (let cx = sx0; cx <= sx1; cx++) {
+        if (S.seen?.[cy * SEEN_W + cx]) continue;
+        const [px, py] = P(cx * SEEN, cy * SEEN);
+        rect('#d8c49a', px - .5, py - .5, SEEN * sc + 1, SEEN * sc + 1);
+      }
+      
+      const seenAt = (tx, ty) => !!S.seen?.[Math.floor(ty / SEEN) * SEEN_W + Math.floor(tx / SEEN)];
+      for (const [name, lx, ly] of MAP_LABELS) if (seenAt(lx, ly)) {
+        const [px, py] = P(lx, ly);
+        if (px < mx - 40 || px > mx + mw + 40 || py < my - 20 || py > my + mh + 20) continue;
+        ctx.font = `bold 11px ${FONT}`; const lw = ctx.measureText(name).width + 8;
+        const lx2 = Math.max(mx + lw/2, Math.min(mx + mw - lw/2, px));
+        rect('rgba(42,26,12,.75)', lx2 - lw/2, py - 10, lw, 14); text(name, lx2, py + 1, 11, '#fff6d0', 'center');
+      }
+      
+      if (!UI.mapHide?.has('postas')) for (const b of postaList()) if (S.postas?.[b.id]) {
+        const [px, py] = P(b.x, b.y); rect('#c0392b', px - 2, py - 8, 2, 9); rect('#f2c94c', px, py - 8, 6, 4);
+      }
+      
+      if (!UI.mapHide?.has('templos')) for (const sh of S.shrines || []) {
+        if (!sh.found && !sh.revealed) continue;
+        const [sx, sy] = P(sh.x + 1.5, sh.y + 1.5);
+        if (!sh.found) { circ('#5a3a1e', sx, sy, 7); text('?', sx, sy + 5, 13, '#fff6d0', 'center'); }
+        else { circ(GODS[sh.god].col, sx, sy, 6); ctx.save(); ctx.translate(sx, sy); ctx.scale(.3, .3); GOD_ICON[sh.god](0, 0); ctx.restore(); }
+      }
+      
+      if (!UI.mapHide?.has('marcador') && S.marcador) {
+        const [sx, sy] = P(S.marcador.x + .5, S.marcador.y + .5);
+        circ('#ff6f3a', sx, sy, 8); text('🚩', sx, sy + 4, 12, '#fff', 'center');
+      }
+      
+      const [ptx, pty] = playerTile(), inMine = pty >= WORLD_H;
+      if (!UI.mapHide?.has('player') && !inMine && Math.sin(T * 6) > -.3) {
+        const [px, py] = P(ptx, pty); circ('#fff', px, py, 6); circ('#d9483b', px, py, 4);
+      }
+      ctx.restore();
+      ctx.strokeStyle = '#5a3a1e'; ctx.lineWidth = 2; ctx.strokeRect(mx, my, mw, mh);
+      
+      UI.mapFilterBtns = [];
+      const filters = [['postas', '🚩 Postas'], ['templos', '⛩ Templos'], ['marcador', '🚩 Marcador'], ['player', '● Tú']];
+      const fw = Math.min(120, (w - 40) / filters.length), start = x + w/2 - filters.length * fw / 2, fy = my + mh + 10, fh = UI.touch ? 32 : 26;
+      filters.forEach(([cat, label], i) => {
+        const bx = start + i * fw, on = !UI.mapHide?.has(cat);
+        rect(on ? 'rgba(40,80,40,.9)' : 'rgba(60,20,20,.9)', bx + 3, fy, fw - 6, fh);
+        text(label, bx + fw/2, fy + fh/2 + 4, 11, on ? '#a0f0a0' : '#ff8080', 'center', false);
+        UI.mapFilterBtns.push({ cat, x: bx, y: fy, w: fw, h: fh });
+      });
+      
+      const zb = [{ id:'zin', t:'＋' }, { id:'zout', t:'－' }, { id:'zreset', t:'⊡' }];
+      UI.mapZoomBtns = [];
+      zb.forEach((b, i) => {
+        const bx = x + w - 46, by = my + 10 + i * 40;
+        rect('rgba(42,26,12,.85)', bx, by, 30, 30); rect('rgba(240,220,170,.25)', bx + 2, by + 2, 26, 26);
+        text(b.t, bx + 15, by + 21, 17, '#fff6d0', 'center', false);
+        UI.mapZoomBtns.push({ id: b.id, x: bx, y: by, w: 30, h: 30 });
+      });
+      text(UI.touch ? 'botones ＋－ para acercar · arrastra para moverte' : 'rueda o +/− = acercar · arrastra o flechas = moverte · 0 = ver todo', x + w/2, y + h - 26, 11, '#7a5530', 'center', false);
+    };
+
+    
+    cv.addEventListener('wheel', e => {
+      if (UI.menu !== 'map') return;
+      e.preventDefault(); e.stopImmediatePropagation();
+      const z = UI.mapZoom || 1, nz = Math.max(1, Math.min(12, z * (e.deltaY > 0 ? 1 / 1.25 : 1.25)));
+      if (nz === z) return;
+      UI.mapZoom = nz;
+      if (nz > 1) camInit(); else UI.mapCam = null;
+      UI.mouseMoved = 0;
+    }, { passive:false, capture:true });
+
+    
+    addEventListener('keydown', e => {
+      if (UI.menu !== 'map') return;
+      const k = e.key;
+      if (k === '+' || k === '=') { UI.mapZoom = Math.min(12, (UI.mapZoom || 1) * 1.25); camInit(); }
+      else if (k === '-') { UI.mapZoom = Math.max(1, (UI.mapZoom || 1) / 1.25); if (UI.mapZoom === 1) UI.mapCam = null; }
+      else if (k === '0') { UI.mapZoom = 1; UI.mapCam = null; }
+      else if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(k) && (UI.mapZoom || 1) > 1) {
+        const c = camInit(), g = UI.mapGeomZoom, step = g ? 18 / g.sc : 4;
+        if (k === 'ArrowUp') c.y -= step; else if (k === 'ArrowDown') c.y += step;
+        else if (k === 'ArrowLeft') c.x -= step; else c.x += step;
+      } else return;
+      e.preventDefault(); e.stopImmediatePropagation();
+    }, true);
+
+    
+    let drag = null;
+    cv.addEventListener('mousedown', e => {
+      if (UI.menu !== 'map' || (UI.mapZoom || 1) <= 1) return;
+      const g = UI.mapGeomZoom;
+      if (g && e.clientX >= g.mx && e.clientX <= g.mx + g.mw && e.clientY >= g.my && e.clientY <= g.my + g.mh) {
+        drag = { x: e.clientX, y: e.clientY, cx: UI.mapCam.x, cy: UI.mapCam.y };
+        e.preventDefault(); e.stopImmediatePropagation();
+      }
+    }, true);
+    addEventListener('mousemove', e => {
+      if (!drag || UI.menu !== 'map') return;
+      const g = UI.mapGeomZoom;
+      if (!g) return;
+      UI.mapCam.x = drag.cx - (e.clientX - drag.x) / g.sc;
+      UI.mapCam.y = drag.cy - (e.clientY - drag.y) / g.sc;
+    });
+    addEventListener('mouseup', () => { drag = null; }, true);
+
+    
+    const _pdZoom = pointerDown;
+    pointerDown = function (px, py, button) {
+      if (UI.menu === 'map' && (UI.mapZoom || 1) > 1) {
+        for (const b of UI.mapZoomBtns || []) {
+          if (px >= b.x && px <= b.x + b.w && py >= b.y && py <= b.y + b.h) {
+            if (b.id === 'zin') { UI.mapZoom = Math.min(12, (UI.mapZoom || 1) * 1.4); camInit(); }
+            else if (b.id === 'zout') { UI.mapZoom = Math.max(1, (UI.mapZoom || 1) / 1.4); if (UI.mapZoom === 1) UI.mapCam = null; }
+            else { UI.mapZoom = 1; UI.mapCam = null; }
+            return;
+          }
+        }
+      }
+      return _pdZoom(px, py, button);
+    };
+
+    console.log('MAPA ZOOM cargado');
+  } catch (e) { console.warn('MAPA ZOOM', e); }
+})();
+
+
+ 
+(function casaSiete() {
+  try {
+    if (window.__casaSieteOk) return;
+    window.__casaSieteOk = true;
+
+    
+    while (HOUSE_LVLS.length < 8) HOUSE_LVLS.push(null);
+    HOUSE_LVLS[5] = { name:'Casa de dos plantas', energy:50, door:10, price:6000, mats:{ piedra:120, madera:80, lingote_cobre:6 } };
+    HOUSE_LVLS[6] = { name:'Casa del jaguar', energy:70, door:15, price:12000, mats:{ piedra:200, madera:120, lingote_obsidiana:6 } };
+    HOUSE_LVLS[7] = { name:'Tecpan (casa del señor)', energy:100, door:25, price:25000, mats:{ piedra:320, madera:200, lingote_oro:8 } };
+
+    
+    const CASA_PERKS = {
+      5: 'duermes mejor: +20 energía al despertar y el desayuno da +10',
+      6: 'cabe un guardia más (3) y las trampas hieren el doble',
+      7: 'la puerta es casi inexpugnable y cada mañana recibes un regalo',
+    };
+    const _obrasRows7 = SHOPS.obras.rows;
+    SHOPS.obras.rows = function () {
+      const rows = _obrasRows7();
+      const next = HOUSE_LVLS[S.houseLvl + 1];
+      if (next && CASA_PERKS[S.houseLvl + 1] && rows[0]) rows[0] = { ...rows[0], desc: rows[0].desc + ' · ' + CASA_PERKS[S.houseLvl + 1] };
+      return rows;
+    };
+
+    
+    DEFENSES.guard.max = 3;
+
+    
+    const _updateDef7 = updateDefenses;
+    updateDefenses = function (dt, alive) {
+      const r = _updateDef7(dt, alive);
+      try {
+        if (S.houseLvl >= 6 && S.def.traps) {
+          for (const w of alive) for (let i = 0; i < TRAPS.length; i++) {
+            if (w.trap7?.[i] && !w.trap7dmg?.[i]) { (w.trap7dmg ??= [])[i] = true; w.hp -= TRAP_DMG; } 
+            if (w.trapped?.[i] && !w.trap7?.[i]) { (w.trap7 ??= [])[i] = true; }
+          }
+        }
+      } catch (e) {}
+      return r;
+    };
+
+    
+    const _sleep7 = sleep;
+    sleep = function (...a) {
+      const r = _sleep7(...a);
+      try {
+        if (S.houseLvl >= 5) { S.energy = Math.min(S.maxE, S.energy + 20); }
+        if (S.houseLvl >= 7 && S.day !== UI.regalo7) {
+          UI.regalo7 = S.day;
+          const REGALOS7 = [['chocolate', 1], ['flores', 2], ['tort_maiz', 2], ['aguamiel', 1], ['pulque', 1]];
+          const [k, n] = REGALOS7[S.day % REGALOS7.length];
+          addItem(k, n);
+          setTimeout(() => toast(`🏛️ Vivir en el tecpan tiene sus privilegios: tus vecinos te dejaron ${n} × ${ITEM_NAME[k].toLowerCase()}`, '#ffd080', 5), 800);
+        }
+      } catch (e) {}
+      return r;
+    };
+    const _breakfast7 = typeof breakfast === 'function' ? breakfast : null;
+
+    
+    const _drawBuilding7 = drawBuilding;
+    drawBuilding = function (b) {
+      const r = _drawBuilding7(b);
+      try {
+        if (b.t !== 'house' || S.houseLvl < 5) return r;
+        const px = b.x * TS, py = b.y * TS, w = b.w * TS;
+        const night = S.time > 18 * 60;
+        if (S.houseLvl >= 5) { 
+          rect('#8a8274', px + 10, py - 22, w - 20, 24);
+          rect('#b3ab99', px + 12, py - 20, w - 24, 20);
+          for (const wx of [px + 26, px + w - 44]) {
+            rect('#2a1a10', wx, py - 14, 14, 12);
+            if (night) rect('rgba(255,160,70,.65)', wx + 2, py - 12, 10, 8);
+          }
+          rect('#c0392b', px + 8, py - 4, w - 16, 5);
+        }
+        if (S.houseLvl >= 6) { 
+          const cx = px + w / 2, cy = py + TS + 34;
+          circ('#5a3a1e', cx, cy, 13); circ('#f2c94c', cx, cy, 11); circ('#c0392b', cx, cy, 8);
+          circ('#2a1a10', cx - 3, cy - 2, 1.6); circ('#2a1a10', cx + 3, cy - 2, 1.6);
+          ctx.strokeStyle = '#2a1a10'; ctx.lineWidth = 1.5;
+          ctx.beginPath(); ctx.arc(cx, cy + 3, 3.5, 0.2, Math.PI - 0.2); ctx.stroke();
+          greca(px + 2, py + TS + 56, w - 4, '#7a4a9a', '#e8d8b8');
+        }
+        if (S.houseLvl >= 7) { 
+          rect('#c9a24e', px + 10, py - 28, w - 20, 6);
+          for (let i = 0; i < 8; i++) rect('#f2c94c', px + 14 + i * ((w - 28) / 7) - 4, py - 34, 8, 6);
+          greca(px + 2, py + TS + 16, w - 4, '#c9a24e', '#fff2c0');
+          
+          for (const sx of [px + w / 2 - 26, px + w / 2 + 26]) {
+            rect('#6b4423', sx - 1, py + TS + 44, 2, 26);
+            circ('#2f8a5a', sx, py + TS + 42, 5); circ('#f2c94c', sx, py + TS + 40, 2.5);
+          }
+        }
+      } catch (e) {}
+      return r;
+    };
+
+    console.log('CASA 7 NIVELES cargado');
+  } catch (e) { console.warn('CASA 7 NIVELES', e); }
+})();
+
+
+ 
+(function pueblosVivos() {
+  try {
+    if (window.__pueblosVivosOk) return;
+    window.__pueblosVivosOk = true;
+
+    const PAPEL_COLS = ['#ff8fb0', '#f2c84a', '#2f8ae8', '#2fae6a', '#c040c0', '#ff6a3a', '#ffffff'];
+    const ROPA_COLS = ['#e8d8b8', '#c0392b', '#2f6aa8', '#2f8a5a', '#f2c84a', '#d9508a'];
+
+    function papelPicado(x0, y0, x1, y1, seed) { 
+      ctx.strokeStyle = 'rgba(60,40,20,.55)'; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(x0, y0);
+      const mx = (x0 + x1) / 2, my = (y0 + y1) / 2 + 7;
+      ctx.quadraticCurveTo(mx, my, x1, y1); ctx.stroke();
+      const n = Math.max(3, Math.round(Math.hypot(x1 - x0, y1 - y0) / 14));
+      for (let i = 1; i < n; i++) {
+        const t = i / n, bx = x0 + (x1 - x0) * t, by = (1 - t) * (1 - t) * y0 + 2 * (1 - t) * t * my + t * t * y1;
+        const sway = Math.sin(T * 2 + i * 1.3 + seed) * 1.6, fw = 7 * Math.min(1.4, Z);
+        ctx.fillStyle = PAPEL_COLS[(i + seed) % PAPEL_COLS.length];
+        ctx.beginPath(); ctx.moveTo(bx - fw / 2, by); ctx.lineTo(bx + fw / 2, by);
+        ctx.lineTo(bx + fw / 2 + sway, by + fw * 1.3); ctx.lineTo(bx - fw / 2 + sway, by + fw * 1.3); ctx.fill();
+      }
+    }
+    function maceta(sx, sy, col, seed) {
+      const k = Z;
+      ell('rgba(30,22,16,.25)', sx, sy + 2 * k, 8 * k, 2.5 * k);
+      rect('#a85a30', sx - 5 * k, sy - 7 * k, 10 * k, 8 * k); rect('#b8693c', sx - 6 * k, sy - 8 * k, 12 * k, 3 * k);
+      ctx.strokeStyle = '#3f8f30'; ctx.lineWidth = Math.max(1, k);
+      for (let i = -1; i <= 1; i++) { ctx.beginPath(); ctx.moveTo(sx, sy - 8 * k); ctx.quadraticCurveTo(sx + i * 5 * k, sy - 13 * k, sx + i * 7 * k, sy - (15 + (seed + i) % 3) * k); ctx.stroke(); }
+      for (let i = 0; i < 3; i++) circ(col, sx + (i - 1) * 6 * k, sy - (13 + ((seed + i) % 3)) * k, 2.2 * k);
+    }
+    function tendedero(x0, y0, x1, y1, seed) {
+      ctx.strokeStyle = 'rgba(80,60,30,.7)'; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x1, y1); ctx.stroke();
+      const n = Math.max(2, Math.round(Math.abs(x1 - x0) / 18));
+      for (let i = 1; i < n; i++) {
+        const t = i / n, bx = x0 + (x1 - x0) * t, by = y0 + (y1 - y0) * t;
+        const sway = Math.sin(T * 1.7 + i + seed) * 1.8, k = Z;
+        ctx.fillStyle = ROPA_COLS[(i + seed) % ROPA_COLS.length];
+        ctx.beginPath(); ctx.moveTo(bx - 4 * k, by); ctx.lineTo(bx + 4 * k, by);
+        ctx.lineTo(bx + 4 * k + sway, by + 10 * k); ctx.lineTo(bx - 4 * k + sway, by + 10 * k); ctx.fill();
+      }
+    }
+    function maguey(sx, sy, s, seed) {
+      ctx.fillStyle = '#4a7a6a';
+      for (let i = 0; i < 7; i++) {
+        const a = -Math.PI / 2 + (i - 3) * 0.32, L = (12 - Math.abs(i - 3) * 2) * s;
+        ctx.beginPath(); ctx.moveTo(sx, sy);
+        ctx.quadraticCurveTo(sx + Math.cos(a) * L * 0.5, sy + Math.sin(a) * L * 0.7, sx + Math.cos(a) * L, sy + Math.sin(a) * L);
+        ctx.lineTo(sx + Math.cos(a + 0.14) * L * 0.7, sy + Math.sin(a + 0.14) * L * 0.55);
+        ctx.closePath(); ctx.fill();
+      }
+      ell('#3a5a50', sx, sy, 3 * s, 2 * s);
+    }
+
+    const _drawWorldPueblo = drawWorld;
+    drawWorld = function (...a) {
+      const r = _drawWorldPueblo(...a);
+      try {
+        if (inking || !S || UI.menu || UI.home || UI.inside || UI.edif) return r;
+        const [ptx] = playerTile();
+        if (zone(ptx, Math.floor((S.player.y - 4) / TS)) !== 'town') return r; 
+        ctx.save(); ctx.setTransform(cv.width / VW, 0, 0, cv.width / VW, 0, 0);
+        const S2P = (wx, wy) => [(wx - camX) * Z, (wy - camY) * Z];
+        const vis = sx => sx > -60 && sx < VW + 60;
+
+        
+        for (const ry of [7, 26]) {
+          for (let x = TOWN_X + 2; x < WILD_X - 8; x += 7) {
+            const [ax, ay] = S2P(x * TS, (ry - 0.15) * TS), [bx, by] = S2P((x + 6) * TS, (ry - 0.15) * TS);
+            if (!vis(ax) && !vis(bx)) continue;
+            if (hash(x, ry) < 0.75) papelPicado(ax, ay, bx, by, x + ry);
+          }
+        }
+        
+        for (const b of builds()) {
+          if (!['casita', 'agro', 'herreria', 'bar', 'consultorio', 'temazcal', 'armeria', 'ixtlilton', 'puesto'].includes(b.t)) continue;
+          const [sx, sy] = S2P((b.x - 0.3) * TS, (b.y + b.h + 0.25) * TS);
+          if (!vis(sx)) continue;
+          if (hash(b.x, b.y) < 0.8) maceta(sx, sy, PAPEL_COLS[(b.x + b.y) % PAPEL_COLS.length], b.x + b.y);
+        }
+        
+        for (let x = TOWN_X + 6; x < TOWN_X + 30; x += 9) {
+          const [ax, ay] = S2P(x * TS, 26.6 * TS), [bx, by] = S2P((x + 5) * TS, 26.6 * TS);
+          if (!vis(ax) && !vis(bx)) continue;
+          if (hash(x, 26) < 0.6) tendedero(ax, ay, bx, by, x);
+        }
+        
+        for (let x = TOWN_X - 1; x < WILD_X; x += 5) {
+          for (const yy of [1.5, 29.5]) {
+            const [sx, sy] = S2P((x + 0.5) * TS, yy * TS);
+            if (!vis(sx) || hash(x, yy | 0) > 0.55) continue;
+            maguey(sx, sy, Math.max(0.6, Z * 0.8), x);
+          }
+        }
+        ctx.restore();
+      } catch (e) {}
+      return r;
+    };
+
+    console.log('PUEBLOS VIVOS cargado');
+  } catch (e) { console.warn('PUEBLOS VIVOS', e); }
+})();
+
+
+ 
+(function mueblesMejor() {
+  try {
+    if (window.__mueblesMejorOk) return;
+    window.__mueblesMejorOk = true;
+
+    
+    const _rowsM50 = SHOPS.muebles50.rows;
+    SHOPS.muebles50.rows = function () {
+      const rows = _rowsM50();
+      for (const r of rows) {
+        const m = MUEBLES50.find(mm => mm.n === r.name);
+        if (m) r.icon = (x, y) => drawMueble50(m, x, y + 4);
+      }
+      return rows;
+    };
+
+    
+    const TIERS_COMODIDAD = [[12, 2], [25, 4], [40, 6], [55, 8]];
+    const totalMuebles = () => mueblesPuestos().length + (typeof mueblesAla === 'function' ? mueblesAla().length : 0);
+    const tierComodidad = () => { const n = totalMuebles(); let b = 0; for (const [min, v] of TIERS_COMODIDAD) if (n >= min) b = v; return b; };
+
+    const _sleepMuebles = sleep;
+    sleep = function (...a) {
+      const r = _sleepMuebles(...a);
+      try {
+        const b = tierComodidad();
+        if (b) { S.energy = Math.min(S.maxE + totalMuebles(), S.energy + b); }
+        const n = totalMuebles();
+        for (const [min, v] of TIERS_COMODIDAD) {
+          if (n >= min && (UI.tierMuebles || 0) < min) {
+            UI.tierMuebles = min;
+            setTimeout(() => toast(`🛋 Tu casa está de revista (${n} muebles): comodidad nivel ${v / 2} · +${v} energía extra cada mañana`, '#ffd080', 7));
+            break;
+          }
+        }
+      } catch (e) {}
+      return r;
+    };
+
+    
+    const _subM50 = SHOPS.muebles50.sub;
+    SHOPS.muebles50.sub = () => {
+      const b = tierComodidad();
+      return _subM50() + (b ? ` · nivel de comodidad ${b / 2} (+${b} extra)` : ` · a ${12 - totalMuebles()} del nivel 1 de comodidad`);
+    };
+
+    console.log('MUEBLES MEJOR cargado');
+  } catch (e) { console.warn('MUEBLES MEJOR', e); }
+})();
+
+
+ 
+(function combateMejor() {
+  try {
+    if (window.__combateMejorOk) return;
+    window.__combateMejorOk = true;
+
+    
+    if (!GEAR.lanza_jaguar) GEAR.lanza_jaguar = { slot:'weapon', name:'Lanza del jaguar', icon:'🐆', dmg:26, reach:52, price:1100, mats:{ lingote_obsidiana:3, madera:8 } };
+    if (!GEAR.macuahuitl_oro) GEAR.macuahuitl_oro = { slot:'weapon', name:'Macuahuitl de oro', icon:'👑', dmg:44, reach:36, price:3200, mats:{ lingote_oro:4, lingote_obsidiana:3 } };
+
+    
+    const CARGA_MAX = 1.0; 
+    addEventListener('keydown', e => {
+      const k = e.key.length === 1 ? e.key.toLowerCase() : e.key;
+      if (k !== 'r' || UI.menu || UI.fish || UI._x0c7a68 || UI._x22f2b0 || e.repeat) return;
+      if (!equipped('weapon')) return; 
+      e.preventDefault(); e.stopImmediatePropagation();
+      if (UI.atkCarga == null) UI.atkCarga = T;
+    }, true);
+    addEventListener('keyup', e => {
+      const k = e.key.length === 1 ? e.key.toLowerCase() : e.key;
+      if (k !== 'r' || UI.atkCarga == null) return;
+      const carga = Math.min(1, (T - UI.atkCarga) / CARGA_MAX);
+      UI.atkCarga = null;
+      UI.atkMul = 1 + carga * 1.2; 
+      attack();
+    }, true);
+
+    const _attackC = attack;
+    attack = function () {
+      const mul = UI.atkMul || 1;
+      if (mul > 1) {
+        const w = equipped('weapon');
+        if (w) {
+          const orig = w.dmg;
+          w.dmg = Math.round(orig * mul);
+          const r = _attackC();
+          w.dmg = orig;
+          UI.atkMul = 0;
+          if (mul > 1.9) { UI.shake = 0.25; sfx('hit'); }
+          return r;
+        }
+      }
+      UI.atkMul = 0;
+      return _attackC();
+    };
+
+    
+    const _drawWorldAtk = drawWorld;
+    drawWorld = function (...a) {
+      const r = _drawWorldAtk(...a);
+      try {
+        if (inking || UI.atkCarga == null || UI.menu) return r;
+        const carga = Math.min(1, (T - UI.atkCarga) / CARGA_MAX);
+        const sx = (S.player.x - camX) * Z, sy = (S.player.y - 52 - camY) * Z;
+        ctx.save(); ctx.setTransform(cv.width / VW, 0, 0, cv.width / VW, 0, 0);
+        ctx.strokeStyle = 'rgba(20,12,8,.6)'; ctx.lineWidth = 5;
+        ctx.beginPath(); ctx.arc(sx, sy, 12, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2); ctx.stroke();
+        ctx.strokeStyle = carga >= 1 ? '#ffd23f' : '#f2c94c'; ctx.lineWidth = 3;
+        ctx.beginPath(); ctx.arc(sx, sy, 12, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * carga); ctx.stroke();
+        if (carga >= 1 && Math.sin(T * 10) > 0) text('¡YA!', sx, sy - 18, 10, '#ffd23f', 'center');
+        ctx.restore();
+      } catch (e) {}
+      return r;
+    };
+
+    console.log('COMBATE MEJOR cargado');
+  } catch (e) { console.warn('COMBATE MEJOR', e); }
 })();
 
 
