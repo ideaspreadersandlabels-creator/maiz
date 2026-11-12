@@ -9788,8 +9788,13 @@ function drawPlayer() {
   const p = S.player, x = Math.round(p.x), y = Math.round(p.y);
   if (p.boat) return drawInBoat(x, y);
   const step = UI.moving ? Math.sin(UI.walkT*12) : 0, bob = Math.abs(step)*2;
-  drawPerson(x, y, NPC_LOOK.player, p.dir, step, '', bob);
-  if (bruised()) { ell('#6a3048', x + (p.dir === 'left' ? -4 : 3), y - 30 - bob, 2.2, 1.6); ell('#4a2030', x + (p.dir === 'left' ? -2 : 5), y - 27 - bob, 1.4, 1); }
+  const nuevo = !!globalThis.heroCodice, gy = nuevo ? 8 : 0; 
+  if (nuevo) {
+    if (!inking) inkPassAt(x, y, () => globalThis.heroCodice(x, y, NPC_LOOK.player, p.dir, step, bob));
+    if (!inking) sunShadow(x, y, 10);
+    globalThis.heroCodice(x, y, NPC_LOOK.player, p.dir, step, bob);
+  } else drawPerson(x, y, NPC_LOOK.player, p.dir, step, '', bob);
+  if (bruised()) { ell('#6a3048', x + (p.dir === 'left' ? -4 : 3), y - 30 - gy - bob, 2.2, 1.6); ell('#4a2030', x + (p.dir === 'left' ? -2 : 5), y - 27 - gy - bob, 1.4, 1); }
   drawGear(x, y - bob, p.dir);
   if (UI.swing > 0) {
     const k = UI.swing / 0.22; 
@@ -10747,26 +10752,26 @@ function drawMenusInner() {
   if (m === 'title') { drawTitle(); return; }
   if (m === 'intro') {
     const [x, y] = dialog(520, 360), cx = x + 260;
-    text("·x11a577", cx, y+40, 28, '#4a2f18', 'center');
-    text("·x183be4", cx, y+62, 12, '#7a5530', 'center', false);
+    text('🌽 Tlaxcallan', cx, y+40, 28, '#4a2f18', 'center');
+    text('Tu milpa en el señorío de Tlaxcallan, antes de la llegada de los españoles', cx, y+62, 12, '#7a5530', 'center', false);
     const lines = [
-      "·x82620c",
-      "·x8af773",
-      "·x426111",
-      "·xf03e21",
-      "·x335e1e",
-      "·xb96e79",
-      "·x191377",
-      "·x9c761c",
-      "·x73bab6",
+      'WASD / flechas — moverse  (Shift = correr)',
+      'Espacio o clic izq. — usar herramienta',
+      'E o clic der. — interactuar / cosechar',
+      '1-0 o rueda — elegir objeto  (Q = más semillas)',
+      'F — comer · R — atacar · I — equipo · Tab — bolsa · Esc — pausa',
+      'P — pescar · M — mapa · J — diario (misiones)',
+      'Ara la tierra, planta, riega cada día y cosecha.',
+      'Vende en el chiquihuite junto a tu casa: te pagan en cacao.',
+      'Al este, Tlaxcallan y el bosque; al sur, el desierto y sus minas.',
     ];
     lines.forEach((l, i) => text(l, x+34, y+90 + i*24, 15, i > 5 ? '#7a5530' : '#4a2f18', 'left', i <= 5));
-    text("·x28cfc0", cx, y+332, 14, '#d9483b', 'center');
+    text('Pulsa cualquier tecla para empezar', cx, y+332, 14, '#d9483b', 'center');
   }
   if (m === 'choosePet') {
     const [x, y] = dialog(480, 300), cx = x + 240;
-    text("·x800607", cx, y+46, 24, '#4a2f18', 'center');
-    text("·x89ac4c", cx, y+70, 13, '#7a5530', 'center', false);
+    text('Elige a tu mascota', cx, y+46, 24, '#4a2f18', 'center');
+    text('La otra se queda en casa y, con el bebé, será su guardián', cx, y+70, 13, '#7a5530', 'center', false);
     UI.petCards = [];
     ['gato', 'perro'].forEach((type, i) => {
       const bx = x + 40 + i*210, by = y + 90, bw = 190, bh = 160;
@@ -10780,37 +10785,37 @@ function drawMenusInner() {
       text(PETS[type].name, bx + bw/2, by + 150, 13, '#7a5530', 'center', false);
       UI.petCards.push({ type, x:bx, y:by, w:bw, h:bh });
     });
-    text("·x52007e", cx, y+284, 13, '#d9483b', 'center');
+    text('Pulsa 1 o 2, o haz clic', cx, y+284, 13, '#d9483b', 'center');
   }
   if (m === 'templeAsk') {
     const [x, y] = dialog(520, 230), cx = x + 260;
-    text("·x9e9d6a", cx, y+44, 22, '#4a2f18', 'center');
-    text("·xf64a73", cx, y+80, 14, '#7a5530', 'center', false);
-    text("·xd4f423", cx, y+108, 14, '#7a5530', 'center', false);
-    text("·x80a6fb", cx, y+128, 14, '#7a5530', 'center', false);
-    text("·xc76802", cx, y+162, 13, '#4a2f18', 'center');
-    text("·x49e2bb", cx, y+204, 15, '#d9483b', 'center');
+    text('🛕 Templo de Ixtlilton', cx, y+44, 22, '#4a2f18', 'center');
+    text(`Tienes ${ILLNESS[S.sick].name.toLowerCase()} (${ILLNESS[S.sick].why}).`, cx, y+80, 14, '#7a5530', 'center', false);
+    text('Sacerdote: "Ixtlilton, el negrito, cura con su agua negra.', cx, y+108, 14, '#7a5530', 'center', false);
+    text('Deja tu ofrenda y bebe del tlilatl."', cx, y+128, 14, '#7a5530', 'center', false);
+    text(`Ofrenda: ${TEMPLE_PRICE} cacao · te cura la enfermedad y +30 de vida`, cx, y+162, 13, '#4a2f18', 'center');
+    text('Enter / E = Dejar la ofrenda      Esc = Ahora no', cx, y+204, 15, '#d9483b', 'center');
   }
   if (m === 'doctorAsk') {
     const [x, y] = dialog(520, 250), cx = x + 260;
     ctx.save(); ctx.translate(x + 78, y + 168); ctx.scale(2.4, 2.4); drawPerson(0, 0, NPC_LOOK.daniel, 'right'); ctx.restore();
-    text("·xa6373c", cx + 36, y + 44, 20, '#4a2f18', 'center');
-    if (S.sick) text("·x5d5cec", cx + 36, y + 84, 14, '#7a5530', 'center', false);
-    else text("·x87cb4e", cx + 36, y + 84, 14, '#7a5530', 'center', false);
-    text("·xec4ea9", cx + 36, y + 112, 13, '#7a5530', 'center', false);
-    text("·x9f8162", cx + 36, y + 150, 14, '#4a2f18', 'center');
-    text("·x742c74", cx + 36, y + 214, 15, '#d9483b', 'center');
+    text('Daniel, doctor de Tlaxcallan', cx + 36, y + 44, 20, '#4a2f18', 'center');
+    if (S.sick) text(`Traes ${ILLNESS[S.sick].name.toLowerCase()}. Te la quito y te vendo.`, cx + 36, y + 84, 14, '#7a5530', 'center', false);
+    else text('Traes golpes y cansancio. Déjame revisarte.', cx + 36, y + 84, 14, '#7a5530', 'center', false);
+    text('Una vez al día. El veneno solo lo saca el temazcal.', cx + 36, y + 112, 13, '#7a5530', 'center', false);
+    text(`${DOC_PRICE} cacao · +50 vida · +40 energía${S.sick ? ' · te cura la enfermedad' : ''}`, cx + 36, y + 150, 14, '#4a2f18', 'center');
+    text('Enter / E = Atenderte      Esc = Ahora no', cx + 36, y + 214, 15, '#d9483b', 'center');
   }
   if (m === 'death') drawSacrifice(1 - UI.deathT / SACRIFICE.secs);
   if (m === 'itzelInvite') {
     const [x, y] = dialog(520, 260), cx = x + 260;
     ctx.save(); ctx.translate(x + 70, y + 180); ctx.scale(2.5, 2.5); drawPerson(0, 0, ITZEL.look, 'right'); ctx.restore();
     text("·x5af8ad", cx + 40, y+44, 22, '#8a1a3a', 'center');
-    text("·x0cb5fd", cx + 40, y+82, 14, '#4a2f18', 'center', false);
-    text("·xcb0c4f", cx + 40, y+104, 14, '#4a2f18', 'center', false);
-    text("·x1f6341", cx + 40, y+126, 14, '#4a2f18', 'center', false);
-    text("·xb94bf5", cx + 40, y+164, 13, '#b5462f', 'center');
-    text("·x345275", cx + 40, y+228, 15, '#d9483b', 'center');
+    text('"Ya llevas varios pulques, ¿eh? Y estás casado...', cx + 40, y+82, 14, '#4a2f18', 'center', false);
+    text('me encantan los casados. ¿Nos escapamos', cx + 40, y+104, 14, '#4a2f18', 'center', false);
+    text('a ver la luna junto al lago?"', cx + 40, y+126, 14, '#4a2f18', 'center', false);
+    text(`⚠ Es una cita a escondidas: ${wifeName()} se va a enterar`, cx + 40, y+164, 13, '#b5462f', 'center');
+    text('Enter / E = Ir con ella      Esc = Decirle que no', cx + 40, y+228, 15, '#d9483b', 'center');
   }
   if (m === 'date') { 
     rect('#101830', 0, 0, VW, VH);
@@ -10822,14 +10827,14 @@ function drawMenusInner() {
     petate(VW/2 - 70, VH*0.74, 140, 24);
     ctx.save(); ctx.translate(VW/2 - 30, VH*0.78); ctx.scale(3, 3); drawPerson(0, 0, NPC_LOOK.player, 'right'); ctx.restore();
     ctx.save(); ctx.translate(VW/2 + 30, VH*0.78); ctx.scale(3, 3); drawPerson(0, 0, UI.date.look, 'left'); ctx.restore();
-    text("·x09cf38", VW/2, 60, 20, '#f4ecd8', 'center');
-    text("·x0e4601", VW/2, 90, 15, '#ff9090', 'center');
+    text(`Te escapas con ${UI.date.name} a ver la luna junto al lago...`, VW/2, 60, 20, '#f4ecd8', 'center');
+    text(`Mientras tanto, ${wifeName()} te espera en casa.`, VW/2, 90, 15, '#ff9090', 'center');
     if (UI.kissFx > 0) for (let i = 0; i < 6; i++) {
       ctx.globalAlpha = UI.kissFx; text('❤', VW/2 - 30 + i*12, VH*0.78 - 110 - (1 - UI.kissFx)*80 - (i % 3)*10, 18, '#ff6b8a', 'center', false);
     }
     ctx.globalAlpha = 1;
-    text("·x84856a", VW/2, VH - 70, 16, '#ffc0d0', 'center');
-    if (UI.dateKisses >= BETRAYAL.kisses) text("·x8aa932", VW/2, VH - 44, 13, '#ff9090', 'center');
+    text(`Pulsa B o haz clic para darle un beso 💋 · besos: ${UI.dateKisses}`, VW/2, VH - 70, 16, '#ffc0d0', 'center');
+    if (UI.dateKisses >= BETRAYAL.kisses) text(`⚠ Con ${UI.dateKisses} besos, ${wifeName()} casi te pedirá el divorcio`, VW/2, VH - 44, 13, '#ff9090', 'center');
     sceneBar();
   }
   if (m === 'divorce') { 
@@ -10849,8 +10854,8 @@ function drawMenusInner() {
     if (UI.exBaby) ell('#f4ecd8', 6, -20, 5, 3);
     ctx.restore();
     text('💔', ex, hy - 130, 36, '#fff', 'center', false);
-    text("·x7940ce", VW/2, 70, 21, '#f4ecd8', 'center');
-    text(UI.exBaby ? "·xe3eb92" : "·x027993", VW/2, 100, 16, '#ffd9a8', 'center');
+    text(`${UI.ex.name} pidió el divorcio ante los jueces de Tlaxcallan`, VW/2, 70, 21, '#f4ecd8', 'center');
+    text(UI.exBaby ? `Se llevó sus cosas y a ${UI.exBaby}. Ya no vive contigo.` : 'Se llevó sus cosas. Ya no vive contigo.', VW/2, 100, 16, '#ffd9a8', 'center');
   }
   if (m === 'cure') { 
     const k = 1 - UI.cureT / CURE_SECS;
@@ -10867,17 +10872,17 @@ function drawMenusInner() {
     
     ell('#8a5a30', VW/2, VH*0.72 - 70, 16, 7); ell('#0a0a10', VW/2, VH*0.72 - 72, 12, 4);
     for (let i = 0; i < 6; i++) { const t = (T*0.3 + i/6) % 1; circ(`rgba(220,220,220,${0.4*(1-t)})`, VW/2 + Math.sin(i*2 + T)*80, VH*0.6 - t*VH*0.4, 10 + t*20); }
-    text("·x9ddc2e", VW/2, 60, 20, '#f4ecd8', 'center');
+    text('El sacerdote te da a beber el agua negra de Ixtlilton...', VW/2, 60, 20, '#f4ecd8', 'center');
     rect('#5a3a1e', VW/2 - 150, VH - 60, 300, 14); rect('#e8d8b8', VW/2 - 148, VH - 58, 296 * k, 10);
   }
   if (m === 'temazcalAsk') {
     const [x, y] = dialog(500, 230), cx = x + 250;
-    text("·xe93be7", cx, y+44, 22, '#4a2f18', 'center');
-    text("·xf174d5", cx, y+78, 14, '#7a5530', 'center', false);
-    text("·xf46488", cx, y+98, 14, '#7a5530', 'center', false);
-    text("·x4098c1", cx, y+132, 13, '#4a2f18', 'center');
-    if (S.poison) text("·xf0463e", cx, y+156, 14, '#3a8a2a', 'center');
-    text("·x692d5e", cx, y+204, 15, '#d9483b', 'center');
+    text('🌫️ Temazcal de Ameyalli', cx, y+44, 22, '#4a2f18', 'center');
+    text('Ameyalli: "El vapor de las piedras calientes limpia el cuerpo', cx, y+78, 14, '#7a5530', 'center', false);
+    text('y saca el veneno. Quítate la ropa y entra."', cx, y+98, 14, '#7a5530', 'center', false);
+    text(`Te cura de todo: veneno ☠, heridas ❤ y mareo · ${TEMAZCAL_PRICE} cacao · 1 hora`, cx, y+132, 13, '#4a2f18', 'center');
+    if (S.poison) text('Estás envenenado: ¡entra cuanto antes!', cx, y+156, 14, '#3a8a2a', 'center');
+    text('Enter / E = Entrar      Esc = Ahora no', cx, y+204, 15, '#d9483b', 'center');
   }
   const mainPoseOkBulge = () => true;
 function _x4bbb92(her, act, crew) {}
@@ -10886,11 +10891,11 @@ function _x4bbb92(her, act, crew) {}
     rect('rgba(10,4,8,.85)', 0, 0, VW, VH);
     drawAnimeCard(x0, y0, cw, ch, s.c);
     const tx = x0 + cw + 30;
-    text("·x1cfb50", tx, y0 + 30, 20, '#ffe0ea', 'left');
+    text(`Seducir a ${s.c.name} · ronda ${s.round + 1}/3`, tx, y0 + 30, 20, '#ffe0ea', 'left');
     text(`"${s.said}"`, tx, y0 + 70, 16, '#f4ecd8', 'left', false);
     text('●'.repeat(s.score) + '○'.repeat(Math.max(0, s.round - s.score)), tx, y0 + 100, 16, '#ff8fb0', 'left');
     UI.seduceBtns = s.opts.map((o, i) => { const by = y0 + 130 + i * 52; rect('#3a2418', tx, by, 430, 42); text(`${i + 1}  ${o.text}`, tx + 12, by + 27, 14, '#f4ecd8', 'left'); return { i, x:tx, y:by, w:430, h:42 }; });
-    text("·x0d4547", tx, y0 + 300, 13, '#c0b8e0', 'left', false);
+    text('1 2 3 o clic para elegir · Esc salir', tx, y0 + 300, 13, '#c0b8e0', 'left', false);
     return;
   }
   if (m === 'night' || m === 'love' || m === 'affair' || m === "_x871ab5") {
@@ -11122,8 +11127,8 @@ function _x4bbb92(her, act, crew) {}
     ctx.strokeStyle = NPC_LOOK.player.accent; ctx.lineWidth = 4; 
     ctx.beginPath(); ctx.moveTo(VW/2 - 30, VH*0.7 - 50); ctx.quadraticCurveTo(VW/2, VH*0.7 - 30, VW/2 + 30, VH*0.7 - 50); ctx.stroke();
     text('💞', VW/2, VH*0.7 - 140, 40, '#fff', 'center', false);
-    text("·x5488c8", VW/2, 70, 22, '#f4ecd8', 'center');
-    text("·x21173c", VW/2, 100, 18, '#ffc040', 'center');
+    text(`Atan tu tilmatli con ${UI.bride.look.apache ? 'el vestido de gamuza' : 'el huipil'} de ${UI.bride.name}`, VW/2, 70, 22, '#f4ecd8', 'center');
+    text(`Desde hoy se llama ${WIFE_NAME}`, VW/2, 100, 18, '#ffc040', 'center');
   }
   if (m === 'bath') { 
     const k = 1 - UI.bathT / BATH_SECS;
@@ -11144,31 +11149,31 @@ function _x4bbb92(her, act, crew) {}
       const t = (T*0.25 + i/18) % 1;
       circ(`rgba(235,235,235,${0.35*(1-t)})`, VW/2 + Math.sin(i*2.3 + T*0.5)*VW*0.3, VH*0.8 - t*VH*0.7, 20 + t*40);
     }
-    text("·x21316d", VW/2, 60, 22, '#f4ecd8', 'center');
-    text(S.poison ? "·x8b58ff" : "·x4f8d8f", VW/2, 90, 15, '#e8d8b8', 'center', false);
+    text('Te quitas la tilmatli y entras al temazcal... 🌫️', VW/2, 60, 22, '#f4ecd8', 'center');
+    text(S.poison ? 'El vapor va sacando el veneno de tu cuerpo' : 'El vapor relaja tu cuerpo', VW/2, 90, 15, '#e8d8b8', 'center', false);
     rect('#5a3a1e', VW/2 - 150, VH - 60, 300, 14); rect('#e8a050', VW/2 - 148, VH - 58, 296 * k, 10);
   }
   if (m === 'summary') {
     const u = UI.summary, notes = u.honorNotes || [], extra = (notes.length + (S.request ? 1 : 0)) * 20;
     const [x, y] = dialog(480, 352 + extra), cx = x + 240;
-    text("·x6b1fbf", cx, y+48, 24, '#4a2f18', 'center');
-    text(u.killed ? "·x37fc51" : u.passedOut ? "·xb9f9f5" : "·x6661f4", cx, y+86, 15, u.passedOut ? '#b5462f' : '#4a2f18', 'center');
-    text("·x6e3cb1", cx, y+114, 16, '#4a2f18', 'center');
-    text("·x39bff4" + (u.milpa ? "·x593e13" : '') + (u.died ? "·x78648b" : ''), cx, y+140, 15, u.died ? '#b5462f' : '#7a5530', 'center');
-    text(S.rainToday ? "·x6d8d4b" : "·xd2e8f3", cx, y+166, 15, '#3a6fa0', 'center');
+    text(`Amanece el día ${S.day}`, cx, y+48, 24, '#4a2f18', 'center');
+    text(u.killed ? `☀️ Te sacrificaron en el Templo Mayor. Perdiste ${u.lost} cacao${u.lostWeapon ? ` y tu ${u.lostWeapon.toLowerCase()}` : ''}.` : u.passedOut ? `Te desmayaste. Perdiste ${u.lost} cacao.` : 'Dormiste bien. ¡Energía al máximo!', cx, y+86, 15, u.passedOut ? '#b5462f' : '#4a2f18', 'center');
+    text(`Ganancias del envío: ${u.earn} cacao`, cx, y+114, 16, '#4a2f18', 'center');
+    text(`Cultivos que crecieron: ${u.grew}` + (u.milpa ? ` (${u.milpa} en milpa 🌽)` : '') + (u.died ? `  ·  se secaron: ${u.died} 🥀` : ''), cx, y+140, 15, u.died ? '#b5462f' : '#7a5530', 'center');
+    text(S.rainToday ? 'Hoy llueve — los cultivos se riegan solos 🌧️' : 'Hace buen día ☀️', cx, y+166, 15, '#3a6fa0', 'center');
     if (S.chickens.length)
-      text(u.eggs ? "·xb8db8c" : "·x7484b5", cx, y+192, 15, u.eggs ? '#4a2f18' : '#b5462f', 'center');
-    if (u.bugs) text("·xb4d2c2", cx, y+216, 15, '#b5462f', 'center');
+      text(u.eggs ? `Tus guajolotas pusieron ${u.eggs} huevo(s) 🥚` : 'Sin comida o sin agua, las guajolotas no pusieron huevos', cx, y+192, 15, u.eggs ? '#4a2f18' : '#b5462f', 'center');
+    if (u.bugs) text(`¡Apareció una plaga en ${u.bugs} cultivo(s)! 🐛 Usa ceniza con chile`, cx, y+216, 15, '#b5462f', 'center');
     if (u.petMsg) text(u.petMsg, cx, y+240, 14, u.petMsg.includes('hambre') ? '#b5462f' : '#7a3a5a', 'center');
-    if (S.poison) text("·xfd1332", cx, y+268, 14, '#3a8a2a', 'center');
-    else if (S.sick) text("·x9093f4", cx, y+268, 14, '#8a7a10', 'center');
+    if (S.poison) text('☠ Sigues envenenado: ve al temazcal de Tlaxcallan', cx, y+268, 14, '#3a8a2a', 'center');
+    else if (S.sick) text(`🤒 Sigues con ${ILLNESS[S.sick].name.toLowerCase()}: ve al templo de Ixtlilton`, cx, y+268, 14, '#8a7a10', 'center');
     else if (u.spouseMsg) text(u.spouseMsg, cx, y+268, 14, '#a03a6a', 'center');
-    else text("·x11de52", cx, y+268, 12, '#7a5530', 'center', false);
+    else text(`Riega cada día: tras ${DRY_DAYS} noches sin agua, un cultivo se seca`, cx, y+268, 12, '#7a5530', 'center', false);
     const rk = honorRank();
-    text("·xed3aea", cx, y+296, 15, '#4a2f18', 'center');
+    text(`${rk.icon} Honra: ${rk.name} (${S.honor > 0 ? '+' : ''}${S.honor})`, cx, y+296, 15, '#4a2f18', 'center');
     notes.forEach((n, i) => text(n, cx, y+318 + i*20, 13, n.startsWith('⛈') ? '#5a3a8a' : n.startsWith('🎉') || n.startsWith('👦') || n.startsWith('🎃') || n.startsWith('🐣') ? '#2f6aa8' : n.startsWith('🍂') || n.startsWith('🗓') || n.startsWith('🐦') || n.startsWith('🪵') ? '#8a5a1a' : n.startsWith('🌋') || n.startsWith('🌎') || n.startsWith('🧱') ? '#a04a10' : n.includes('+') || n.startsWith('🎁') ? '#3a7a2a' : '#b5462f', 'center', false));
-    if (S.request) text("·x715ab3", cx, y+318 + notes.length*20, 12, '#7a5530', 'center', false);
-    text("·x518b6c", cx, y+330 + extra, 13, '#d9483b', 'center');
+    if (S.request) text(`📜 ${S.request.name} te pide ${requestText(S.request)} (${S.request.why})`, cx, y+318 + notes.length*20, 12, '#7a5530', 'center', false);
+    text('Pulsa cualquier tecla', cx, y+330 + extra, 13, '#d9483b', 'center');
   }
   if (m === 'shop') drawShop();
   if (m === 'map') drawMap();
@@ -11181,11 +11186,11 @@ function _x4bbb92(her, act, crew) {}
   if (m === 'ending') { 
     const [x, y] = dialog(Math.min(560, VW - 20), 300), w = Math.min(560, VW - 20), cx = x + w/2;
     ctx.save(); ctx.translate(cx, y + 70); ctx.scale(2.2, 2.2); ICON_DRAW['🌞'](0, 0); ctx.restore();
-    text("·xc1a300", cx, y + 120, 24, '#4a2f18', 'center');
-    ctx.font = "·x97dd11";
-    wrapText("·x203dbe", w - 60)
+    text('¡Tlaxcallan sigue libre!', cx, y + 120, 24, '#4a2f18', 'center');
+    ctx.font = `14px ${FONT}`;
+    wrapText('Citlalmina pintó un códice con tu año: la milpa, las fiestas, la guerra y tu familia. Está en tu casa. Puedes seguir un segundo año.', w - 60)
       .forEach((l, i) => text(l, cx, y + 156 + i*20, 14, '#6a4a2a', 'center', false));
-    text("·xffcebb", cx, y + 270, 13, '#d9483b', 'center');
+    text('Puedes seguir jugando · Enter para continuar', cx, y + 270, 13, '#d9483b', 'center');
   }
   if (m === 'codex') {
     const c = S.codex;
@@ -11193,22 +11198,22 @@ function _x4bbb92(her, act, crew) {}
     rect('#e6d2a8', 48, 40, VW - 96, VH - 80);
     sceneBar();
     rect('#c45a3a', 64, 56, VW - 128, 8);
-    text("·xb1e7a1", VW/2, 90, 26, '#4a2f18', 'center');
-    text("·xcc6f96", VW/2, 118, 14, '#7a5530', 'center', false);
+    text('Códice de Citlalmina', VW/2, 90, 26, '#4a2f18', 'center');
+    text(`Año ${Math.max(1, Math.ceil(c.day / 28))} · día ${c.day}`, VW/2, 118, 14, '#7a5530', 'center', false);
     const lines = [
-      "·x4e25ca",
-      "·xe78ee9",
-      "·x99f4c4",
-      "·x4aed95",
-      "·x43eb21",
+      `Cosechas guardadas: ${c.harvests}`,
+      `Fiestas en la plaza: ${c.festivals}`,
+      `Asaltos que rechazaste: ${c.raids}`,
+      `Familia: ${c.family}`,
+      `Hijo: ${c.child}`,
     ];
     lines.forEach((l, i) => text(l, VW/2, 170 + i*36, 18, '#3a2418', 'center'));
-    text("·x0b41af", VW/2, VH - 70, 14, '#8a1a2a', 'center');
+    text('Enter para cerrar el códice', VW/2, VH - 70, 14, '#8a1a2a', 'center');
   }
   if (m === 'confirmNew') {
     const [x, y] = dialog(400, 150);
-    text("·x58b56d", x+200, y+56, 17, '#b5462f', 'center');
-    text("·xbed96a", x+200, y+100, 15, '#4a2f18', 'center');
+    text('¿Borrar la granja y empezar de nuevo?', x+200, y+56, 17, '#b5462f', 'center');
+    text('S = Sí      cualquier otra tecla = No', x+200, y+100, 15, '#4a2f18', 'center');
   }
 }
 
@@ -47522,6 +47527,201 @@ drawShop = function (...a) {
   }
   return r;
 };
+
+
+
+{
+  const SOMBRA = 'rgba(40,18,8,.2)', LUZ = 'rgba(255,225,190,.3)';
+  const AZUL = '#2f6aa8', AZUL_OSC = '#234f82', CREMA = '#f7f1e4', MORADO = '#7a2f6a', ORO = '#f2c84a', JADE = '#3fae8a', ROJO = '#c0392b';
+  const rr = (c, x, y, w, h, r) => { ctx.fillStyle = c; ctx.beginPath(); if (ctx.roundRect) ctx.roundRect(x, y, w, h, r); else ctx.rect(x, y, w, h); ctx.fill(); };
+  const linea = (c, lw, x0, y0, x1, y1) => { ctx.strokeStyle = c; ctx.lineWidth = lw; ctx.lineCap = 'round'; ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x1, y1); ctx.stroke(); ctx.lineCap = 'butt'; };
+  const forma = (c, pts) => { ctx.fillStyle = c; ctx.beginPath(); ctx.moveTo(pts[0], pts[1]); for (let i = 2; i < pts.length; i += 2) ctx.lineTo(pts[i], pts[i + 1]); ctx.closePath(); ctx.fill(); };
+  const curva = (c, lw, x0, y0, cx, cy, x1, y1) => { ctx.strokeStyle = c; ctx.lineWidth = lw; ctx.lineCap = 'round'; ctx.beginPath(); ctx.moveTo(x0, y0); ctx.quadraticCurveTo(cx, cy, x1, y1); ctx.stroke(); ctx.lineCap = 'butt'; };
+  const pluma = (px, py, giro) => {
+    ctx.save(); ctx.translate(px, py); ctx.rotate(giro + Math.sin(T * 1.7) * 0.06);
+    ctx.fillStyle = '#2a8a6a'; ctx.beginPath(); ctx.moveTo(0, 0); ctx.quadraticCurveTo(-3.2, -6, -0.6, -12.5); ctx.quadraticCurveTo(2.8, -7, 0, 0); ctx.fill();
+    ctx.fillStyle = '#5fd0a4'; ctx.beginPath(); ctx.moveTo(0, -1); ctx.quadraticCurveTo(-1.4, -6, -0.5, -11); ctx.quadraticCurveTo(1, -6, 0, -1); ctx.fill();
+    circ(ORO, 0, 0, 1.1);
+    ctx.restore();
+  };
+  const pierna = (piel, px, py, lejos) => {
+    rr(piel, px, py - 15, 6, 14.5, 2.6);
+    rr(SOMBRA, px + 4, py - 14, 2, 12, 1);
+    if (lejos) rr('rgba(40,18,8,.16)', px, py - 15, 6, 14.5, 2.6);
+    rr('#5a3818', px - 1, py - 2.4, 8, 2.4, 1);            
+    rect('#c9a24e', px + 0.4, py - 5, 5.2, 1);             
+    rect('#c9a24e', px + 2.4, py - 5, 1, 2.8);
+  };
+  const brazo = (piel, hx, hy, mx, my) => {
+    linea(piel, 4.2, hx, hy, mx, my);
+    linea(SOMBRA, 1.1, hx + 1.4, hy + 1, mx + 1.4, my - 1);
+    circ(piel, mx, my + 1, 2.3);
+    ctx.strokeStyle = ORO; ctx.lineWidth = 4.4; ctx.beginPath(); ctx.moveTo(hx + (mx - hx) * 0.66, hy + (my - hy) * 0.66); ctx.lineTo(hx + (mx - hx) * 0.8, hy + (my - hy) * 0.8); ctx.stroke(); 
+  };
+  const banda = (x0, yb, w) => {
+    rr(ROJO, x0, yb, w, 3, 1.2);
+    for (let i = 2.2; i < w - 1; i += 3) rect('#f4ecd8', x0 + i, yb + 1.1, 1, 0.9);
+  };
+
+  globalThis.heroCodice = function (x, y, o, dir, step, bob) {
+    const J = globalThis.JUGADOR_EDGAR || {};
+    const piel = o.skin, pelo = J.pelo || o.hair || '#241b13', ceja = J.ceja || '#2a1e16', ojo = J.ojo || '#4a3426', barba = 'rgba(38,28,20,.62)';
+    if (!step && !bob) bob = Math.sin(T * 2.2 + x * 0.13) * 0.8;
+    const vaiven = step || Math.sin(T * 1.35 + x * 0.07) * 0.16;
+    const yb = y - bob, vuelo = step * 1.6 + Math.sin(T * 1.3 + x * 0.05) * 0.5;
+    const cansado = typeof S !== 'undefined' && (S.hp < 35 || S.energy < 20);
+    const parpadea = typeof blinking === 'function' && blinking(x);
+
+    if (dir === 'left' || dir === 'right') {
+      const f = dir === 'left' ? -1 : 1, paso = step * 3.4;
+      
+      forma(AZUL_OSC, [x - f * 1, yb - 32, x - f * 7, yb - 31, x - f * (11.5 + vuelo), yb - 10, x - f * (3 + vuelo * 0.5), yb - 9]);
+      forma(AZUL, [x - f * 1, yb - 32, x - f * 6, yb - 31, x - f * (10 + vuelo), yb - 12, x - f * (3.5 + vuelo * 0.5), yb - 11]);
+      linea('#f4ecd8', 1.2, x - f * (10.6 + vuelo), yb - 11.4, x - f * (3.4 + vuelo * 0.5), yb - 10.2);
+      pierna(piel, x - 3 - paso, y - Math.max(0, -step) * 1.5, true);
+      pierna(piel, x - 3 + paso, y - Math.max(0, step) * 1.5, false);
+      
+      rr(CREMA, x - 6, yb - 19, 12, 8.5, 3);
+      rect(MORADO, x - 6, yb - 19, 12, 2);
+      forma(CREMA, [x + f * 1.5, yb - 17, x + f * 5.5, yb - 17, x + f * 5, yb - 7.5, x + f * 3.4, yb - 6, x + f * 1.9, yb - 7.5]);
+      rect(MORADO, x + (f > 0 ? 1.9 : -5), yb - 9.4, 3.1, 1);
+      
+      rr(piel, x - 5.6, yb - 33, 11.2, 16, 4.2);
+      rr(SOMBRA, x - (f > 0 ? 5.6 : -3.4), yb - 31, 2.2, 13, 1);
+      curva(SOMBRA, 0.7, x + f * 1, yb - 26.5, x + f * 3.5, yb - 25.4, x + f * 5, yb - 27);
+      
+      for (let i = 0; i < 3; i++) circ(JADE, x + f * (1.5 + i * 1.9), yb - 29.6 + i * 0.9, 1.25);
+      circ(ORO, x + f * 5.4, yb - 26.6, 1.5);
+      circ(AZUL, x - f * 0.5, yb - 32, 2.1); circ('#f4ecd8', x - f * 0.5, yb - 32, 0.8);
+      
+      brazo(piel, x + f * 0.5, yb - 29.5, x + f * 0.5 - paso * 1.1, yb - 19.5);
+      
+      rr(piel, x - 2.4, yb - 36.5, 5, 5, 1.4);
+      rr(piel, x - 7 + f * 0.6, yb - 49.4, 14.4, 15.2, 6.4);
+      forma(piel, [x + f * 7.2, yb - 42.5, x + f * 9.4, yb - 39.2, x + f * 7.2, yb - 38.2]); 
+      rr(LUZ, x + f * 2.5 - 1.5, yb - 47.5, 3, 4, 1.4);
+      
+      ctx.fillStyle = barba; ctx.beginPath();
+      ctx.moveTo(x - f * 2.4, yb - 43); ctx.quadraticCurveTo(x - f * 2.6, yb - 35.4, x + f * 2, yb - 34.3);
+      ctx.quadraticCurveTo(x + f * 7.4, yb - 33.8, x + f * 7.6, yb - 37.2);
+      ctx.quadraticCurveTo(x + f * 4, yb - 36.4, x + f * 2.6, yb - 38.4);
+      ctx.quadraticCurveTo(x + f * 0.6, yb - 40.6, x - f * 0.4, yb - 43); ctx.closePath(); ctx.fill();
+      curva('rgba(38,28,20,.75)', 1.2, x + f * 4.2, yb - 37.6, x + f * 6.2, yb - 38.2, x + f * 7.6, yb - 37);
+      curva('#8a4030', 0.7, x + f * 5, yb - 35.9, x + f * 6.2, yb - 35.4 + (cansado ? -0.5 : 0.3), x + f * 7.2, yb - 36);
+      
+      linea(ceja, 1.3, x + f * 2.6, yb - 43.8 + (cansado ? 0.8 : 0), x + f * 6.4, yb - 43.4);
+      if (parpadea) linea('#1a1410', 0.8, x + f * 3, yb - 40.6, x + f * 6, yb - 40.6);
+      else { ell('#fff6ea', x + f * 4.6, yb - 40.8, 1.9, 1.5); circ(ojo, x + f * 5.1, yb - 40.8, 1.2); circ('#1a1410', x + f * 5.2, yb - 40.8, 0.6); rect('#fff6ea', x + f * 5.2 - 0.6, yb - 41.6, 0.6, 0.6); }
+      ell('rgba(215,110,95,.35)', x + f * 3.4, yb - 37.9, 1.6, 0.9);
+      ell(piel, x - f * 1.4, yb - 41.6, 1.6, 2.1); curva(SOMBRA, 0.6, x - f * 1.8, yb - 42.6, x - f * 0.8, yb - 41.6, x - f * 1.6, yb - 40.6); 
+      
+      ctx.fillStyle = pelo; ctx.beginPath();
+      ctx.moveTo(x + f * 6.8, yb - 45.6); ctx.quadraticCurveTo(x + f * 7.6, yb - 52.6, x, yb - 52.8);
+      ctx.quadraticCurveTo(x - f * 9.4, yb - 52.6, x - f * 8.6, yb - 43);
+      ctx.quadraticCurveTo(x - f * 8.6, yb - 37.6, x - f * 5.4, yb - 36.6);
+      ctx.quadraticCurveTo(x - f * 3.4, yb - 40, x - f * 3, yb - 44.2);
+      ctx.quadraticCurveTo(x + f * 1, yb - 46.4, x + f * 6.8, yb - 45.6); ctx.closePath(); ctx.fill();
+      curva('rgba(255,255,255,.16)', 0.9, x - f * 4, yb - 51, x, yb - 52, x + f * 4, yb - 50.6);
+      banda(x - 7.6 + f * 0.4, yb - 49.2, 15.2);
+      linea(ROJO, 1.5, x - f * 7.4, yb - 47.6, x - f * 10.4, yb - 43.6 + vuelo * 0.4); linea(ROJO, 1.5, x - f * 7.4, yb - 47.6, x - f * 9, yb - 41.8 + vuelo * 0.4);
+      pluma(x - f * 5, yb - 49.6, -f * 0.5);
+      return;
+    }
+
+    const l1 = -Math.max(0, step) * 3, l2 = -Math.max(0, -step) * 3, a = vaiven * 3;
+    if (dir === 'up') {
+      pierna(piel, x - 7, y + l1, false); pierna(piel, x + 1, y + l2, false);
+      rr(CREMA, x - 7, yb - 19, 14, 8.5, 3); rect(MORADO, x - 7, yb - 19, 14, 2);
+      brazo(piel, x - 10.4, yb - 29.5, x - 11.4, yb - 19.5 + a); brazo(piel, x + 10.4, yb - 29.5, x + 11.4, yb - 19.5 - a);
+      rr(piel, x - 2.5, yb - 36.5, 5, 5, 1.4);
+      
+      ctx.fillStyle = AZUL; ctx.beginPath();
+      ctx.moveTo(x - 6, yb - 33); ctx.lineTo(x + 6, yb - 33); ctx.quadraticCurveTo(x + 9.6, yb - 32.6, x + 9.6, yb - 29);
+      ctx.lineTo(x + 11 + vuelo * 0.5, yb - 10); ctx.lineTo(x - 11 + vuelo * 0.5, yb - 10); ctx.lineTo(x - 9.6, yb - 29);
+      ctx.quadraticCurveTo(x - 9.6, yb - 32.6, x - 6, yb - 33); ctx.closePath(); ctx.fill();
+      forma('rgba(0,0,0,.12)', [x + 4, yb - 33, x + 9.6, yb - 30, x + 11 + vuelo * 0.5, yb - 10, x + 6, yb - 10]);
+      linea('#f4ecd8', 1.2, x - 10.4 + vuelo * 0.5, yb - 12, x + 10.4 + vuelo * 0.5, yb - 12);
+      ctx.strokeStyle = '#f4ecd8'; ctx.lineWidth = 0.9; ctx.beginPath();
+      for (let i = -2; i <= 2; i++) { const gx = x + i * 4 + vuelo * 0.3; ctx.moveTo(gx - 1.5, yb - 15); ctx.lineTo(gx - 1.5, yb - 17.4); ctx.lineTo(gx + 1.2, yb - 17.4); ctx.lineTo(gx + 1.2, yb - 15.8); }
+      ctx.stroke();
+      for (let i = 0; i < 3; i++) circ(ORO, x - 4 + i * 4, yb - 22.5, 0.9);
+      
+      rr(piel, x - 7.5, yb - 49.4, 15, 15.2, 6.4);
+      ell(piel, x - 7.9, yb - 41.6, 1.6, 2.1); ell(piel, x + 7.9, yb - 41.6, 1.6, 2.1);
+      ctx.fillStyle = pelo; ctx.beginPath();
+      ctx.moveTo(x - 8.4, yb - 43); ctx.quadraticCurveTo(x - 9.2, yb - 52.8, x, yb - 52.9); ctx.quadraticCurveTo(x + 9.2, yb - 52.8, x + 8.4, yb - 43);
+      ctx.quadraticCurveTo(x + 8.2, yb - 36.4, x + 4.6, yb - 35.4); ctx.quadraticCurveTo(x, yb - 34.4, x - 4.6, yb - 35.4);
+      ctx.quadraticCurveTo(x - 8.2, yb - 36.4, x - 8.4, yb - 43); ctx.closePath(); ctx.fill();
+      curva('rgba(255,255,255,.14)', 0.9, x - 5, yb - 50.6, x, yb - 52, x + 5, yb - 50.6);
+      banda(x - 8.2, yb - 49.2, 16.4);
+      circ(ROJO, x, yb - 47.6, 1.7);
+      linea(ROJO, 1.5, x, yb - 47.2, x - 2.4 + vuelo * 0.3, yb - 41.8); linea(ROJO, 1.5, x, yb - 47.2, x + 2 + vuelo * 0.3, yb - 42.6);
+      pluma(x + 5, yb - 49.6, 0.42);
+      return;
+    }
+
+    
+    
+    ctx.fillStyle = AZUL_OSC; ctx.beginPath();
+    ctx.moveTo(x - 8.6, yb - 32); ctx.lineTo(x + 8.6, yb - 32); ctx.lineTo(x + 11.6 + vuelo * 0.5, yb - 9.5); ctx.lineTo(x - 12 + vuelo * 0.5, yb - 9.5); ctx.closePath(); ctx.fill();
+    linea('#d8d0bc', 1.1, x - 11.4 + vuelo * 0.5, yb - 11.2, x + 11 + vuelo * 0.5, yb - 11.2);
+    pierna(piel, x - 7, y + l1, false); pierna(piel, x + 1, y + l2, false);
+    
+    rr(CREMA, x - 7, yb - 19, 14, 8.5, 3);
+    rect(MORADO, x - 7, yb - 19, 14, 2);
+    forma(CREMA, [x - 2.8, yb - 17, x + 2.8, yb - 17, x + 2.6, yb - 7.4, x, yb - 5.4, x - 2.6, yb - 7.4]);
+    rect(MORADO, x - 2.6, yb - 9.6, 5.2, 1); rect('rgba(0,0,0,.08)', x + 1.4, yb - 17, 1.2, 9);
+    
+    ctx.fillStyle = piel; ctx.beginPath();
+    ctx.moveTo(x - 6, yb - 33); ctx.lineTo(x + 6, yb - 33); ctx.quadraticCurveTo(x + 9.6, yb - 32.8, x + 9.4, yb - 29);
+    ctx.lineTo(x + 6.6, yb - 17); ctx.lineTo(x - 6.6, yb - 17); ctx.lineTo(x - 9.4, yb - 29);
+    ctx.quadraticCurveTo(x - 9.6, yb - 32.8, x - 6, yb - 33); ctx.closePath(); ctx.fill();
+    forma(SOMBRA, [x + 6.4, yb - 32, x + 9.4, yb - 29.4, x + 6.6, yb - 17, x + 4.6, yb - 17]);
+    rr(LUZ, x - 8, yb - 31.6, 2.4, 6, 1.2);
+    curva(SOMBRA, 0.7, x - 6, yb - 25.6, x - 3.2, yb - 24.2, x - 0.6, yb - 25.8); curva(SOMBRA, 0.7, x + 0.6, yb - 25.8, x + 3.2, yb - 24.2, x + 6, yb - 25.6);
+    circ(SOMBRA, x, yb - 20.4, 0.6);
+    
+    ctx.fillStyle = AZUL; ctx.beginPath();
+    ctx.moveTo(x - 9.4, yb - 32.4); ctx.lineTo(x - 2.4, yb - 32.6); ctx.quadraticCurveTo(x - 4.6, yb - 22, x - 8.4, yb - 12.4);
+    ctx.lineTo(x - 12.6 + vuelo * 0.5, yb - 11.4); ctx.quadraticCurveTo(x - 10.6, yb - 22, x - 9.4, yb - 32.4); ctx.closePath(); ctx.fill();
+    curva('#f4ecd8', 1, x - 3.6, yb - 30.4, x - 5.6, yb - 21, x - 8.8, yb - 13.6);
+    for (let i = 0; i < 3; i++) circ(ORO, x - 7.4 - i * 0.9, yb - 26 + i * 4.2, 0.85);
+    circ(AZUL_OSC, x - 6, yb - 32.2, 2.3); circ(AZUL, x - 6, yb - 32.4, 1.7); circ('#f4ecd8', x - 6, yb - 32.4, 0.7);
+    
+    for (let i = 0; i < 5; i++) { const k = i - 2; circ(JADE, x + 1 + k * 2.6, yb - 30.2 + (4 - k * k) * 0.55, 1.3); }
+    circ(ORO, x + 1, yb - 26.2, 1.7); circ('#fff3c0', x + 0.6, yb - 26.6, 0.5);
+    brazo(piel, x - 10.4, yb - 29.5, x - 11.4, yb - 19.5 + a); brazo(piel, x + 10.4, yb - 29.5, x + 11.4, yb - 19.5 - a);
+    
+    rr(piel, x - 2.5, yb - 36.5, 5, 5, 1.4); rect(SOMBRA, x - 2.5, yb - 35.2, 5, 1.2);
+    ell(piel, x - 7.9, yb - 41.6, 1.6, 2.1); ell(piel, x + 7.9, yb - 41.6, 1.6, 2.1);
+    rr(piel, x - 7.5, yb - 49.4, 15, 15.2, 6.4);
+    rr(LUZ, x - 6, yb - 47.4, 3, 4.4, 1.4);
+    
+    ctx.fillStyle = barba; ctx.beginPath();
+    ctx.moveTo(x - 7.5, yb - 43); ctx.quadraticCurveTo(x - 7.6, yb - 35.2, x, yb - 34.2); ctx.quadraticCurveTo(x + 7.6, yb - 35.2, x + 7.5, yb - 43);
+    ctx.quadraticCurveTo(x + 5.6, yb - 37.4, x + 3, yb - 37.6); ctx.quadraticCurveTo(x, yb - 36.4, x - 3, yb - 37.6);
+    ctx.quadraticCurveTo(x - 5.6, yb - 37.4, x - 7.5, yb - 43); ctx.closePath(); ctx.fill();
+    curva('rgba(38,28,20,.78)', 1.3, x - 3.4, yb - 37, x, yb - 38.8, x + 3.4, yb - 37);
+    curva('#8a4030', 0.75, x - 1.8, yb - 36, x, yb - 35.4 + (cansado ? -0.9 : 0.9), x + 1.8, yb - 36);
+    
+    const cy = cansado ? 0.6 : 0;
+    linea(ceja, 1.4, x - 5.6, yb - 43.7 + cy * 2, x - 1.8, yb - 43.6); linea(ceja, 1.4, x + 1.8, yb - 43.6, x + 5.6, yb - 43.7 + cy * 2);
+    for (const s of [-1, 1]) {
+      if (parpadea) linea('#1a1410', 0.8, x + s * 3.6 - 1.6, yb - 40.6, x + s * 3.6 + 1.6, yb - 40.6);
+      else { ell('#fff6ea', x + s * 3.6, yb - 40.8, 2, 1.55); circ(ojo, x + s * 3.6, yb - 40.7, 1.25); circ('#1a1410', x + s * 3.6, yb - 40.7, 0.62); rect('#fff6ea', x + s * 3.6 - 0.9, yb - 41.5, 0.6, 0.6); }
+    }
+    curva('rgba(150,80,60,.5)', 0.7, x - 0.9, yb - 39, x, yb - 38.2, x + 0.9, yb - 39);
+    ell('rgba(215,110,95,.32)', x - 5.2, yb - 38.4, 1.5, 0.9); ell('rgba(215,110,95,.32)', x + 5.2, yb - 38.4, 1.5, 0.9);
+    
+    ctx.fillStyle = pelo; ctx.beginPath();
+    ctx.moveTo(x - 8.3, yb - 42.4); ctx.quadraticCurveTo(x - 9.4, yb - 52.8, x, yb - 53); ctx.quadraticCurveTo(x + 9.4, yb - 52.8, x + 8.3, yb - 42.4);
+    ctx.quadraticCurveTo(x + 7.4, yb - 45.6, x + 6.2, yb - 46); ctx.quadraticCurveTo(x + 2, yb - 45, x, yb - 46.2); ctx.quadraticCurveTo(x - 3, yb - 45, x - 6.2, yb - 46);
+    ctx.quadraticCurveTo(x - 7.4, yb - 45.6, x - 8.3, yb - 42.4); ctx.closePath(); ctx.fill();
+    curva('rgba(255,255,255,.16)', 0.9, x - 5, yb - 50.8, x - 1, yb - 52, x + 3, yb - 51.2);
+    banda(x - 8.2, yb - 49.2, 16.4);
+    pluma(x + 5.4, yb - 49.6, 0.42);
+  };
+}
 
 // Textos retirados de la versión pública: no se dibujan.
 const TOKEN_PUBLICO = /(?:·x|_x)[0-9a-f]{6}/;
