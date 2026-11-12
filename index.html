@@ -65,26 +65,11 @@ const MINES = [
   { name:'Mina de Oro',    ex:122, ey:62, x0:53, need:2, ores:[['oro', 0.07], ['obsidiana', 0.04], ['carbon', 0.05]] },
 ];
 for (const m of MINES) if (m.ex >= FARM_OLD) m.ex += DX;
-
-let _zoneMap = null, _zoneMapMW = 0, _zoneMapMH = 0;
-function rebuildZoneMap() {
-  if (!_zoneMap || _zoneMapMW !== MW || _zoneMapMH !== MH) {
-    _zoneMap = new Array(MW * MH);
-    _zoneMapMW = MW; _zoneMapMH = MH;
-  }
-  for (let y = 0; y < MH; y++) for (let x = 0; x < MW; x++) {
-    _zoneMap[y * MW + x] = y >= WORLD_H ? 'mine' : x >= NORTE_X0 ? 'norte' : x >= CHICHIMECA_X0 ? 'chichimeca' : x >= MAR_END ? 'maya' : x >= COSTA_END ? 'mar' : x >= NIEVE_END ? 'costa' : x >= OTOMI_END ? (y < SNOW_H + 2 ? 'nieve' : 'selva') : x >= OTOMI_X ? 'otomi' : y >= DESERT_Y ? (x >= AZ_X ? 'sierra' : 'desert')
-      : x < FARM_W ? 'farm' : x < TOWN_X - 1 ? 'wild' : x < WILD_X ? 'town' : x >= AZ_X && inCity(x, y) ? 'city' : 'wild';
-  }
-}
-const zone = (x, y) => {
-  if (!_zoneMap || _zoneMapMW !== MW || _zoneMapMH !== MH) rebuildZoneMap();
-  if (x < 0 || y < 0 || x >= MW || y >= MH) return 'mine';
-  return _zoneMap[y * MW + x];
-};
+const zone = (x, y) => y >= WORLD_H ? 'mine' : x >= NORTE_X0 ? 'norte' : x >= CHICHIMECA_X0 ? 'chichimeca' : x >= MAR_END ? 'maya' : x >= COSTA_END ? 'mar' : x >= NIEVE_END ? 'costa' : x >= OTOMI_END ? (y < SNOW_H + 2 ? 'nieve' : 'selva') : x >= OTOMI_X ? 'otomi' : y >= DESERT_Y ? (x >= AZ_X ? 'sierra' : 'desert')
+  : x < FARM_W ? 'farm' : x < TOWN_X - 1 ? 'wild' : x < WILD_X ? 'town' : x >= AZ_X && inCity(x, y) ? 'city' : 'wild';
 
 const FONT = '"Nunito", "Trebuchet MS", Verdana, sans-serif';
-const SAVE_KEY = 'granjaClaude_v1';
+const SAVE_KEY = 'corazonMaiz_publico_v1'; 
 
 const CROPS = [
   { id:'frijol',   name:'Frijol',    seed:20, sell:35,  days:4,  fruit:'#5a2a3a', leaf:'#6fbf4a', shape:'pod' },
@@ -465,7 +450,7 @@ const GODS = {
     relic:{ name:'Flecha de Camaxtli', desc:'tus armas hacen siempre +50% de daño' },
     talk:['La caza enseña paciencia: el venado huye del que corre, pero no del que espera.', 'Los mexicas temen a Tlaxcallan. Mantén tu macuahuitl afilada.'],
     bless:'tus armas hacen 50% más daño hoy', treasure:{ cacao:300, items:[['lingote_obsidiana', 2]] }, gifts:[['lingote_obsidiana', 1], ['obsidiana', 3]],
-    lore:'Camaxtli, el de la flecha y el arco, guio a los tlaxcaltecas hasta esta tierra. Es el dios principal de Tlaxcallan y cada cuatro años se le celebra con 160 días de penitencia.' },
+    lore:'Camaxtli, el de la flecha y el arco, guio a los tlaxcaltecas hasta esta tierra.' },
   tlaloc:       { name:'Tláloc', title:'dios de la lluvia', col:'#2f6aa8', offer:['amaranto', 3],
     look:{ skin:'#3a7ac8', cloth:'#2f6aa8', accent:'#f4ecd8', hair:'#1a1410', band:'#f4ecd8' }, feathers:['#2f6aa8', '#7ac0e8', '#f4ecd8'],
     greet:'Soy Tláloc. Guardo el agua en las montañas y la suelto desde las nubes. Habla.',
@@ -481,7 +466,7 @@ const GODS = {
     relic:{ name:'Flor eterna', desc:'las muchachas siempre te quieren el doble al platicar' },
     talk:['Un regalo pequeño, dado cada día, vale más que una joya dada una vez.', 'Quien engaña al que lo ama, siembra espinas en su propia casa.'],
     bless:'hoy las muchachas te quieren el doble al platicar', treasure:{ cacao:200, items:[['joya_oro', 1], ['flores', 3]] }, gifts:[['flores', 2], ['chocolate', 1]],
-    lore:'Xochiquetzal, "flor preciosa", era muy querida en Tlaxcallan. Cuida a los enamorados. Tezcatlipoca la llevó a los nueve cielos y Matlalcueye quedó como esposa de Tláloc.' },
+    lore:'Xochiquetzal, "flor preciosa", era muy querida en Tlaxcallan. Cuida a los enamorados.' },
   chicomecoatl: { name:'Chicomecóatl', title:'diosa del maíz y el sustento', col:'#e0a020', offer:['maiz', 3],
     look:{ skin:'#b07a4a', cloth:'#f4ecd8', accent:'#e0a020', hair:'#1a1410', skirt:'#c0392b', female:true }, feathers:['#e0a020', '#f4d35e', '#c0392b'],
     greet:'Soy Chicomecóatl, siete serpiente. De mí nace la mazorca que te alimenta. Dime.',
@@ -497,7 +482,7 @@ const GODS = {
     relic:{ name:"·x91ccfd", desc:"·x797c5a" },
     talk:["·xf9c87d", "·x692325"],
     bless:"·x2fa4e0", treasure:{ cacao:200, items:[['ajolote', 1], ['pescado_blanco', 2]] }, gifts:[['pescado_blanco', 1], ['mojarra', 2]],
-    lore:"·xbcf2cd" },
+    lore:"·x790852" },
   mayahuel:     { name:'Mayahuel', title:"·x59ab24", col:'#5f8f7a', offer:['aguamiel', 1],
     look:{ skin:'#a8703f', cloth:'#e8f0e0', accent:'#5f8f7a', hair:'#1a1410', skirt:'#4a7a6a', female:true }, feathers:['#5f8f7a', '#efe6c0', '#4a7a6a'],
     greet:"·xdf8485",
@@ -595,35 +580,9 @@ const FURNACE = { t:'furnace', x:12, y:4, w:2, h:2 };
 const FURNACE_PRICE = 200, FURNACE_STONE = 15, COAL_PRICE = 30;
 
 const TINACAL = { t:'tinacal', x:23, y:3, w:3, h:3 };
-let _buildsCache = null, _buildsCacheFrame = -1;
-let builds = () => {
-  if (_buildsCacheFrame === T && _buildsCache) return _buildsCache;
-  _buildsCacheFrame = T;
-  _buildsCache = !S ? BUILD : [...BUILD, ...(S.coop ? [COOP] : []), ...(S.hutch ? [HUTCH] : []), ...(S.duckhouse ? [DUCKHOUSE] : []), ...(S.furnace ? [FURNACE] : []), ...(S.tinacal ? [TINACAL] : []),
-    ...(S.def?.tower ? [TOWER] : []), ...(S.hive ? [HIVE] : []), ...(S.day && festivalToday() ? [FIESTA] : []), ...(S.shrines || []).map(s => ({ t:'shrine', x:s.x, y:s.y, w:SHRINE.size, h:SHRINE.size, god:s.god, s }))];
-  return _buildsCache;
-};
-
-let _buildGrid = null, _buildGridCache = null;
-function rebuildBuildGrid() {
-  const bs = builds();
-  if (_buildGridCache === bs) return;
-  _buildGridCache = bs;
-  const grid = new Map();
-  for (let i = 0; i < bs.length; i++) {
-    const b = bs[i];
-    for (let y = b.y; y < b.y + b.h; y++) for (let x = b.x; x < b.x + b.w; x++) grid.set(y * MW + x, i);
-  }
-  _buildGrid = { bs, grid };
-}
-const buildingAt = (x, y) => {
-  if (!_buildGrid) rebuildBuildGrid();
-  
-  const bs = builds();
-  if (bs !== _buildGrid.bs) rebuildBuildGrid();
-  const idx = _buildGrid.grid.get(y * MW + x);
-  return idx != null ? _buildGrid.bs[idx] : undefined;
-};
+let builds = () => !S ? BUILD : [...BUILD, ...(S.coop ? [COOP] : []), ...(S.hutch ? [HUTCH] : []), ...(S.duckhouse ? [DUCKHOUSE] : []), ...(S.furnace ? [FURNACE] : []), ...(S.tinacal ? [TINACAL] : []),
+  ...(S.def?.tower ? [TOWER] : []), ...(S.hive ? [HIVE] : []), ...(S.day && festivalToday() ? [FIESTA] : []), ...(S.shrines || []).map(s => ({ t:'shrine', x:s.x, y:s.y, w:SHRINE.size, h:SHRINE.size, god:s.god, s }))];
+const buildingAt = (x, y) => builds().find(b => x >= b.x && x < b.x+b.w && y >= b.y && y < b.y+b.h);
 
 const grid = v => Array.from({ length:MH }, () => new Array(MW).fill(v));
 
@@ -942,7 +901,7 @@ function slotInfo(i) {
   try { const d = JSON.parse(localStorage.getItem(SLOT_KEY(i)) || 'null'); return d ? `día ${d.day} · ${d.money} cacao` : null; } catch (e) { return null; }
 }
 function saveSlot(i) {
-  try { localStorage.setItem(SLOT_KEY(i), serializeS()); save(); toast(`📜 Guardado en la ranura ${i}`, '#c8f7a0'); }
+  try { localStorage.setItem(SLOT_KEY(i), JSON.stringify(S)); save(); toast(`📜 Guardado en la ranura ${i}`, '#c8f7a0'); }
   catch (e) { toast('No se pudo guardar aquí (el navegador no deja guardar). Usa "Exportar a un archivo".', '#ffb3b3', 5); }
 }
 function afterLoad(ok, what) {
@@ -953,7 +912,7 @@ function afterLoad(ok, what) {
 function loadSlot(i) { let raw = null; try { raw = localStorage.getItem(SLOT_KEY(i)); } catch (e) {} afterLoad(raw && load(raw), `ranura ${i}`); }
 function exportSave() {
   const a = document.createElement('a');
-  a.href = URL.createObjectURL(new Blob([serializeS()], { type:'application/json' }));
+  a.href = URL.createObjectURL(new Blob([JSON.stringify(S)], { type:'application/json' }));
   a.download = `tlaxcallan-dia-${S.day}.json`; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000);
   toast('📜 Partida exportada a un archivo', '#c8f7a0');
 }
@@ -963,45 +922,9 @@ function importSave() {
   inp.click();
 }
 const BACKUP_KEY = `${SAVE_KEY}_respaldo`; 
-
-
-const GRID_KEYS = ['ground', 'wet', 'obj', 'fert', 'pest'];
-function packGrid(g) {
-  return g.map(row => {
-    const out = [];
-    for (let i = 0; i < row.length;) {
-      const v = row[i];
-      let j = i + 1;
-      if (v === null || typeof v !== 'object') while (j < row.length && row[j] === v) j++; 
-      out.push(v, j - i);
-      i = j;
-    }
-    return out;
-  });
-}
-function unpackGrid(p) {
-  return p.map(row => {
-    const out = [];
-    for (let i = 0; i < row.length; i += 2) {
-      const v = row[i], n = row[i + 1];
-      for (let k = 0; k < n; k++) out.push(v);
-    }
-    return out;
-  });
-}
-function serializeS() {
-  const packed = { ...S, __packed: 1 };
-  for (const k of GRID_KEYS) if (Array.isArray(S[k])) packed[k] = packGrid(S[k]);
-  return JSON.stringify(packed);
-}
-function unpackS() {
-  if (!S.__packed) return;
-  delete S.__packed;
-  for (const k of GRID_KEYS) if (Array.isArray(S[k])) S[k] = unpackGrid(S[k]);
-}
 function save() {
   let data, prev = null;
-  try { data = serializeS(); prev = localStorage.getItem(SAVE_KEY); } catch (e) { return saveFailed(e); }
+  try { data = JSON.stringify(S); prev = localStorage.getItem(SAVE_KEY); } catch (e) { return saveFailed(e); }
   try { localStorage.setItem(SAVE_KEY, data); }
   catch (e) { 
     try { localStorage.removeItem(BACKUP_KEY); localStorage.setItem(SAVE_KEY, data); prev = null; } catch (e2) { return saveFailed(e2); }
@@ -1019,7 +942,6 @@ function load(src) {
     const raw = src ?? localStorage.getItem(SAVE_KEY);
     if (raw) {
       S = JSON.parse(raw);
-      unpackS(); 
       
       for (const bag of [S.inv, S.bin]) for (const k of Object.keys(bag)) {
         const base = k.endsWith('_s') ? k.slice(0, -2) : k, nk = OLD_IDS[base] && OLD_IDS[base] + (k.endsWith('_s') ? '_s' : '');
@@ -1112,8 +1034,6 @@ function toast(msg, col='#fff', t=3) {
 }
 const addItem = (k, n=1) => S.inv[k] = (S.inv[k] || 0) + n;
 
-const fmtNum = n => (n || 0).toLocaleString('es-MX');
-
 
 function solid(x, y) {
   if (x < 0 || y < 0 || x >= MW || y >= MH) return true;
@@ -1144,12 +1064,8 @@ function unstick(p) {
   }
 }
 function interactFacing() { UI.keyAct = true; try { interact(); } finally { UI.keyAct = false; } }
-let _playerTileCache = null, _playerTileFrame = -1;
 function playerTile() {
-  if (_playerTileFrame === T && _playerTileCache) return _playerTileCache;
-  _playerTileFrame = T;
-  _playerTileCache = [Math.floor(S.player.x/TS), Math.floor((S.player.y-4)/TS)];
-  return _playerTileCache;
+  return [Math.floor(S.player.x/TS), Math.floor((S.player.y-4)/TS)];
 }
 function target() {
   const [px, py] = playerTile();
@@ -6643,7 +6559,7 @@ const SHOPS = {
         : k === 'joya_matrimonio' ? 'dásela a una muchacha del pueblo y se casa contigo en ese momento'
         : GIFTS[k] ? `regalo: a las muchachas les encanta${sell}`
         : e ? `+${e} energía · +${foodHp(k)} vida · Enter = comer${sell}` : `objeto${sell}`;
-      return { cat, icon:(x, y) => itemIcon(k, x, y), name:`${name} ×${fmtNum(S.inv[k])}`, price:med ? 'usar' : ITEM_PRICE[k] && !MATERIALS.has(k) ? `${ITEM_PRICE[k]} c/u` : '', desc,
+      return { cat, icon:(x, y) => itemIcon(k, x, y), name:`${name} ×${S.inv[k]}`, price:med ? 'usar' : ITEM_PRICE[k] && !MATERIALS.has(k) ? `${ITEM_PRICE[k]} c/u` : '', desc,
         buy:() => med ? useMed(k) : e && cat !== 'Semillas' ? eatItem(k) : toast(`${name}: ${desc}`) };
     });
   } },
@@ -7436,8 +7352,8 @@ function update(dt) {
 
 
 const PREFS = { vol:1, music:1, sfx:1, msg:1, auto:true };
-try { Object.assign(PREFS, JSON.parse(localStorage.getItem('tlaxcallan_prefs') || '{}')); } catch (e) {}
-function savePrefs() { try { localStorage.setItem('tlaxcallan_prefs', JSON.stringify(PREFS)); } catch (e) {} }
+try { Object.assign(PREFS, JSON.parse(localStorage.getItem('corazonMaiz_publico_prefs') || '{}')); } catch (e) {}
+function savePrefs() { try { localStorage.setItem('corazonMaiz_publico_prefs', JSON.stringify(PREFS)); } catch (e) {} }
 function applyVolumes() {
   if (!SND.ctx) return;
   const t = SND.ctx.currentTime, fx = SND.on ? PREFS.sfx : 0;
@@ -7446,8 +7362,8 @@ function applyVolumes() {
   SND.music.gain.setTargetAtTime(SND.musicOn ? 0.32 * PREFS.music : 0, t, 0.2);
 }
 const SND = { ctx:null, on:true, musicOn:true, mode:'milpa', nextNote:0, step:0, mel:4 };
-try { const pref = JSON.parse(localStorage.getItem('tlaxcallan_audio') || '{}'); SND.on = pref.on ?? true; SND.musicOn = pref.music ?? true; } catch (e) {}
-function saveAudioPref() { try { localStorage.setItem('tlaxcallan_audio', JSON.stringify({ on:SND.on, music:SND.musicOn })); } catch (e) {} }
+try { const pref = JSON.parse(localStorage.getItem('corazonMaiz_publico_audio') || '{}'); SND.on = pref.on ?? true; SND.musicOn = pref.music ?? true; } catch (e) {}
+function saveAudioPref() { try { localStorage.setItem('corazonMaiz_publico_audio', JSON.stringify({ on:SND.on, music:SND.musicOn })); } catch (e) {} }
 function audioInit() {
   if (SND.ctx) { if (SND.ctx.state === 'suspended') SND.ctx.resume(); return; }
   const A = window.AudioContext || window.webkitAudioContext;
@@ -7711,7 +7627,7 @@ function updateFx(dt) {
     const x = Math.floor(vx0 + Math.random()*vw), y = Math.floor(vy0 + Math.random()*vh);
     if (S.ground[y]?.[x] === G.WATER && S.ground[y]?.[x+1] === G.WATER) {
       const fx = x*TS + 10, fy = y*TS + 18, dir = Math.random() < 0.5 ? -1 : 1;
-      if (PARTS.length < MAX_PARTS) PARTS.push({ x:fx, y:fy, vx:dir*28, vy:-95, g:230, life:0.82, t:0, size:4, col:Math.random() < 0.5 ? '#c0c8d0' : '#e8a050', glow:false, kind:'fish', seed:0 });
+      PARTS.push({ x:fx, y:fy, vx:dir*28, vy:-95, g:230, life:0.82, t:0, size:4, col:Math.random() < 0.5 ? '#c0c8d0' : '#e8a050', glow:false, kind:'fish', seed:0 });
       puff(fx, fy + 4, 1, { col:'rgba(220,240,255,.9)', kind:'splash', grav:0, spd:0, life:0.5, size:8 });
       if (Math.hypot(fx - p.x, fy - p.y) < 300) sfx('splash');
       setTimeout(() => puff(fx + dir*23, fy + 4, 1, { col:'rgba(220,240,255,.9)', kind:'splash', grav:0, spd:0, life:0.5, size:8 }), 800);
@@ -9763,19 +9679,12 @@ function drawAnimeWoman(look, cx, fy, s) {
 
 const PORTRAITS = {};
 
-function imgWebp(src) {
-  const im = new Image();
-  im.onerror = () => { im.onerror = null; im.src = src; };
-  im.src = src.replace(/\.(png|jpe?g)$/i, '.webp');
-  return im;
-}
-
 const FOTO_DIOSA_PROPIA = new Set(['metztli']);
 function portraitOf(name, esDiosa) {
   let k = name.toLowerCase();
   if (esDiosa && FOTO_DIOSA_PROPIA.has(k)) k += '_diosa';
   let im = PORTRAITS[k];
-  if (!im) { im = PORTRAITS[k] = imgWebp(`retratos/${k}.jpg`); }
+  if (!im) { im = PORTRAITS[k] = new Image(); im.src = `retratos/${k}.jpg`; }
   return im.complete && im.naturalWidth ? im : null;
 }
 function drawAnimeCard(x, y, w, h, c) {
@@ -11328,7 +11237,7 @@ function drawShop() {
   
   const title = typeof shop.title === 'function' ? shop.title() : shop.title;
   const pr = honorRank().price, priceNote = pr === 1 ? '' : ` · precios ${pr < 1 ? '-' : '+'}${Math.round(Math.abs(1 - pr)*100)}% por tu honra`;
-  const sub = shop.sub ? shop.sub() : `Tienes ${fmtNum(S.money)} granos de cacao${priceNote}`;
+  const sub = shop.sub ? shop.sub() : `Tienes ${S.money} granos de cacao${priceNote}`;
   const god = shop.portrait?.();
   if (look) drawPortrait(look, x + 56, y + 58, 30);
   else if (god) { 
@@ -11339,7 +11248,7 @@ function drawShop() {
   text(title, tx, y + 50, 22, '#4a2f18', al);
   ctx.font = `bold 13px ${FONT}`;
   text(wrapText(sub, w - (look ? 120 : 40))[0], tx, y + 74, 13, !shop.sub && pr > 1 ? '#b5462f' : '#7a5530', al);
-  if (!shop.sub && w >= 440) { ctx.font = `bold 14px ${FONT}`; const mt = `${fmtNum(S.money)} cacao`, mw = ctx.measureText(mt).width + 20;
+  if (!shop.sub && w >= 440) { ctx.font = `bold 14px ${FONT}`; const mt = `${S.money} cacao`, mw = ctx.measureText(mt).width + 20;
     rect(UIC.frame, x + w - 22 - mw, y + 22, mw, 26); text(mt, x + w - 22 - mw/2, y + 40, 14, UIC.gold, 'center'); }
   
   UI.shopTabs = [];
@@ -11844,7 +11753,7 @@ function spriteCanvas(name, swap) {
 }
 function drawSprite(name, x, y, swap) {
   if (SMOOTH_ICON[name]) return SMOOTH_ICON[name](x, y); 
-  const s = ctx.imageSmoothingEnabled; ctx.imageSmoothingEnabled = false; 
+  const s = ctx.imageSmoothingEnabled; ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
   ctx.drawImage(spriteCanvas(name, swap), Math.round(x - 12), Math.round(y - 13), 24, 24);
   ctx.imageSmoothingEnabled = s;
 }
@@ -11947,7 +11856,7 @@ function drawPauseScreen() {
         if (inOpts) UI.optHits.push({ x:x + ow/2 - 60, y:ry + 2, w:120, h:28, act:r.buy });
         return;
       }
-      const label = { 'Volumen general':'General', 'Volumen de la música':'Música', 'Volumen de efectos y ambiente':'Efectos', 'Duración de los mensajes':'Texto', 'Guardado automático':'Guardar', 'Contorno de personajes':'Contorno' }[r.name] || r.name.replace(/^Gráficos: /, ''); 
+      const label = { 'Volumen general':'General', 'Volumen de la música':'Música', 'Volumen de efectos y ambiente':'Efectos', 'Duración de los mensajes':'Texto', 'Guardado automático':'Guardar', 'Contorno de personajes':'Contorno' }[r.name] || r.name;
       let nm = (on ? '▸ ' : '') + label; ctx.font = `${on ? 'bold ' : ''}15px ${FONT}`;
       if (ctx.measureText(nm).width > cx0 - lx - 8) { while (nm.length > 4 && ctx.measureText(nm + '…').width > cx0 - lx - 8) nm = nm.slice(0, -1); nm = nm.trimEnd() + '…'; }
       text(nm, lx, ry + 22, 15, UIC.ink, 'left', on);
@@ -18305,7 +18214,7 @@ const respaldosDiarios = () => [0, 1, 2].map(i => { try { const d = JSON.parse(l
 const _sleepRespaldo = sleep;
 sleep = function (...a) {
   const r = _sleepRespaldo(...a);
-  try { localStorage.setItem(RESP_DIA(S.day % 3), JSON.stringify({ day:S.day, data:serializeS() })); } catch (e) {} 
+  try { localStorage.setItem(RESP_DIA(S.day % 3), JSON.stringify({ day:S.day, data:JSON.stringify(S) })); } catch (e) {} 
   return r;
 };
 function recuperarRespaldo() {
@@ -18584,25 +18493,8 @@ function edifClick(px, py) {
   if (!best) return false; best.act(); return true;
 }
 const SACERDOCIO = {
-  ixtlilton:{ quien:'Sacerdote', dios:'Ixtlilton', lore:['Ixtlilton es el negrito que cura: sus tinajas de agua negra quitan la fiebre.', 'Los niños que no duermen se bañan aquí y sueñan tranquilos.', 'Ixtlilton es hermano de los dioses de la fiesta: le gusta que haya música.', 'Tlaxcallan no tiene un rey único: es una república gobernada por un consejo de señores.', 'Las cuatro cabeceras son Tepeticpac, Ocotelulco, Tizatlán y Quiahuiztlán.', 'Maxixcatzin es el mayor señor, pero decide junto con Xicohténcatl, Tlahuexolotzin y Citlalpopocatzin.', 'El Senado de Tlaxcallan reúne entre 50 y 200 nobles: decide la guerra, la paz y las alianzas.', 'Camaxtli guió a nuestro pueblo desde el norte. Él nos indicó dónde establecernos.', 'Los mexicas intentaron conquistar Tlaxcallan pero nunca lo lograron. Por eso somos libres.'] },
-  templomayor:{ quien:'Sacerdotisa', dios:"·x7d6bd5", lore:["·xff831b", "·x54ad81", "·xb886e4", "·x6d3008", "·xee7af5", "·xf773dd", "·x48834d", "·xf3cebf", "·x5820c8", "·xcd9073"] },
-  consejo:{ quien:'Anciano del Consejo', dios:'Tlaxcallan', lore:[
-    'Tlaxcallan no tiene un rey único: es una república como Venecia, gobernada por un consejo de señores.',
-    'Las cuatro cabeceras son Tepeticpac, Ocotelulco, Tizatlán y Quiahuiztlán, cada una con su gobernante.',
-    'Maxixcatzin de Ocotelulco es el mayor señor, pero decide junto con Xicohténcatl, Tlahuexolotzin y Citlalpopocatzin.',
-    'El Senado de Tlaxcallan reúne entre 50 y 200 nobles: decide la guerra, la paz, las alianzas y los embajadores.',
-    'El teccalli es la casa señorial: tierras, vasallos y familias enteras giran alrededor del señor.',
-    'No hay moneda: se comercia por trueque en el gran mercado de Ocotelulco.',
-    'Los mexicas intentaron conquistar Tlaxcallan pero nunca lo lograron. Por eso los tlaxcaltecas son libres.',
-    'Camaxtli guió a nuestro pueblo desde el norte. Él nos indicó dónde establecernos en esta tierra.',
-    "·x4db3d6",
-    'Cada cuatro años se celebra la gran fiesta de Camaxtli: 160 días de penitencia y sacrificio.',
-    'Los tlamaceuhque recorren los templos de noche con un brasero en la cabeza, cumpliendo promesas.',
-    'Cuando muere un señor, lo cremamos en pira. Sus cenizas se mezclan con sangre para hacer su estatua.',
-    'Toci, nuestra abuela, es la diosa de los temazcales y las medicinas. Su templo está en Santa Ana Chiautempan.',
-    'Quetzalcóatl salió de Tula para poblar Tlaxcala, Huexotzinco y Cholula. Por eso hay muchos templos suyos aquí.',
-    'Los otomíes son nuestros aliados: guardan la frontera norte y son los mejores arqueros del valle.',
-  ] },
+  ixtlilton:{ quien:'Sacerdote', dios:'Ixtlilton', lore:["·x8bab78", "·xbac41b", "·xdea5d1"] },
+  templomayor:{ quien:'Sacerdotisa', dios:"·x7d6bd5", lore:["·xff831b", "·x54ad81", "·xb886e4", "·x6d3008"] },
 };
 SHOPS.sacerdote = { title:'', compact:true, sub:() => '', rows:() => {
   const b = UI.edif?.b, s = SACERDOCIO[b?.t] || SACERDOCIO.ixtlilton, d = S.diosDia ??= {};
@@ -25341,7 +25233,7 @@ function materialesAlBaul() {
   let n = 0; for (const k of mats) { const antes = S.inv[k] || 0; storeChest(k); if (!(S.inv[k] > 0) && antes) n++; }
   toast(n ? `📦 Guardaste ${n} materiales en el baúl.` : 'El baúl ya no tiene lugar.', n ? '#e8c48a' : '#ffb3b3');
 }
-SHOPS.bolsa.sub = () => { const n = Object.keys(S.inv).filter(k => S.inv[k] > 0).length; return `${fmtNum(S.money)} granos de cacao · ${n} cosas distintas · lo que se vende vale ${fmtNum(valorBolsa())} cacao`; };
+SHOPS.bolsa.sub = () => { const n = Object.keys(S.inv).filter(k => S.inv[k] > 0).length; return `${S.money} granos de cacao · ${n} cosas distintas · lo que se vende vale ${valorBolsa()} cacao`; };
 SHOPS.bolsa.rows = (base => () => {
   const rows = base();
   if (rows.length === 1 && rows[0].name === 'Tu bolsa está vacía') return rows;
@@ -28608,8 +28500,9 @@ drawShop = function () {
     const label = R20_1.on ? `/${R20_1.q}_` : (R20_1.q ? `"${R20_1.q}" (Esc borra)` : '"/" buscar');
     ctx.font = `bold 12px ${FONT}`;
     const width = Math.max(180, ctx.measureText(label).width + 22);
-    rect('rgba(20,10,10,.85)', 10, VH - 34, width, 22); 
-    text(label, 10 + width/2, VH - 19, 12, R20_1.on ? '#ffe08a' : '#a0a0a0', 'center', false);
+    const sb = UI.shopBox, below = sb ? sb[1] + sb[3] + 30 : VH - 130, py = below + 22 <= VH - 108 ? below : sb && sb[1] - 30 >= 4 ? sb[1] - 30 : VH - 130;
+    if (!UI.touch || R20_1.on || R20_1.q) rect('rgba(20,10,10,.85)', VW/2 - width/2, py, width, 22);
+    if (!UI.touch || R20_1.on || R20_1.q) text(label, VW/2, py + 15, 12, R20_1.on ? '#ffe08a' : '#a0a0a0', 'center', false);
   }
 };
 
@@ -30031,7 +29924,7 @@ for (const [nom, fn] of [['acceptItzel', acceptItzel], ['rejectItzel', rejectItz
    
   let hist28 = [], idb28 = null;
   try {
-    const rq = indexedDB.open('tlaxcallan_hist', 1);
+    const rq = indexedDB.open('corazonMaiz_publico_hist', 1);
     rq.onupgradeneeded = () => rq.result.createObjectStore('h', { keyPath:'at' });
     rq.onsuccess = () => {
       idb28 = rq.result;
@@ -30045,7 +29938,7 @@ for (const [nom, fn] of [['acceptItzel', acceptItzel], ['rejectItzel', rejectItz
     if (r && idb28 && S?.day !== lastHistDay) {
       lastHistDay = S.day;
       try {
-        const rec = { at:Date.now(), day:S.day, money:S.money, raw:serializeS() };
+        const rec = { at:Date.now(), day:S.day, money:S.money, raw:JSON.stringify(S) };
         hist28.unshift(rec);
         const old = hist28.splice(5);
         const tx = idb28.transaction('h', 'readwrite'), os = tx.objectStore('h');
@@ -35775,7 +35668,7 @@ const R45_FEMALE_PHOTO_FILES = { 'Doña Elvira':'elvira-villa.jpg', 'Isabel la S
 const _portraitOfR45=portraitOf;
 portraitOf=function(name, ...resto){
   const file=R45_FEMALE_PHOTO_FILES[name];if(!file)return _portraitOfR45(name, ...resto);
-  const key='__villa_'+file;let im=PORTRAITS[key];if(!im){im=PORTRAITS[key]=imgWebp(`retratos/${file}`);}
+  const key='__villa_'+file;let im=PORTRAITS[key];if(!im){im=PORTRAITS[key]=new Image();im.src=`retratos/${file}`;}
   return im.complete&&im.naturalWidth?im:null;
 };
 const _shopLookR45=shopLook;
@@ -41909,7 +41802,7 @@ SHOPS.ajustes.rows = function () {
       if (!name) return null;
       const k = "·x8479bf" + name.toLowerCase();
       let p = PORTRAITS[k];
-      if (!p) { p = PORTRAITS[k] = imgWebp("·xcfae3e"); }
+      if (!p) { p = PORTRAITS[k] = new Image(); p.src = "·xcfae3e"; }
       return p.complete && p.naturalWidth ? p : null;
     };
 
@@ -44718,6 +44611,83 @@ FISH_TABLE.norte = [['arenque', 45], ['bacalao', 35], ['salmon', 20]];
 
 
 
+
+const _x04bb34 = {
+  explicito:/(?:·x|_x)[0-9a-f]{6}/i,
+  
+  menu:/(?:·x|_x)[0-9a-f]{6}/i,
+  menusCerrados:new Set(['r32Cierre', "_xf04c77", "_x52279f", 'cajon', "_x81a806", 'maratonElige', 'mercado', 'subasta', 'ropaIntima', 'r40Cuarto', "_x89be67", 'peleaTrans', "_x2383cc", "_xa45f5c", "_xf46228", 'especialidades', 'travesura']),
+};
+const esExplicito = t => typeof t === 'string' && _x04bb34.explicito.test(t);
+
+const _toastFamiliar = toast;
+toast = function (msg, col, t) { if (esExplicito(typeof msg === 'string' ? msg : '')) return; return _toastFamiliar(msg, col, t); };
+const _sayLineFamiliar = sayLine;
+sayLine = function (s, ...a) { if (esExplicito(s) || UI._x0ddf56) return; return _sayLineFamiliar(s, ...a); };
+
+for (const [id, sh] of Object.entries(SHOPS)) if (typeof sh?.rows === 'function') {
+  const base = sh.rows;
+  sh.rows = function (...a) { const r = base.apply(this, a); const mal = t => esExplicito(t) || (typeof t === 'string' && _x04bb34.menu.test(t)); return Array.isArray(r) ? r.filter(x => !mal(x?.name) && !mal(x?.desc)) : r; };
+}
+const _openMenuFamiliar = openMenu;
+openMenu = function (id, ...a) { if (_x04bb34.menusCerrados.has(id)) return toast("·xe2ac24", '#ffd9a8', 3); return _openMenuFamiliar(id, ...a); };
+
+const _xedfc75 = 4.2;
+const _xafeb83 = _x08c229;
+_x08c229 = function (...a) {
+  const r = _xafeb83(...a);
+  const m = UI.menu, pareja = (m === 'night' || m === 'love') && S.spouse ? VILLAGERS.find(v => v.name === S.spouse)?.look : null;
+  UI._x0ddf56 = { t:0, yo:NPC_LOOK.player, ella:pareja || (typeof _x601af7 === 'function' ? _x601af7()?.look : null) || NPC_LOOK.player, menu:m };
+  return r;
+};
+function _x77e05e() {
+  const c = UI._x0ddf56; if (!c) return; UI._x0ddf56 = null;
+  UI.herCame = true; UI.together = true;
+  try { if (UI._x0c7a68) _xace719(); } catch (e) { console.warn("·xffdf2c", e); }
+  if (["_x871ab5", 'night', 'love', 'affair'].includes(UI.menu) || UI._x0c7a68 || (UI.menu === 'shop' && _x04bb34.menusCerrados.has(UI.shopId))) { UI._x0c7a68 = null; UI.menu = null; }
+  _toastFamiliar("·x880a07", '#ffd0e0', 4);
+}
+function _x257cb0(dt) {
+  const c = UI._x0ddf56; c.t += dt;
+  const k = Math.min(1, c.t / _xedfc75), W = VW, H = VH, cx = W / 2, piso = H * 0.72;
+  rect('#1a1830', 0, 0, W, H); rect('#2a2440', 0, piso, W, H - piso);
+  rect('#3a3458', cx + 120, H * 0.18, 120, 100); rect('#c8d0f0', cx + 130, H * 0.2, 100, 80); circ('#fff6d0', cx + 200, H * 0.26, 16); rect('#3a3458', cx + 178, H * 0.2, 4, 80); 
+  const bx = cx - 40, by = piso - 10;
+  rect('#5a3a22', bx - 90, by - 60, 12, 70); rect('#5a3a22', bx + 78, by - 30, 12, 40); rect('#e8dcc4', bx - 80, by - 34, 170, 26); rect('#f4ecd8', bx - 74, by - 46, 44, 16); 
+  const camino = Math.min(1, k / 0.55), dentro = k > 0.6;
+  if (!dentro) for (const [look, off] of [[c.yo, -18], [c.ella, 18]]) {
+    const x = W * 0.12 + (bx - W * 0.12 - 20) * camino + off, paso = camino < 1 ? Math.sin(c.t * 12 + off) : 0;
+    ctx.save(); ctx.translate(x, piso + 6); ctx.scale(2.2, 2.2); drawPerson(0, 0, look, 'right', paso, ''); ctx.restore();
+  } else {
+    for (const [look, off] of [[c.yo, -44], [c.ella, -16]]) { ctx.save(); ctx.translate(bx + off, by + 22); ctx.scale(1.6, 1.6); ctx.beginPath(); ctx.rect(-16, -52, 32, 24); ctx.clip(); drawPerson(0, 0, look, 'down', 0, '', 0.01); ctx.restore(); } 
+    rect('#c0392b', bx - 78, by - 26, 166, 22); rect('#a02a20', bx - 78, by - 6, 166, 4); rect('rgba(255,255,255,.18)', bx - 78, by - 26, 166, 3); 
+    for (let i = 0; i < 3; i++) { const t = (c.t * 0.6 + i / 3) % 1; text('z', bx + 40 + t * 30, by - 60 - t * 40, 12 + t * 10, `rgba(220,220,255,${1 - t})`, 'center'); }
+    circ('#ff8ab0', bx - 16, by - 70 + Math.sin(c.t * 3) * 3, 6); text('❤', bx - 16, by - 66, 12, '#ff8ab0', 'center');
+  }
+  if (k > 0.8) { ctx.fillStyle = `rgba(0,0,0,${(k - 0.8) / 0.2})`; ctx.fillRect(0, 0, W, H); }      
+  text("·x6b620e", cx, H * 0.1, 18, '#fff6e0', 'center');
+  text("·xf8036b", W - 16, H - 16, 12, 'rgba(255,246,224,.6)', 'right', false);
+  if (c.t >= _xedfc75) _x77e05e();
+}
+let _x535f50 = 0;
+const _drawMenusFamiliar = drawMenus;
+drawMenus = function (...a) {
+  if (UI.menu === 'shop' && _x04bb34.menusCerrados.has(UI.shopId)) UI.menu = null; 
+  if (!UI._x0ddf56) return _drawMenusFamiliar(...a);
+  const now = performance.now(), dt = Math.min(0.05, (now - (_x535f50 || now)) / 1000); _x535f50 = now;
+  ctx.save(); _x257cb0(dt); ctx.restore();
+};
+
+addEventListener('keydown', e => { if (!UI._x0ddf56) return; e.preventDefault(); e.stopImmediatePropagation(); if (!e.repeat && ['Enter', 'Escape', ' '].includes(e.key)) _x77e05e(); }, true);
+addEventListener('keyup', e => { if (UI._x0ddf56) { e.preventDefault(); e.stopImmediatePropagation(); } }, true);
+addEventListener('pointerdown', e => { if (!UI._x0ddf56) return; e.stopImmediatePropagation(); }, true);
+
+const _updateFamiliar = update;
+update = function (dt) { if (UI._x0ddf56) return; return _updateFamiliar(dt); };
+
+
+
+
 const TITULO_JUEGO = 'Corazón de Maíz';
 document.title = TITULO_JUEGO + (document.title.includes("·x66dc47") ? "·x734262" : '');
 const NOMBRES_LUGARES = [ 
@@ -45078,6 +45048,7 @@ drawPortrait = function (look, cx, cy, r) {
 
 
 
+
 const INTRO_ARCHIVO = 'corazon-de-maiz-intro.html';
 function verIntro(alTerminar) {
   if (document.getElementById('introCDM')) return;
@@ -45218,385 +45189,6 @@ function estadoEncargo(x, y, w) {
 }
 
 
- 
-(function _x05e3c7() {
-  try {
-    if (window._x5f9266) return;
-    window._x5f9266 = true;
-
-    
-    const _caraCalor = caraBonita;
-    caraBonita = function (look, f, ex, ey, o) {
-      const r = _caraCalor(look, f, ex, ey, o);
-      try {
-        if (inking || !(UI._x0c7a68 || UI._x22f2b0) || !o || !o.fem) return r;
-        const P = UI._xc28808 || { her:0 };
-        const heat = Math.min(1, (P.her || 0) / 76) + Math.min(0.32, (UI.herPeak || 0) * 0.32);
-        if (heat <= 0.04) return r;
-        const a = Math.min(0.46, heat * 0.4) * (0.84 + 0.16 * Math.sin(T * 2.3));
-        const halo = (cx, cy, rad, col) => {
-          const g = ctx.createRadialGradient(cx, cy, 0.05, cx, cy, rad);
-          g.addColorStop(0, 'rgba(' + col + ',' + a + ')'); g.addColorStop(1, 'rgba(' + col + ',0)');
-          ctx.fillStyle = g; ctx.beginPath(); ctx.arc(cx, cy, rad, 0, Math.PI * 2); ctx.fill();
-        };
-        halo(f * 3.15, 2.75, 2.7, '255,92,108');
-        halo(f * 5.25, 2.3, 1.8, '255,108,108');
-        halo(-f * 1.15, 1.15, 1.7, '255,102,102');
-        if (heat > 0.42) halo(f * 1.35, 0.1, 5.4, '255,118,92');
-        ctx.fillStyle = 'rgba(255,242,232,' + (0.09 + heat * 0.2) + ')';
-        ctx.beginPath(); ctx.ellipse(f * 1.15, -2.7, 1.9, 0.55, -0.25, 0, Math.PI * 2); ctx.fill();
-        ctx.beginPath(); ctx.ellipse(f * 3.95, 1.25, 1.15, 0.42, 0.3, 0, Math.PI * 2); ctx.fill();
-        ctx.beginPath(); ctx.ellipse(f * 5.15, 0.45, 0.42, 1.05, 0, 0, Math.PI * 2); ctx.fill();
-      } catch (e) { console.warn("·x5e2177", e); }
-      return r;
-    };
-
-    
-    const _peloCalor = peloSuelto;
-    peloSuelto = function (look, x, f) {
-      const r = _peloCalor(look, x, f);
-      try {
-        if (inking || !look || !look.hair || look.goddess) return r;
-        const hr = look.hair;
-        const A = globalThis.ANIM_VIVA_ESTADO || {};
-        const hy = (A.hair && A.hair.y) || 0, hv = (A.hair && A.hair.v) || 0;
-        const pk = Math.max(0, Math.min(2, UI.herPeak || 0));
-        ctx.save();
-        ctx.lineCap = 'round';
-        for (let i = 0; i < 4; i++) {
-          const bx = -f * (2.4 + i * 1.2), by = -3.4 + i * 1.55;
-          const sw = Math.sin(T * 1.75 + i * 1.35 + x * 0.12) * 1.15 + hy * (1.35 + i * 0.25) + hv * 0.42;
-          const drop = 6.2 + i * 1.7 + pk * (1.6 + i * 0.5) + Math.abs(hy) * 0.8;
-          ctx.strokeStyle = anMix(hr, -0.12 - i * 0.03); ctx.lineWidth = 1.15 - i * 0.16;
-          ctx.beginPath(); ctx.moveTo(bx, by);
-          ctx.quadraticCurveTo(bx - f * (1.15 + i * 0.35) + sw * 0.55, by + drop * 0.55, bx - f * (1.6 + i * 0.55) + sw, by + drop);
-          ctx.stroke();
-          ctx.strokeStyle = 'rgba(255,240,220,.16)'; ctx.lineWidth = 0.32;
-          ctx.beginPath(); ctx.moveTo(bx - f * 0.25, by + 0.4);
-          ctx.quadraticCurveTo(bx - f * (1.15 + i * 0.35) + sw * 0.55, by + drop * 0.55, bx - f * (1.5 + i * 0.5) + sw * 0.92, by + drop * 0.9);
-          ctx.stroke();
-        }
-        if (pk > 0.22) for (let i = 0; i < 3; i++) {
-          const a2 = Math.min(0.5, pk * 0.34), sx = -f * (2 + i * 2.1), sy = -4.2 - i * 1.1 - pk * i * 0.7;
-          ctx.strokeStyle = 'rgba(' + (i % 2 ? '255,236,214' : '240,214,190') + ',' + (a2 * (0.5 + 0.3 * Math.sin(T * 3 + i * 2))) + ')';
-          ctx.lineWidth = 0.55;
-          ctx.beginPath(); ctx.moveTo(sx, sy);
-          ctx.quadraticCurveTo(sx - f * (2.2 + i), sy - 1.6 - pk, sx - f * (3.4 + i * 1.2) - Math.sin(T * 4 + i) * 1.2, sy - 2.4 - pk * 1.7);
-          ctx.stroke();
-        }
-        ctx.restore();
-      } catch (e) { console.warn("·x1ef939", e); }
-      return r;
-    };
-
-    const _animPelo = globalThis.ANIM_PELO;
-    globalThis.ANIM_PELO = look => {
-      const b = _animPelo ? _animPelo(look) : 0;
-      return b * 1.28 + Math.sin(T * 2.1) * 0.16 + (UI.herPeak || 0) * 0.5;
-    };
-
-    
-    const _x1c8bc0 = _x4bbb92;
-    _x4bbb92 = function (...a) {};
-  } catch (e) { console.warn("·xa61cfc", e); }
-})();
-
-
-
- 
-(function iconosYFondos() {
-  try {
-    if (window.__iconosYFondosOk) return;
-    window.__iconosYFondosOk = true;
-
-    const ICONOS = {
-      maiz: "·x9715ee",
-      frijol: "·x5d4e0a",
-      chile: "·xb900c6",
-      calabaza: "·x46e0f7",
-    };
-    const FONDOS = {
-      cuarto: "·x4e7a21",
-      recamara: "·x386d71",
-      recamara2: "·x4e7a21",
-      milpa: "·x4db9d8",
-      temazcal: "·x20d64c",
-      lago: "·xc9d03b",
-      templo: "·xce6331",
-      palacio: "·x3ec95c",
-      mictlan: "·xf42c59",
-      castillo: "·x4ae952",
-      jardinHumo: "·x9177ec",
-      tumba: "·xe50d63",
-      tormenta: "·xae6b48",
-      cdmx: "·xaefaae",
-    };
-
-    const cache = {};
-    function cargarImg(src) {
-      if (cache[src]) return cache[src];
-      const im = imgWebp(src);
-      cache[src] = im;
-      return im;
-    }
-    
-    for (const k in ICONOS) cargarImg(ICONOS[k]);
-    for (const k in FONDOS) cargarImg(FONDOS[k]);
-
-    globalThis.iconoDe = id => {
-      const src = ICONOS[id]; if (!src) return null;
-      const im = cache[src]; return (im && im.complete && im.naturalWidth) ? im : null;
-    };
-    globalThis.fondoDe = place => {
-      const src = FONDOS[place]; if (!src) return null;
-      const im = cache[src]; return (im && im.complete && im.naturalWidth) ? im : null;
-    };
-
-    
-    const _xfff20d = _x4bbb92;
-    _x4bbb92 = function (...a) {};
-
-    
-    const _drawTitleBackdropFondo = drawTitleBackdrop;
-    drawTitleBackdrop = function () {
-      _drawTitleBackdropFondo();
-      try {
-        const im = null; 
-        if (!im || !im.complete || !im.naturalWidth) return;
-        ctx.save();
-        ctx.globalAlpha = 0.25;
-        ctx.globalCompositeOperation = 'screen';
-        const iw = im.naturalWidth, ih = im.naturalHeight;
-        const k = Math.max(VW / iw, VH / ih);
-        const dw = iw * k, dh = ih * k;
-        ctx.drawImage(im, (VW - dw) / 2, (VH - dh) / 2, dw, dh);
-        ctx.restore();
-      } catch (e) { console.warn("·x7375e5", e); }
-    };
-
-    console.log("·x30a16c" + Object.keys(ICONOS).length + "·x9be227" + Object.keys(FONDOS).length + "·x3103c4");
-  } catch (e) { console.warn("·xb2ea59", e); }
-})();
-
-
-
- 
-(function texturasPielTela() {
-  try {
-    if (window.__texturasPielTelaOk) return;
-    window.__texturasPielTelaOk = true;
-
-    const IMGS = { piel: "·xe8f29e", tela: "·xa807e8" };
-    const cache = {};
-    function cargar(src) {
-      if (cache[src]) return cache[src];
-      const im = imgWebp(src); cache[src] = im; return im;
-    }
-    for (const k in IMGS) cargar(IMGS[k]);
-
-    globalThis.texturaPiel = () => { const im = cache[IMGS.piel]; return (im && im.complete && im.naturalWidth) ? im : null; };
-    globalThis.texturaTela = () => { const im = cache[IMGS.tela]; return (im && im.complete && im.naturalWidth) ? im : null; };
-
-    
-    const _xff1d26 = _x4bbb92;
-    _x4bbb92 = function (...a) {};
-    console.log("·xc84fa8");
-  } catch (e) { console.warn('[TEXTURAS]', e); }
-})();
-
-
-
- 
-(function sudorMicroOnda() {
-  try {
-    if (window.__sudorMicroOndaOk) return;
-    window.__sudorMicroOndaOk = true;
-
-    
-    const _caraMicro = caraBonita;
-    caraBonita = function (look, f, ex, ey, o) {
-      const r = _caraMicro(look, f, ex, ey, o);
-      try {
-        if (inking || !(UI._x0c7a68 || UI._x22f2b0) || !o || !o.fem) return r;
-        const P = UI._xc28808 || { her:0 };
-        const hot = Math.min(1, (P.her || 0) / 100);
-        const peak = Math.min(1, UI.herPeak || 0);
-        
-        if (hot > 0.2) {
-          ctx.save();
-          ctx.globalAlpha = hot * 0.6;
-          ctx.strokeStyle = anMix(look.hair || '#1a1410', 0.1);
-          ctx.lineWidth = 0.35;
-          ctx.beginPath();
-          ctx.moveTo(ex - f * 1.5, -2.65 - hot * 0.6);
-          ctx.quadraticCurveTo(ex, -3.1 - hot * 0.8, ex + f * 1.75, -2.7 - hot * 0.5);
-          ctx.stroke();
-          ctx.restore();
-        }
-        
-        if (hot > 0.4 && !o.open) {
-          ctx.save();
-          ctx.globalAlpha = (hot - 0.4) * 0.5;
-          ctx.fillStyle = '#3a0e10';
-          ctx.beginPath();
-          ctx.ellipse(f * 5.0, 4.2, 0.45 + hot * 0.2, 0.2 + hot * 0.15, 0, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.restore();
-        }
-        
-        if (peak > 0.3) {
-          ctx.save();
-          ctx.globalAlpha = peak * 0.4;
-          ctx.fillStyle = 'rgba(255,255,255,.3)';
-          ctx.beginPath();
-          ctx.arc(f * 3.2 + f * 0.22, -0.6, 0.9 + peak * 0.3, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.restore();
-        }
-        
-        if (peak > 0.6) {
-          ctx.save();
-          ctx.globalAlpha = (peak - 0.6) * 0.5;
-          ctx.strokeStyle = 'rgba(60,25,15,.4)';
-          ctx.lineWidth = 0.3;
-          ctx.beginPath();
-          ctx.moveTo(f * 1.8, -2.9); ctx.lineTo(f * 2.5, -2.6);
-          ctx.moveTo(f * 4.5, -2.7); ctx.lineTo(f * 3.8, -2.4);
-          ctx.stroke();
-          ctx.restore();
-        }
-      } catch (e) { console.warn('[MICRO-EXP]', e); }
-      return r;
-    };
-
-    
-    const sudorImg = imgWebp("·xf96c31");
-    const gotas = [];
-    let ultimaGota = 0;
-
-    const _xff90e3 = _x4bbb92;
-    _x4bbb92 = function (...a) {};
-
-    
-    const ondaImg = imgWebp("·x42d712");
-    let ondaT = 0, ondaActiva = false;
-
-    
-    const _animPersonOnda = globalThis.ANIM_PERSON;
-    globalThis.ANIM_PERSON = (look, J, main) => {
-      if (_animPersonOnda) J = _animPersonOnda(look, J, main);
-      try {
-        if (UI.herPeak > 0 && !ondaActiva) { ondaActiva = true; ondaT = T; }
-        if (ondaActiva && T - ondaT > 2) ondaActiva = false;
-      } catch (e) {}
-      return J;
-    };
-
-    
-    const _x99a4e7 = _x4bbb92;
-    _x4bbb92 = function (...a) {};
-
-    console.log("·x4f217d");
-  } catch (e) { console.warn("·x56a45b", e); }
-})();
-
-
-
- 
-(function mejorasCodigo() {
-  try {
-    if (window.__mejorasCodigoOk) return;
-    window.__mejorasCodigoOk = true;
-
-    
-    
-    const _animPersonResp = globalThis.ANIM_PERSON;
-    globalThis.ANIM_PERSON = (look, J, main) => {
-      if (_animPersonResp) J = _animPersonResp(look, J, main);
-      try {
-        if (!J || !J.sh || !J.hip || !main) return J;
-        const P = UI._xc28808 || { her:0 };
-        const hot = Math.min(1, (P.her || 0) / 100);
-        const peak = Math.min(1, UI.herPeak || 0);
-        
-        const amp = 0.16 + hot * 0.25 + peak * 0.15;
-        const breath = Math.sin((UI._x69476e || 0) * 0.5 + (look === (UI._x601af7?.look) ? 0 : Math.PI)) * amp;
-        if (breath && J.sh && J.hip) {
-          const shift = (pt) => pt && [pt[0], pt[1] + breath, ...pt.slice(2)];
-          J.sh = shift(J.sh); J.hip = shift(J.hip); J.head = shift(J.head);
-          if (J.butt) J.butt = shift(J.butt);
-          for (const k of ['armF', 'armN', 'legF', 'legN']) if (J[k]) J[k] = J[k].map(shift);
-          if (J.bustJ !== undefined) J.bustJ = (J.bustJ || 0) + breath * 0.6;
-        }
-      } catch (e) {}
-      return J;
-    };
-
-    
-    const _caraOjos = caraBonita;
-    caraBonita = function (look, f, ex, ey, o) {
-      const r = _caraOjos(look, f, ex, ey, o);
-      try {
-        if (inking || !(UI._x0c7a68 || UI._x22f2b0) || !o || !o.fem || o.closed) return r;
-        
-        const shiftX = f * (0.08 + Math.min(0.15, ((UI._xc28808 && UI._xc28808.her) || 0) / 400));
-        
-        const irisX = f * 3.2 + f * 0.22 + shiftX;
-        ctx.save();
-        ctx.globalAlpha = 0.25;
-        ctx.fillStyle = 'rgba(255,255,255,.6)';
-        ctx.beginPath(); ctx.arc(irisX, -0.65, 0.18, 0, Math.PI * 2); ctx.fill();
-        ctx.restore();
-      } catch (e) {}
-      return r;
-    };
-
-    
-    const _animFrameShake = globalThis.ANIM_FRAME;
-    globalThis.ANIM_FRAME = act => {
-      if (_animFrameShake) _animFrameShake(act);
-      try {
-        if (!UI._x24aaa9 || !UI._x0c7a68) return;
-        const P = UI._xc28808 || { her:0 };
-        const hot = Math.min(1, (P.her || 0) / 100);
-        const peak = Math.min(1, UI.herPeak || 0);
-        
-        const intensity = hot * 0.4 + peak * 1.2;
-        if (intensity > 0.1) {
-          const sx = (Math.random() - 0.5) * intensity * 1.5;
-          const sy = (Math.random() - 0.5) * intensity * 1.2;
-          UI._x24aaa9.x = (UI._x24aaa9.x || 0) + sx * 0.3;
-          UI._x24aaa9.y = (UI._x24aaa9.y || 0) + sy * 0.3;
-        }
-      } catch (e) {}
-    };
-
-    
-    const _x7b3495 = _x4bbb92;
-    _x4bbb92 = function (...a) {};
-
-    console.log("·xf59544");
-  } catch (e) { console.warn("·x1ac3a7", e); }
-})();
-
-
-
- 
-(function mejorasAltaPrioridad() {
-  try {
-    if (window.__mejorasAltaPrioridadOk) return;
-    window.__mejorasAltaPrioridadOk = true;
-
-    const st = UI._x61a217 ??= { me:0, her:0, shake:0 };
-
-    const _x6ad877 = _x4bbb92;
-    _x4bbb92 = function (...a) {};
-    console.log("·xcb8d67");
-  } catch (e) { console.warn("·x60299f", e); }
-})();
-
-
-
 
 
 
@@ -45617,7 +45209,6 @@ function estadoEncargo(x, y, w) {
   
   Promise.all(Object.values(IMG).map(im => im.decode?.().catch(() => {}))).then(() => { if (typeof ITEM_ICON_CACHE !== 'undefined') ITEM_ICON_CACHE.clear(); });
 })();
-
 
 
 
@@ -47903,844 +47494,34 @@ function tenangoCdm(x, y, w, h, seed) {
   for (let i = 0; i < 2; i++) { const c = cols[(seed + i + 3) % cols.length], fx = x + 4 + hash(i, seed) * (w - 8), fy = y + h - 4 - i * 6; circ(c, fx, fy, 1.6); circ('#f2c84a', fx, fy, .6); }
 }
 
- 
-(function _x4a2c7b() {
-  try {
-    if (window._x035812) return;
-    window._x035812 = true;
-
-    
-    if (!S.visited) S.visited = {};
-    const _updateNiebla = update;
-    update = function (dt) {
-      const r = _updateNiebla(dt);
-      try {
-        if (!S || !S.player) return r;
-        const tx = Math.floor(S.player.x / TS), ty = Math.floor(S.player.y / TS);
-        for (let dy = -6; dy <= 6; dy++) for (let dx = -6; dx <= 6; dx++) {
-          const x = tx + dx, y = ty + dy;
-          if (x >= 0 && y >= 0 && x < MW && y < WORLD_H) S.visited[x + ',' + y] = true;
-        }
-      } catch (e) {}
-      return r;
-    };
-
-    
-    if (UI.photoMode === undefined) UI.photoMode = false;
-    if (UI.photoFilter === undefined) UI.photoFilter = 0;
-    const FILTROS_FOTO = ['normal', 'sepia', 'blanco y negro', 'viñeta', 'cálido'];
-    const FILTRO_CSS = ['', 'sepia(0.9)', 'grayscale(1)', 'contrast(1.1) brightness(0.95)', 'sepia(0.3) saturate(1.4) brightness(1.05)'];
-    addEventListener('keydown', e => {
-      if (e.key === 'F8') {
-        if (UI.menu) return;
-        e.preventDefault();
-        UI.photoMode = !UI.photoMode;
-        toast(UI.photoMode ? 'Modo foto: 1-5 filtro · Enter capturar · Esc salir' : 'Modo foto desactivado', '#ffd9a8', 4);
-      }
-      if (!UI.photoMode) return;
-      if (e.key >= '1' && e.key <= '5') { UI.photoFilter = parseInt(e.key) - 1; toast('Filtro: ' + FILTROS_FOTO[UI.photoFilter], '#ffd9a8', 2); }
-      if (e.key === 'Escape') { UI.photoMode = false; toast('Modo foto desactivado', '#ffd9a8', 2); }
-      if (e.key === 'Enter') {
-        const canvas = document.querySelector('canvas');
-        if (!canvas) return;
-        const off = document.createElement('canvas');
-        off.width = canvas.width; off.height = canvas.height;
-        const octx = off.getContext('2d');
-        octx.filter = FILTRO_CSS[UI.photoFilter] || '';
-        octx.drawImage(canvas, 0, 0);
-        octx.filter = 'none';
-        if (UI.photoFilter === 3) {
-          const g = octx.createRadialGradient(off.width/2, off.height/2, off.width*0.3, off.width/2, off.height/2, off.width*0.7);
-          g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(1, 'rgba(0,0,0,0.55)');
-          octx.fillStyle = g; octx.fillRect(0, 0, off.width, off.height);
-        }
-        off.toBlob(b => {
-          const url = URL.createObjectURL(b);
-          const a = document.createElement('a');
-          a.href = url; a.download = 'tlaxcallan_foto_' + S.day + '_' + Date.now() + '.png';
-          a.click(); URL.revokeObjectURL(url);
-          toast('Foto guardada', '#c8f7a0', 3);
-        });
-      }
-    });
-
-    
-    function objetivoCercano() {
-      const px = S.player.x, py = S.player.y;
-      let best = null, bestD = Infinity;
-      for (const sh of (S.shrines || [])) {
-        if (sh.found) continue;
-        const cx = (sh.x + 1.5) * TS, cy = (sh.y + 1.5) * TS;
-        const d = (cx - px) ** 2 + (cy - py) ** 2;
-        if (d < bestD) { bestD = d; best = { x: cx, y: cy, label: 'Santuario' }; }
-      }
-      if (!best) best = { x: (FARM_OLD + 5) * TS, y: 8 * TS, label: 'Tlaxcallan' };
-      return best;
-    }
-    const _drawWorldInd = drawWorld;
-    drawWorld = function (...a) {
-      const r = _drawWorldInd(...a);
-      try {
-        if (inking || UI.menu || UI.home || UI.edif || UI._x0c7a68 || UI._x22f2b0) return r;
-        if (!S || !S.player) return r;
-        const obj = objetivoCercano();
-        if (!obj) return r;
-        const px = S.player.x, py = S.player.y;
-        const dx = obj.x - px, dy = obj.y - py;
-        const dist = Math.hypot(dx, dy);
-        if (dist < 120) return r;
-        const ang = Math.atan2(dy, dx);
-        const cx = VW / 2, cy = VH / 2;
-        const rEdge = Math.min(VW, VH) / 2 - 30;
-        const ax = cx + Math.cos(ang) * rEdge;
-        const ay = cy + Math.sin(ang) * rEdge;
-        ctx.save(); ctx.setTransform(cv.width / VW, 0, 0, cv.width / VW, 0, 0);
-        ctx.translate(ax, ay); ctx.rotate(ang);
-        ctx.fillStyle = 'rgba(255,220,120,0.9)';
-        ctx.beginPath(); ctx.moveTo(14, 0); ctx.lineTo(-8, -8); ctx.lineTo(-4, 0); ctx.lineTo(-8, 8); ctx.closePath(); ctx.fill();
-        ctx.restore();
-        ctx.save(); ctx.setTransform(cv.width / VW, 0, 0, cv.width / VW, 0, 0);
-        ctx.fillStyle = 'rgba(0,0,0,0.6)';
-        const tw = ctx.measureText(obj.label).width + 12;
-        ctx.fillRect(ax - tw/2, ay + 14, tw, 16);
-        ctx.fillStyle = '#ffd9a8'; ctx.font = 'bold 11px ' + FONT; ctx.textAlign = 'center';
-        ctx.fillText(obj.label, ax, ay + 26);
-        ctx.restore();
-      } catch (e) {}
-      return r;
-    };
-
-    
-    const _drawWorldAura = drawWorld;
-    drawWorld = function (...a) {
-      const r = _drawWorldAura(...a);
-      try {
-        if (inking || !S || UI.menu || UI.home || UI.edif || UI._x0c7a68 || UI._x22f2b0) return r;
-        if (typeof hijasActivas !== 'function') return r;
-        const list = hijasActivas();
-        ctx.save(); ctx.setTransform(cv.width / VW, 0, 0, cv.width / VW, 0, 0);
-        for (const d of list) {
-          const col = d.col || '#c080ff';
-          const g = ctx.createRadialGradient(d.x, d.y - 10, 2, d.x, d.y - 10, 30);
-          g.addColorStop(0, col + '55'); g.addColorStop(1, col + '00');
-          ctx.fillStyle = g; ctx.beginPath(); ctx.arc(d.x, d.y - 10, 30, 0, Math.PI * 2); ctx.fill();
-          for (let i = 0; i < 4; i++) {
-            const ang = T * 1.5 + i * Math.PI / 2 + (d.i || 0);
-            const rad = 14 + Math.sin(T * 2 + i) * 4;
-            const px = d.x + Math.cos(ang) * rad;
-            const py = d.y - 10 + Math.sin(ang) * rad * 0.5;
-            ctx.fillStyle = col; ctx.globalAlpha = 0.5 + 0.5 * Math.sin(T * 3 + i);
-            ctx.beginPath(); ctx.arc(px, py, 1.5, 0, Math.PI * 2); ctx.fill();
-          }
-          ctx.globalAlpha = 1;
-        }
-        ctx.restore();
-      } catch (e) {}
-      return r;
-    };
-
-    
-    let ultimoPaso = { x:0, y:0, t:0 };
-    const _updatePasos = update;
-    update = function (dt) {
-      const r = _updatePasos(dt);
-      try {
-        if (!SND.ctx || !SND.on || !S || !S.player) return r;
-        if (UI.menu || UI.paused || UI._x0c7a68 || UI._x22f2b0) return r;
-        const p = S.player;
-        const dist = Math.hypot(p.x - ultimoPaso.x, p.y - ultimoPaso.y);
-        if (dist < 18) return r;
-        if (T - ultimoPaso.t < 0.28) return r;
-        ultimoPaso = { x: p.x, y: p.y, t: T };
-        const tx = Math.floor(p.x / TS), ty = Math.floor(p.y / TS);
-        const g = S.ground?.[ty]?.[tx];
-        const z = (typeof globalThis.zone === 'function') ? globalThis.zone(tx, ty) : '';
-        let vol = 0.05, freq = 180, type = 'triangle', dur = 0.06;
-        if (g === 2 || g === 13) { vol = 0.07; freq = 600; type = 'sine'; dur = 0.08; }
-        else if (g === 4 || g === 3 || g === 5 || g === 6) { vol = 0.06; freq = 260; type = 'square'; dur = 0.05; }
-        else if (g === 7) { vol = 0.04; freq = 400; type = 'sawtooth'; dur = 0.07; }
-        else if (g === 10 || g === 12 || z === 'nieve') { vol = 0.03; freq = 900; type = 'sine'; dur = 0.1; }
-        else { vol = 0.045; freq = 220; type = 'triangle'; dur = 0.06; }
-        if (SND.on) tone(freq + Math.random() * 40, dur, { type, vol, bus: SND.sfx });
-      } catch (e) {}
-      return r;
-    };
-
-    
-    const _drawAnimeCard = drawAnimeCard;
-    drawAnimeCard = function (x, y, w, h, c) {
-      ctx.save();
-      const breath = 1 + Math.sin(T * 1.6 + (c?.name?.charCodeAt(0) || 0) * 0.7) * 0.008;
-      const bob = Math.sin(T * 1.6 + (c?.name?.charCodeAt(0) || 0) * 0.7) * 1.2;
-      ctx.translate(x + w/2, y + h/2); ctx.scale(breath, breath);
-      ctx.translate(-(x + w/2), -(y + h/2) + bob);
-      const r = _drawAnimeCard(x, y, w, h, c);
-      ctx.restore();
-      try {
-        const im = portraitOf(c?.name, !!c?.look?.goddess);
-        if (im && Math.sin(T * 0.15 + (c?.name?.charCodeAt(0) || 0)) > 0.985) {
-          ctx.save(); ctx.globalAlpha = 0.35; ctx.fillStyle = '#1a1424';
-          const eyeY = y + h * 0.32;
-          ctx.fillRect(x + w*0.25, eyeY, w*0.18, 3);
-          ctx.fillRect(x + w*0.57, eyeY, w*0.18, 3);
-          ctx.restore();
-        }
-      } catch (e) {}
-      return r;
-    };
-
-    
-    if (S.pet && !Array.isArray(S.pet.tricks)) S.pet.tricks = [];
-    const TRUCOS_PET = ['sentado', 'dar la pata', 'traer', 'voltereta'];
-    let trucoActivo = null, trucoHasta = 0;
-    addEventListener('keydown', e => {
-      if (e.key === 'F9' && !UI.menu && S.pet) {
-        const p = S.player, pt = S.pet;
-        if (Math.hypot(p.x - pt.x, p.y - pt.y) > 60) { toast('Acercate a tu mascota', '#ffd9a8', 2); return; }
-        e.preventDefault();
-        const learned = S.pet.tricks || [];
-        const next = TRUCOS_PET.find(t => !learned.includes(t));
-        if (next) { learned.push(next); S.pet.tricks = learned; toast('Tu mascota aprendio: ' + next, '#c8f7a0', 4); }
-        else { const t = TRUCOS_PET[Math.floor(Math.random() * TRUCOS_PET.length)]; trucoActivo = t; trucoHasta = T + 2.5; toast('Tu mascota hace: ' + t, '#ffd0e0', 2); }
-      }
-    });
-
-    
-    if (S.epidemiaActiva === undefined) S.epidemiaActiva = false;
-    if (S.epidemiaCurada === undefined) S.epidemiaCurada = false;
-    const _updateEpi = update;
-    update = function (dt) {
-      const r = _updateEpi(dt);
-      try {
-        if (!S || !S.time || UI.menu) return r;
-        if (!S.epidemiaCurada && !S.epidemiaActiva && S.day >= 15 && S.day % 30 === 0 && S.time >= 9 * 60 && S.time < 9 * 60 + 10) {
-          S.epidemiaActiva = true;
-          toast('Una plaga golpea el pueblo! Consigue hierbas en el bosque.', '#ffb3b3', 8);
-          try { sfx('thunder'); } catch (e) {}
-        }
-        if (S.epidemiaActiva && !S.epidemiaPenalizada && S.maxE > 100) { S.epidemiaPenalizada = true; S.maxE = Math.max(100, S.maxE - 60); }
-        if (S.epidemiaActiva && (S.inv?.hierba_med || 0) >= 3) {
-          S.inv.hierba_med -= 3; S.epidemiaActiva = false; S.epidemiaCurada = true; S.epidemiaPenalizada = false;
-          S.maxE = Math.min(270, S.maxE + 60); S.money += 200;
-          addHonor(5, 'curaste la plaga del pueblo');
-          toast('Curaste la plaga con hierbas! +200 cacao', '#c8f7a0', 7);
-        }
-      } catch (e) {}
-      return r;
-    };
-
-    
-    if (!Array.isArray(UI.mapPins)) UI.mapPins = [];
-    const _pointerDownPin = pointerDown;
-    pointerDown = function (px, py, button) {
-      if (UI.menu === 'map' && button === 2 && window.event?.shiftKey) {
-        const w = VW - 30, sc = Math.min((w - 40)/MW, (VH - 140)/WORLD_H), mw = MW*sc, mh = WORLD_H*sc;
-        const [x, y] = dialog(w, mh + 130), mx = x + (w - mw)/2, my = y + 56;
-        const tx = Math.floor((px - mx)/sc), ty = Math.floor((py - my)/sc);
-        if (tx >= 0 && ty >= 0 && tx < MW && ty < WORLD_H) {
-          UI.mapPins.push({ x: tx, y: ty, color: '#ff6b6b', label: 'Pin ' + (UI.mapPins.length + 1) });
-          toast('Pin colocado en (' + tx + ', ' + ty + ')', '#c8f7a0', 2);
-          return;
-        }
-      }
-      return _pointerDownPin(px, py, button);
-    };
-
-    
-    const PREFS_A11Y_KEY = 'tlaxcallan_a11y';
-    function loadA11y() { try { return JSON.parse(localStorage.getItem(PREFS_A11Y_KEY) || '{}'); } catch (e) { return {}; } }
-    function saveA11y(p) { try { localStorage.setItem(PREFS_A11Y_KEY, JSON.stringify(p)); } catch (e) {} }
-    const a11y = Object.assign({ colorblind: 'none', highContrast: false }, loadA11y());
-    if (!document.getElementById('a11y-svg-filters')) {
-      const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-      svg.id = 'a11y-svg-filters'; svg.setAttribute('style', 'position:absolute;width:0;height:0');
-      svg.innerHTML = '<defs><filter id="cb-protanopia"><feColorMatrix type="matrix" values="0.567,0.433,0,0,0  0.558,0.442,0,0,0  0,0.242,0.758,0,0  0,0,0,1,0"/></filter><filter id="cb-deuteranopia"><feColorMatrix type="matrix" values="0.625,0.375,0,0,0  0.7,0.3,0,0,0  0,0.3,0.7,0,0  0,0,0,1,0"/></filter><filter id="cb-tritanopia"><feColorMatrix type="matrix" values="0.95,0.05,0,0,0  0,0.433,0.567,0,0  0,0.475,0.525,0,0  0,0,0,1,0"/></filter></defs>';
-      document.body.appendChild(svg);
-    }
-    function aplicarA11y() {
-      const canvas = document.querySelector('canvas');
-      if (!canvas) return;
-      const FILTROS_CB = { none: '', protanopia: 'url(#cb-protanopia)', deuteranopia: 'url(#cb-deuteranopia)', tritanopia: 'url(#cb-tritanopia)' };
-      let f = FILTROS_CB[a11y.colorblind] || '';
-      if (a11y.highContrast) f = (f ? f + ' ' : '') + 'contrast(1.35) saturate(1.2)';
-      canvas.style.filter = f;
-      saveA11y(a11y);
-    }
-    aplicarA11y();
-    const MODOS_CB = ['none', 'protanopia', 'deuteranopia', 'tritanopia'];
-    addEventListener('keydown', e => {
-      if (e.key === 'F6') { const i = MODOS_CB.indexOf(a11y.colorblind); a11y.colorblind = MODOS_CB[(i + 1) % MODOS_CB.length]; aplicarA11y(); toast('Daltonismo: ' + a11y.colorblind, '#c8f7a0', 3); }
-      if (e.key === 'F7') { a11y.highContrast = !a11y.highContrast; aplicarA11y(); toast('Alto contraste: ' + (a11y.highContrast ? 'ON' : 'OFF'), '#c8f7a0', 3); }
-    });
-
-    
-    const LOGROS = [
-      { id:'primera_cosecha', nombre:'Primera cosecha', desc:'Cosecha tu primer cultivo', cond:() => (S.cosechas || 0) >= 1, icono:'*' },
-      { id:'cien_cacao', nombre:'Rico', desc:'Acumula 1000 cacao', cond:() => (S.money || 0) >= 1000, icono:'$' },
-      { id:'origen_elegido', nombre:'Origen', desc:'Elige tu origen', cond:() => !!S.origen, icono:'v' },
-    ];
-    const LOGROS_KEY = 'tlaxcallan_logros';
-    function logrosDesbloqueados() { try { return JSON.parse(localStorage.getItem(LOGROS_KEY) || '[]'); } catch (e) { return []; } }
-    function guardarLogros(ids) { try { localStorage.setItem(LOGROS_KEY, JSON.stringify(ids)); } catch (e) {} }
-    function revisarLogros() {
-      const desbloqueados = logrosDesbloqueados();
-      const nuevos = [];
-      for (const l of LOGROS) {
-        if (desbloqueados.includes(l.id)) continue;
-        try { if (l.cond()) { desbloqueados.push(l.id); nuevos.push(l); } } catch (e) {}
-      }
-      if (nuevos.length) { guardarLogros(desbloqueados); for (const l of nuevos) toast('Logro desbloqueado: ' + l.nombre, '#ffd060', 5); }
-    }
-    let _logrosT = 0;
-    const _updateLogros = update;
-    update = function (dt) {
-      const r = _updateLogros(dt);
-      try { _logrosT += dt; if (_logrosT > 5) { _logrosT = 0; revisarLogros(); } } catch (e) {}
-      return r;
-    };
-
-    console.log("·x68c22e");
-  } catch (e) { console.warn("·xa8123b", e); }
-})();
 
 
- 
-(function spritesPoses() {
-  try {
-    if (window.__spritesPosesOk) return;
-    window.__spritesPosesOk = true;
-
-    const POSES_SPRITES = {
-      _x137a21: "·xc4cdd4",
-      _xd3d24d: "·x548f56",
-      _x4823f4: "·x235f87",
-      _x76ab44: "·x74e3db",
-      _x79c2b8: "·xf26f17",
-      depie: "·xaed656",
-    };
-
-    const cache = {};
-    function cargarImg(src) {
-      if (cache[src]) return cache[src];
-      const im = imgWebp(src);
-      cache[src] = im;
-      return im;
-    }
-    for (const k in POSES_SPRITES) cargarImg(POSES_SPRITES[k]);
-
-    globalThis.poseSprite = name => {
-      const src = POSES_SPRITES[name]; if (!src) return null;
-      const im = cache[src]; return (im && im.complete && im.naturalWidth) ? im : null;
-    };
-
-    
-    const _xddd3d1 = _x4bbb92;
-    _x4bbb92 = function (...a) {};
-
-    console.log("·x5199ab");
-  } catch (e) { console.warn("·x8db6be", e); }
-})();
+{
+  const ETAPAS = {
+    jitomate:["<ellipse cx=\"32\" cy=\"113\" rx=\"17\" ry=\"4.4\" fill=\"#6e4524\" stroke=\"#1a1410\" stroke-width=\"0.9\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M20 112 q12 -4 24 0\" stroke=\"#8a5a30\" stroke-width=\"1.4\" fill=\"none\"/><ellipse cx=\"32\" cy=\"110\" rx=\"2.4\" ry=\"1.7\" fill=\"#e8d8a0\" stroke=\"#1a1410\" stroke-width=\"0.9\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>", "<ellipse cx=\"32\" cy=\"113\" rx=\"17\" ry=\"4.4\" fill=\"#6e4524\" stroke=\"#1a1410\" stroke-width=\"0.9\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M20 112 q12 -4 24 0\" stroke=\"#8a5a30\" stroke-width=\"1.4\" fill=\"none\"/><path d=\"M32 111 Q35 105.5 32 100\" stroke=\"#1a1410\" stroke-width=\"4\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M32 111 Q35 105.5 32 100\" stroke=\"#3f9a35\" stroke-width=\"2\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M32 102 Q30 96.5 24.2 97.5 Q26.2 103 32 102Z\" fill=\"#3f9a35\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 102 L24.2 97.5\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 101 Q37.8 102 39.8 96.5 Q34 95.5 32 101Z\" fill=\"#3f9a35\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 101 L39.8 96.5\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/>", "<ellipse cx=\"32\" cy=\"113\" rx=\"17\" ry=\"4.4\" fill=\"#6e4524\" stroke=\"#1a1410\" stroke-width=\"0.9\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M20 112 q12 -4 24 0\" stroke=\"#8a5a30\" stroke-width=\"1.4\" fill=\"none\"/><path d=\"M40 112 V58\" stroke=\"#8a5a30\" stroke-width=\"2.6\"/><path d=\"M32 111 Q35 94 32 77\" stroke=\"#1a1410\" stroke-width=\"4.4\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M32 111 Q35 94 32 77\" stroke=\"#3f9a35\" stroke-width=\"2.4\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M32 108 Q28.7 100.9 21.1 102.9 Q24.4 110 32 108Z\" fill=\"#3f9a35\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 108 L21.1 102.9\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 102.3 Q39.6 104.4 42.9 97.3 Q35.3 95.2 32 102.3Z\" fill=\"#3f9a35\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 102.3 L42.9 97.3\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 96.7 Q28.7 89.6 21.1 91.6 Q24.4 98.7 32 96.7Z\" fill=\"#3f9a35\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 96.7 L21.1 91.6\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 91 Q39.6 93 42.9 85.9 Q35.3 83.9 32 91Z\" fill=\"#3f9a35\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 91 L42.9 85.9\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 85.3 Q28.7 78.2 21.1 80.3 Q24.4 87.4 32 85.3Z\" fill=\"#3f9a35\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 85.3 L21.1 80.3\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 79.7 Q39.6 81.7 42.9 74.6 Q35.3 72.6 32 79.7Z\" fill=\"#3f9a35\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 79.7 L42.9 74.6\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/>", "<ellipse cx=\"32\" cy=\"113\" rx=\"17\" ry=\"4.4\" fill=\"#6e4524\" stroke=\"#1a1410\" stroke-width=\"0.9\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M20 112 q12 -4 24 0\" stroke=\"#8a5a30\" stroke-width=\"1.4\" fill=\"none\"/><path d=\"M40 112 V42\" stroke=\"#8a5a30\" stroke-width=\"2.6\"/><path d=\"M32 111 Q35 83 32 55\" stroke=\"#1a1410\" stroke-width=\"4.4\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M32 111 Q35 83 32 55\" stroke=\"#3f9a35\" stroke-width=\"2.4\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M32 108 Q28.1 99.7 19.3 102.1 Q23.2 110.4 32 108Z\" fill=\"#3f9a35\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 108 L19.3 102.1\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 101 Q40.8 103.4 44.7 95.1 Q35.9 92.7 32 101Z\" fill=\"#3f9a35\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 101 L44.7 95.1\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 94 Q28.1 85.7 19.3 88.1 Q23.2 96.4 32 94Z\" fill=\"#3f9a35\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 94 L19.3 88.1\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 87 Q40.8 89.4 44.7 81.1 Q35.9 78.7 32 87Z\" fill=\"#3f9a35\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 87 L44.7 81.1\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 80 Q28.1 71.7 19.3 74.1 Q23.2 82.4 32 80Z\" fill=\"#3f9a35\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 80 L19.3 74.1\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 73 Q40.8 75.4 44.7 67.1 Q35.9 64.7 32 73Z\" fill=\"#3f9a35\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 73 L44.7 67.1\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 66 Q28.1 57.7 19.3 60.1 Q23.2 68.4 32 66Z\" fill=\"#3f9a35\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 66 L19.3 60.1\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 59 Q40.8 61.4 44.7 53.1 Q35.9 50.7 32 59Z\" fill=\"#3f9a35\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 59 L44.7 53.1\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><ellipse cx=\"26\" cy=\"68\" rx=\"1.4\" ry=\"2.2\" transform=\"rotate(0 26 70)\" fill=\"#f2c84a\"/><ellipse cx=\"26\" cy=\"68\" rx=\"1.4\" ry=\"2.2\" transform=\"rotate(72 26 70)\" fill=\"#f2c84a\"/><ellipse cx=\"26\" cy=\"68\" rx=\"1.4\" ry=\"2.2\" transform=\"rotate(144 26 70)\" fill=\"#f2c84a\"/><ellipse cx=\"26\" cy=\"68\" rx=\"1.4\" ry=\"2.2\" transform=\"rotate(216 26 70)\" fill=\"#f2c84a\"/><ellipse cx=\"26\" cy=\"68\" rx=\"1.4\" ry=\"2.2\" transform=\"rotate(288 26 70)\" fill=\"#f2c84a\"/><circle cx=\"26\" cy=\"70\" r=\"1\" fill=\"#e8862a\"/><ellipse cx=\"40\" cy=\"58\" rx=\"1.4\" ry=\"2.2\" transform=\"rotate(0 40 60)\" fill=\"#f2c84a\"/><ellipse cx=\"40\" cy=\"58\" rx=\"1.4\" ry=\"2.2\" transform=\"rotate(72 40 60)\" fill=\"#f2c84a\"/><ellipse cx=\"40\" cy=\"58\" rx=\"1.4\" ry=\"2.2\" transform=\"rotate(144 40 60)\" fill=\"#f2c84a\"/><ellipse cx=\"40\" cy=\"58\" rx=\"1.4\" ry=\"2.2\" transform=\"rotate(216 40 60)\" fill=\"#f2c84a\"/><ellipse cx=\"40\" cy=\"58\" rx=\"1.4\" ry=\"2.2\" transform=\"rotate(288 40 60)\" fill=\"#f2c84a\"/><circle cx=\"40\" cy=\"60\" r=\"1\" fill=\"#e8862a\"/><ellipse cx=\"30\" cy=\"84\" rx=\"1.4\" ry=\"2.2\" transform=\"rotate(0 30 86)\" fill=\"#f2c84a\"/><ellipse cx=\"30\" cy=\"84\" rx=\"1.4\" ry=\"2.2\" transform=\"rotate(72 30 86)\" fill=\"#f2c84a\"/><ellipse cx=\"30\" cy=\"84\" rx=\"1.4\" ry=\"2.2\" transform=\"rotate(144 30 86)\" fill=\"#f2c84a\"/><ellipse cx=\"30\" cy=\"84\" rx=\"1.4\" ry=\"2.2\" transform=\"rotate(216 30 86)\" fill=\"#f2c84a\"/><ellipse cx=\"30\" cy=\"84\" rx=\"1.4\" ry=\"2.2\" transform=\"rotate(288 30 86)\" fill=\"#f2c84a\"/><circle cx=\"30\" cy=\"86\" r=\"1\" fill=\"#e8862a\"/>", "<ellipse cx=\"32\" cy=\"113\" rx=\"17\" ry=\"4.4\" fill=\"#6e4524\" stroke=\"#1a1410\" stroke-width=\"0.9\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M20 112 q12 -4 24 0\" stroke=\"#8a5a30\" stroke-width=\"1.4\" fill=\"none\"/><path d=\"M40 112 V42\" stroke=\"#8a5a30\" stroke-width=\"2.6\"/><path d=\"M32 111 Q35 83 32 55\" stroke=\"#1a1410\" stroke-width=\"4.4\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M32 111 Q35 83 32 55\" stroke=\"#3f9a35\" stroke-width=\"2.4\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M32 108 Q28.1 99.7 19.3 102.1 Q23.2 110.4 32 108Z\" fill=\"#3f9a35\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 108 L19.3 102.1\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 101 Q40.8 103.4 44.7 95.1 Q35.9 92.7 32 101Z\" fill=\"#3f9a35\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 101 L44.7 95.1\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 94 Q28.1 85.7 19.3 88.1 Q23.2 96.4 32 94Z\" fill=\"#3f9a35\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 94 L19.3 88.1\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 87 Q40.8 89.4 44.7 81.1 Q35.9 78.7 32 87Z\" fill=\"#3f9a35\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 87 L44.7 81.1\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 80 Q28.1 71.7 19.3 74.1 Q23.2 82.4 32 80Z\" fill=\"#3f9a35\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 80 L19.3 74.1\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 73 Q40.8 75.4 44.7 67.1 Q35.9 64.7 32 73Z\" fill=\"#3f9a35\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 73 L44.7 67.1\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 66 Q28.1 57.7 19.3 60.1 Q23.2 68.4 32 66Z\" fill=\"#3f9a35\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 66 L19.3 60.1\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 59 Q40.8 61.4 44.7 53.1 Q35.9 50.7 32 59Z\" fill=\"#3f9a35\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 59 L44.7 53.1\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><circle cx=\"24\" cy=\"76\" r=\"4.4\" fill=\"#e2403a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><circle cx=\"22.5\" cy=\"74.5\" r=\"1.3\" fill=\"rgba(255,255,255,.5)\"/><circle cx=\"38\" cy=\"66\" r=\"4.4\" fill=\"#e2403a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><circle cx=\"36.5\" cy=\"64.5\" r=\"1.3\" fill=\"rgba(255,255,255,.5)\"/><circle cx=\"28\" cy=\"90\" r=\"4.4\" fill=\"#e2403a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><circle cx=\"26.5\" cy=\"88.5\" r=\"1.3\" fill=\"rgba(255,255,255,.5)\"/><circle cx=\"42\" cy=\"84\" r=\"4.4\" fill=\"#e2403a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><circle cx=\"40.5\" cy=\"82.5\" r=\"1.3\" fill=\"rgba(255,255,255,.5)\"/><circle cx=\"34\" cy=\"58\" r=\"4.4\" fill=\"#e2403a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><circle cx=\"32.5\" cy=\"56.5\" r=\"1.3\" fill=\"rgba(255,255,255,.5)\"/>"],
+    camote:["<ellipse cx=\"32\" cy=\"113\" rx=\"17\" ry=\"4.4\" fill=\"#6e4524\" stroke=\"#1a1410\" stroke-width=\"0.9\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M20 112 q12 -4 24 0\" stroke=\"#8a5a30\" stroke-width=\"1.4\" fill=\"none\"/><ellipse cx=\"32\" cy=\"110\" rx=\"2.4\" ry=\"1.7\" fill=\"#b0506a\" stroke=\"#1a1410\" stroke-width=\"0.9\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>", "<ellipse cx=\"32\" cy=\"113\" rx=\"17\" ry=\"4.4\" fill=\"#6e4524\" stroke=\"#1a1410\" stroke-width=\"0.9\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M20 112 q12 -4 24 0\" stroke=\"#8a5a30\" stroke-width=\"1.4\" fill=\"none\"/><path d=\"M32 111 Q35 105.5 32 100\" stroke=\"#1a1410\" stroke-width=\"4\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M32 111 Q35 105.5 32 100\" stroke=\"#5aa83a\" stroke-width=\"2\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M32 102 Q30 96.5 24.2 97.5 Q26.2 103 32 102Z\" fill=\"#5aa83a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 102 L24.2 97.5\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 101 Q37.8 102 39.8 96.5 Q34 95.5 32 101Z\" fill=\"#5aa83a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 101 L39.8 96.5\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/>", "<ellipse cx=\"32\" cy=\"113\" rx=\"17\" ry=\"4.4\" fill=\"#6e4524\" stroke=\"#1a1410\" stroke-width=\"0.9\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M20 112 q12 -4 24 0\" stroke=\"#8a5a30\" stroke-width=\"1.4\" fill=\"none\"/><path d=\"M32 108 Q28.3 97.7 18.8 103.2 Q22.5 113.5 32 108Z\" fill=\"#5aa83a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 108 L18.8 103.2\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 108 Q35.2 99.2 26 97.6 Q22.8 106.4 32 108Z\" fill=\"#5aa83a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 108 L26 97.6\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 108 Q41.2 106.4 38 97.6 Q28.8 99.2 32 108Z\" fill=\"#5aa83a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 108 L38 97.6\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 108 Q41.5 113.5 45.2 103.2 Q35.7 97.7 32 108Z\" fill=\"#5aa83a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 108 L45.2 103.2\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/>", "<ellipse cx=\"32\" cy=\"113\" rx=\"17\" ry=\"4.4\" fill=\"#6e4524\" stroke=\"#1a1410\" stroke-width=\"0.9\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M20 112 q12 -4 24 0\" stroke=\"#8a5a30\" stroke-width=\"1.4\" fill=\"none\"/><path d=\"M32 108 Q25 95.8 14.3 104.9 Q21.3 117.1 32 108Z\" fill=\"#5aa83a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 108 L14.3 104.9\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 108 Q32 95.5 19.7 97.7 Q19.7 110.2 32 108Z\" fill=\"#5aa83a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 108 L19.7 97.7\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 108 Q37.9 97.9 26.9 93.9 Q21 104 32 108Z\" fill=\"#5aa83a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 108 L26.9 93.9\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 108 Q43 104 37.1 93.9 Q26.1 97.9 32 108Z\" fill=\"#5aa83a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 108 L37.1 93.9\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 108 Q44.3 110.2 44.3 97.7 Q32 95.5 32 108Z\" fill=\"#5aa83a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 108 L44.3 97.7\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 108 Q42.7 117.1 49.7 104.9 Q39 95.8 32 108Z\" fill=\"#5aa83a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 108 L49.7 104.9\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 108 Q40.4 101 32 94 Q23.6 101 32 108Z\" fill=\"#5aa83a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 108 L32 94\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/>", "<ellipse cx=\"32\" cy=\"113\" rx=\"17\" ry=\"4.4\" fill=\"#6e4524\" stroke=\"#1a1410\" stroke-width=\"0.9\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M20 112 q12 -4 24 0\" stroke=\"#8a5a30\" stroke-width=\"1.4\" fill=\"none\"/><path d=\"M32 106 Q25 93.8 14.3 102.9 Q21.3 115.1 32 106Z\" fill=\"#5aa83a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 106 L14.3 102.9\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 106 Q32 93.5 19.7 95.7 Q19.7 108.2 32 106Z\" fill=\"#5aa83a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 106 L19.7 95.7\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 106 Q37.9 95.9 26.9 91.9 Q21 102 32 106Z\" fill=\"#5aa83a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 106 L26.9 91.9\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 106 Q43 102 37.1 91.9 Q26.1 95.9 32 106Z\" fill=\"#5aa83a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 106 L37.1 91.9\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 106 Q44.3 108.2 44.3 95.7 Q32 93.5 32 106Z\" fill=\"#5aa83a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 106 L44.3 95.7\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 106 Q42.7 115.1 49.7 102.9 Q39 93.8 32 106Z\" fill=\"#5aa83a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 106 L49.7 102.9\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 106 Q40.4 99 32 92 Q23.6 99 32 106Z\" fill=\"#5aa83a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 106 L32 92\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><ellipse cx=\"22\" cy=\"112\" rx=\"7\" ry=\"4\" fill=\"#b0506a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><ellipse cx=\"42\" cy=\"113\" rx=\"6\" ry=\"3.4\" fill=\"#b0506a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>"],
+    nopal:["<ellipse cx=\"32\" cy=\"113\" rx=\"17\" ry=\"4.4\" fill=\"#6e4524\" stroke=\"#1a1410\" stroke-width=\"0.9\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M20 112 q12 -4 24 0\" stroke=\"#8a5a30\" stroke-width=\"1.4\" fill=\"none\"/><ellipse cx=\"32\" cy=\"110\" rx=\"2.4\" ry=\"1.7\" fill=\"#5aa04a\" stroke=\"#1a1410\" stroke-width=\"0.9\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>", "<ellipse cx=\"32\" cy=\"113\" rx=\"17\" ry=\"4.4\" fill=\"#6e4524\" stroke=\"#1a1410\" stroke-width=\"0.9\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M20 112 q12 -4 24 0\" stroke=\"#8a5a30\" stroke-width=\"1.4\" fill=\"none\"/><ellipse cx=\"32\" cy=\"103\" rx=\"5\" ry=\"8\" transform=\"rotate(0 32 103)\" fill=\"#5aa04a\" stroke=\"#1a1410\" stroke-width=\"1.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><circle cx=\"30\" cy=\"100\" r=\".7\" fill=\"#e8e0c0\"/><circle cx=\"34\" cy=\"104\" r=\".7\" fill=\"#e8e0c0\"/><circle cx=\"31\" cy=\"107\" r=\".7\" fill=\"#e8e0c0\"/>", "<ellipse cx=\"32\" cy=\"113\" rx=\"17\" ry=\"4.4\" fill=\"#6e4524\" stroke=\"#1a1410\" stroke-width=\"0.9\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M20 112 q12 -4 24 0\" stroke=\"#8a5a30\" stroke-width=\"1.4\" fill=\"none\"/><ellipse cx=\"32\" cy=\"98\" rx=\"8\" ry=\"13\" transform=\"rotate(0 32 98)\" fill=\"#5aa04a\" stroke=\"#1a1410\" stroke-width=\"1.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><circle cx=\"30\" cy=\"95\" r=\".7\" fill=\"#e8e0c0\"/><circle cx=\"34\" cy=\"99\" r=\".7\" fill=\"#e8e0c0\"/><circle cx=\"31\" cy=\"102\" r=\".7\" fill=\"#e8e0c0\"/><ellipse cx=\"40\" cy=\"84\" rx=\"5\" ry=\"8\" transform=\"rotate(25 40 84)\" fill=\"#5aa04a\" stroke=\"#1a1410\" stroke-width=\"1.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><circle cx=\"38\" cy=\"81\" r=\".7\" fill=\"#e8e0c0\"/><circle cx=\"42\" cy=\"85\" r=\".7\" fill=\"#e8e0c0\"/><circle cx=\"39\" cy=\"88\" r=\".7\" fill=\"#e8e0c0\"/>", "<ellipse cx=\"32\" cy=\"113\" rx=\"17\" ry=\"4.4\" fill=\"#6e4524\" stroke=\"#1a1410\" stroke-width=\"0.9\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M20 112 q12 -4 24 0\" stroke=\"#8a5a30\" stroke-width=\"1.4\" fill=\"none\"/><ellipse cx=\"32\" cy=\"96\" rx=\"10\" ry=\"15\" transform=\"rotate(0 32 96)\" fill=\"#5aa04a\" stroke=\"#1a1410\" stroke-width=\"1.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><circle cx=\"30\" cy=\"93\" r=\".7\" fill=\"#e8e0c0\"/><circle cx=\"34\" cy=\"97\" r=\".7\" fill=\"#e8e0c0\"/><circle cx=\"31\" cy=\"100\" r=\".7\" fill=\"#e8e0c0\"/><ellipse cx=\"22\" cy=\"78\" rx=\"7\" ry=\"11\" transform=\"rotate(-25 22 78)\" fill=\"#5aa04a\" stroke=\"#1a1410\" stroke-width=\"1.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><circle cx=\"20\" cy=\"75\" r=\".7\" fill=\"#e8e0c0\"/><circle cx=\"24\" cy=\"79\" r=\".7\" fill=\"#e8e0c0\"/><circle cx=\"21\" cy=\"82\" r=\".7\" fill=\"#e8e0c0\"/><ellipse cx=\"42\" cy=\"78\" rx=\"7\" ry=\"11\" transform=\"rotate(25 42 78)\" fill=\"#5aa04a\" stroke=\"#1a1410\" stroke-width=\"1.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><circle cx=\"40\" cy=\"75\" r=\".7\" fill=\"#e8e0c0\"/><circle cx=\"44\" cy=\"79\" r=\".7\" fill=\"#e8e0c0\"/><circle cx=\"41\" cy=\"82\" r=\".7\" fill=\"#e8e0c0\"/><ellipse cx=\"32\" cy=\"66\" rx=\"6\" ry=\"9\" transform=\"rotate(0 32 66)\" fill=\"#5aa04a\" stroke=\"#1a1410\" stroke-width=\"1.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><circle cx=\"30\" cy=\"63\" r=\".7\" fill=\"#e8e0c0\"/><circle cx=\"34\" cy=\"67\" r=\".7\" fill=\"#e8e0c0\"/><circle cx=\"31\" cy=\"70\" r=\".7\" fill=\"#e8e0c0\"/>", "<ellipse cx=\"32\" cy=\"113\" rx=\"17\" ry=\"4.4\" fill=\"#6e4524\" stroke=\"#1a1410\" stroke-width=\"0.9\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M20 112 q12 -4 24 0\" stroke=\"#8a5a30\" stroke-width=\"1.4\" fill=\"none\"/><ellipse cx=\"32\" cy=\"96\" rx=\"10\" ry=\"15\" transform=\"rotate(0 32 96)\" fill=\"#5aa04a\" stroke=\"#1a1410\" stroke-width=\"1.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><circle cx=\"30\" cy=\"93\" r=\".7\" fill=\"#e8e0c0\"/><circle cx=\"34\" cy=\"97\" r=\".7\" fill=\"#e8e0c0\"/><circle cx=\"31\" cy=\"100\" r=\".7\" fill=\"#e8e0c0\"/><ellipse cx=\"22\" cy=\"78\" rx=\"7\" ry=\"11\" transform=\"rotate(-25 22 78)\" fill=\"#5aa04a\" stroke=\"#1a1410\" stroke-width=\"1.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><circle cx=\"20\" cy=\"75\" r=\".7\" fill=\"#e8e0c0\"/><circle cx=\"24\" cy=\"79\" r=\".7\" fill=\"#e8e0c0\"/><circle cx=\"21\" cy=\"82\" r=\".7\" fill=\"#e8e0c0\"/><ellipse cx=\"42\" cy=\"78\" rx=\"7\" ry=\"11\" transform=\"rotate(25 42 78)\" fill=\"#5aa04a\" stroke=\"#1a1410\" stroke-width=\"1.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><circle cx=\"40\" cy=\"75\" r=\".7\" fill=\"#e8e0c0\"/><circle cx=\"44\" cy=\"79\" r=\".7\" fill=\"#e8e0c0\"/><circle cx=\"41\" cy=\"82\" r=\".7\" fill=\"#e8e0c0\"/><ellipse cx=\"32\" cy=\"66\" rx=\"6\" ry=\"9\" transform=\"rotate(0 32 66)\" fill=\"#5aa04a\" stroke=\"#1a1410\" stroke-width=\"1.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><circle cx=\"30\" cy=\"63\" r=\".7\" fill=\"#e8e0c0\"/><circle cx=\"34\" cy=\"67\" r=\".7\" fill=\"#e8e0c0\"/><circle cx=\"31\" cy=\"70\" r=\".7\" fill=\"#e8e0c0\"/><ellipse cx=\"17\" cy=\"68\" rx=\"2.6\" ry=\"3.4\" fill=\"#e0407a\" stroke=\"#1a1410\" stroke-width=\"0.9\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><ellipse cx=\"26\" cy=\"66\" rx=\"2.6\" ry=\"3.4\" fill=\"#e0407a\" stroke=\"#1a1410\" stroke-width=\"0.9\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><ellipse cx=\"38\" cy=\"66\" rx=\"2.6\" ry=\"3.4\" fill=\"#e0407a\" stroke=\"#1a1410\" stroke-width=\"0.9\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><ellipse cx=\"47\" cy=\"68\" rx=\"2.6\" ry=\"3.4\" fill=\"#e0407a\" stroke=\"#1a1410\" stroke-width=\"0.9\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><ellipse cx=\"32\" cy=\"56\" rx=\"2.6\" ry=\"3.4\" fill=\"#e0407a\" stroke=\"#1a1410\" stroke-width=\"0.9\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>"],
+    amaranto:["<ellipse cx=\"32\" cy=\"113\" rx=\"17\" ry=\"4.4\" fill=\"#6e4524\" stroke=\"#1a1410\" stroke-width=\"0.9\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M20 112 q12 -4 24 0\" stroke=\"#8a5a30\" stroke-width=\"1.4\" fill=\"none\"/><ellipse cx=\"32\" cy=\"110\" rx=\"2.4\" ry=\"1.7\" fill=\"#c0304a\" stroke=\"#1a1410\" stroke-width=\"0.9\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>", "<ellipse cx=\"32\" cy=\"113\" rx=\"17\" ry=\"4.4\" fill=\"#6e4524\" stroke=\"#1a1410\" stroke-width=\"0.9\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M20 112 q12 -4 24 0\" stroke=\"#8a5a30\" stroke-width=\"1.4\" fill=\"none\"/><path d=\"M32 111 Q35 105.5 32 100\" stroke=\"#1a1410\" stroke-width=\"4\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M32 111 Q35 105.5 32 100\" stroke=\"#4fae3c\" stroke-width=\"2\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M32 102 Q30 96.5 24.2 97.5 Q26.2 103 32 102Z\" fill=\"#4fae3c\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 102 L24.2 97.5\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 101 Q37.8 102 39.8 96.5 Q34 95.5 32 101Z\" fill=\"#4fae3c\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 101 L39.8 96.5\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/>", "<ellipse cx=\"32\" cy=\"113\" rx=\"17\" ry=\"4.4\" fill=\"#6e4524\" stroke=\"#1a1410\" stroke-width=\"0.9\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M20 112 q12 -4 24 0\" stroke=\"#8a5a30\" stroke-width=\"1.4\" fill=\"none\"/><path d=\"M32 111 Q35 91 32 71\" stroke=\"#1a1410\" stroke-width=\"4.4\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M32 111 Q35 91 32 71\" stroke=\"#4fae3c\" stroke-width=\"2.4\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M32 108 Q28.7 100.9 21.1 102.9 Q24.4 110 32 108Z\" fill=\"#4fae3c\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 108 L21.1 102.9\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 101.3 Q39.6 103.4 42.9 96.3 Q35.3 94.2 32 101.3Z\" fill=\"#4fae3c\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 101.3 L42.9 96.3\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 94.7 Q28.7 87.6 21.1 89.6 Q24.4 96.7 32 94.7Z\" fill=\"#4fae3c\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 94.7 L21.1 89.6\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 88 Q39.6 90 42.9 82.9 Q35.3 80.9 32 88Z\" fill=\"#4fae3c\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 88 L42.9 82.9\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 81.3 Q28.7 74.2 21.1 76.3 Q24.4 83.4 32 81.3Z\" fill=\"#4fae3c\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 81.3 L21.1 76.3\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 74.7 Q39.6 76.7 42.9 69.6 Q35.3 67.6 32 74.7Z\" fill=\"#4fae3c\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 74.7 L42.9 69.6\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/>", "<ellipse cx=\"32\" cy=\"113\" rx=\"17\" ry=\"4.4\" fill=\"#6e4524\" stroke=\"#1a1410\" stroke-width=\"0.9\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M20 112 q12 -4 24 0\" stroke=\"#8a5a30\" stroke-width=\"1.4\" fill=\"none\"/><path d=\"M32 111 Q35 78 32 45\" stroke=\"#1a1410\" stroke-width=\"4.4\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M32 111 Q35 78 32 45\" stroke=\"#4fae3c\" stroke-width=\"2.4\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M32 108 Q28.1 99.7 19.3 102.1 Q23.2 110.4 32 108Z\" fill=\"#4fae3c\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 108 L19.3 102.1\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 99.8 Q40.8 102.1 44.7 93.8 Q35.9 91.5 32 99.8Z\" fill=\"#4fae3c\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 99.8 L44.7 93.8\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 91.5 Q28.1 83.2 19.3 85.6 Q23.2 93.9 32 91.5Z\" fill=\"#4fae3c\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 91.5 L19.3 85.6\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 83.3 Q40.8 85.6 44.7 77.3 Q35.9 75 32 83.3Z\" fill=\"#4fae3c\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 83.3 L44.7 77.3\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 75 Q28.1 66.7 19.3 69.1 Q23.2 77.4 32 75Z\" fill=\"#4fae3c\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 75 L19.3 69.1\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 66.8 Q40.8 69.1 44.7 60.8 Q35.9 58.5 32 66.8Z\" fill=\"#4fae3c\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 66.8 L44.7 60.8\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 58.5 Q28.1 50.2 19.3 52.6 Q23.2 60.9 32 58.5Z\" fill=\"#4fae3c\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 58.5 L19.3 52.6\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 50.3 Q40.8 52.6 44.7 44.3 Q35.9 42 32 50.3Z\" fill=\"#4fae3c\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 50.3 L44.7 44.3\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 46 q-4 -8 0 -14 q4 6 0 14z\" fill=\"#4fae3c\" stroke=\"#1a1410\" stroke-width=\"0.9\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>", "<ellipse cx=\"32\" cy=\"113\" rx=\"17\" ry=\"4.4\" fill=\"#6e4524\" stroke=\"#1a1410\" stroke-width=\"0.9\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M20 112 q12 -4 24 0\" stroke=\"#8a5a30\" stroke-width=\"1.4\" fill=\"none\"/><path d=\"M32 111 Q35 76 32 41\" stroke=\"#1a1410\" stroke-width=\"4.4\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M32 111 Q35 76 32 41\" stroke=\"#4fae3c\" stroke-width=\"2.4\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M32 108 Q28.1 99.7 19.3 102.1 Q23.2 110.4 32 108Z\" fill=\"#4fae3c\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 108 L19.3 102.1\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 99.3 Q40.8 101.6 44.7 93.3 Q35.9 91 32 99.3Z\" fill=\"#4fae3c\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 99.3 L44.7 93.3\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 90.5 Q28.1 82.2 19.3 84.6 Q23.2 92.9 32 90.5Z\" fill=\"#4fae3c\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 90.5 L19.3 84.6\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 81.8 Q40.8 84.1 44.7 75.8 Q35.9 73.5 32 81.8Z\" fill=\"#4fae3c\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 81.8 L44.7 75.8\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 73 Q28.1 64.7 19.3 67.1 Q23.2 75.4 32 73Z\" fill=\"#4fae3c\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 73 L19.3 67.1\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 64.3 Q40.8 66.6 44.7 58.3 Q35.9 56 32 64.3Z\" fill=\"#4fae3c\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 64.3 L44.7 58.3\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 55.5 Q28.1 47.2 19.3 49.6 Q23.2 57.9 32 55.5Z\" fill=\"#4fae3c\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 55.5 L19.3 49.6\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 46.8 Q40.8 49.1 44.7 40.8 Q35.9 38.5 32 46.8Z\" fill=\"#4fae3c\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 46.8 L44.7 40.8\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 42 q-5 -10 0 -22 q5 10 0 22z\" transform=\"rotate(0 32 42)\" fill=\"#c0304a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><circle cx=\"30\" cy=\"38\" r=\"1.4\" fill=\"rgba(255,255,255,.35)\"/><circle cx=\"34\" cy=\"34\" r=\"1.4\" fill=\"rgba(255,255,255,.35)\"/><circle cx=\"30\" cy=\"30\" r=\"1.4\" fill=\"rgba(255,255,255,.35)\"/><circle cx=\"34\" cy=\"26\" r=\"1.4\" fill=\"rgba(255,255,255,.35)\"/><path d=\"M24 56 q-5 -10 0 -14 q5 10 0 14z\" transform=\"rotate(-25 24 56)\" fill=\"#c0304a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><circle cx=\"22\" cy=\"52\" r=\"1.4\" fill=\"rgba(255,255,255,.35)\"/><circle cx=\"26\" cy=\"48\" r=\"1.4\" fill=\"rgba(255,255,255,.35)\"/><circle cx=\"22\" cy=\"44\" r=\"1.4\" fill=\"rgba(255,255,255,.35)\"/><circle cx=\"26\" cy=\"40\" r=\"1.4\" fill=\"rgba(255,255,255,.35)\"/><path d=\"M40 56 q-5 -10 0 -14 q5 10 0 14z\" transform=\"rotate(25 40 56)\" fill=\"#c0304a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><circle cx=\"38\" cy=\"52\" r=\"1.4\" fill=\"rgba(255,255,255,.35)\"/><circle cx=\"42\" cy=\"48\" r=\"1.4\" fill=\"rgba(255,255,255,.35)\"/><circle cx=\"38\" cy=\"44\" r=\"1.4\" fill=\"rgba(255,255,255,.35)\"/><circle cx=\"42\" cy=\"40\" r=\"1.4\" fill=\"rgba(255,255,255,.35)\"/>"],
+    capulin:["<ellipse cx=\"32\" cy=\"113\" rx=\"17\" ry=\"4.4\" fill=\"#6e4524\" stroke=\"#1a1410\" stroke-width=\"0.9\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M20 112 q12 -4 24 0\" stroke=\"#8a5a30\" stroke-width=\"1.4\" fill=\"none\"/><ellipse cx=\"32\" cy=\"110\" rx=\"2.4\" ry=\"1.7\" fill=\"#5a3a1e\" stroke=\"#1a1410\" stroke-width=\"0.9\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>", "<ellipse cx=\"32\" cy=\"113\" rx=\"17\" ry=\"4.4\" fill=\"#6e4524\" stroke=\"#1a1410\" stroke-width=\"0.9\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M20 112 q12 -4 24 0\" stroke=\"#8a5a30\" stroke-width=\"1.4\" fill=\"none\"/><path d=\"M32 111 Q35 105.5 32 100\" stroke=\"#1a1410\" stroke-width=\"4\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M32 111 Q35 105.5 32 100\" stroke=\"#3f9a35\" stroke-width=\"2\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M32 102 Q30 96.5 24.2 97.5 Q26.2 103 32 102Z\" fill=\"#3f9a35\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 102 L24.2 97.5\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 101 Q37.8 102 39.8 96.5 Q34 95.5 32 101Z\" fill=\"#3f9a35\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 101 L39.8 96.5\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/>", "<ellipse cx=\"32\" cy=\"113\" rx=\"17\" ry=\"4.4\" fill=\"#6e4524\" stroke=\"#1a1410\" stroke-width=\"0.9\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M20 112 q12 -4 24 0\" stroke=\"#8a5a30\" stroke-width=\"1.4\" fill=\"none\"/><path d=\"M32 111 Q35 92.5 32 74\" stroke=\"#1a1410\" stroke-width=\"5\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M32 111 Q35 92.5 32 74\" stroke=\"#6b4423\" stroke-width=\"3\" fill=\"none\" stroke-linecap=\"round\"/><circle cx=\"24\" cy=\"76\" r=\"9\" fill=\"#3f9a35\" stroke=\"#1a1410\" stroke-width=\"1.4\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><circle cx=\"40\" cy=\"76\" r=\"9\" fill=\"#3f9a35\" stroke=\"#1a1410\" stroke-width=\"1.4\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><circle cx=\"32\" cy=\"70\" r=\"9\" fill=\"#3f9a35\" stroke=\"#1a1410\" stroke-width=\"1.4\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>", "<ellipse cx=\"32\" cy=\"113\" rx=\"17\" ry=\"4.4\" fill=\"#6e4524\" stroke=\"#1a1410\" stroke-width=\"0.9\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M20 112 q12 -4 24 0\" stroke=\"#8a5a30\" stroke-width=\"1.4\" fill=\"none\"/><path d=\"M32 111 Q35 85.5 32 60\" stroke=\"#1a1410\" stroke-width=\"5.6\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M32 111 Q35 85.5 32 60\" stroke=\"#6b4423\" stroke-width=\"3.6\" fill=\"none\" stroke-linecap=\"round\"/><circle cx=\"20\" cy=\"64\" r=\"12\" fill=\"#3f9a35\" stroke=\"#1a1410\" stroke-width=\"1.4\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><circle cx=\"44\" cy=\"64\" r=\"12\" fill=\"#3f9a35\" stroke=\"#1a1410\" stroke-width=\"1.4\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><circle cx=\"32\" cy=\"52\" r=\"12\" fill=\"#3f9a35\" stroke=\"#1a1410\" stroke-width=\"1.4\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><circle cx=\"26\" cy=\"56\" r=\"12\" fill=\"#3f9a35\" stroke=\"#1a1410\" stroke-width=\"1.4\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><circle cx=\"38\" cy=\"56\" r=\"12\" fill=\"#3f9a35\" stroke=\"#1a1410\" stroke-width=\"1.4\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><ellipse cx=\"26\" cy=\"56\" rx=\"1.4\" ry=\"2.2\" transform=\"rotate(0 26 58)\" fill=\"#f4ecd8\"/><ellipse cx=\"26\" cy=\"56\" rx=\"1.4\" ry=\"2.2\" transform=\"rotate(72 26 58)\" fill=\"#f4ecd8\"/><ellipse cx=\"26\" cy=\"56\" rx=\"1.4\" ry=\"2.2\" transform=\"rotate(144 26 58)\" fill=\"#f4ecd8\"/><ellipse cx=\"26\" cy=\"56\" rx=\"1.4\" ry=\"2.2\" transform=\"rotate(216 26 58)\" fill=\"#f4ecd8\"/><ellipse cx=\"26\" cy=\"56\" rx=\"1.4\" ry=\"2.2\" transform=\"rotate(288 26 58)\" fill=\"#f4ecd8\"/><circle cx=\"26\" cy=\"58\" r=\"1\" fill=\"#e8862a\"/><ellipse cx=\"40\" cy=\"50\" rx=\"1.4\" ry=\"2.2\" transform=\"rotate(0 40 52)\" fill=\"#f4ecd8\"/><ellipse cx=\"40\" cy=\"50\" rx=\"1.4\" ry=\"2.2\" transform=\"rotate(72 40 52)\" fill=\"#f4ecd8\"/><ellipse cx=\"40\" cy=\"50\" rx=\"1.4\" ry=\"2.2\" transform=\"rotate(144 40 52)\" fill=\"#f4ecd8\"/><ellipse cx=\"40\" cy=\"50\" rx=\"1.4\" ry=\"2.2\" transform=\"rotate(216 40 52)\" fill=\"#f4ecd8\"/><ellipse cx=\"40\" cy=\"50\" rx=\"1.4\" ry=\"2.2\" transform=\"rotate(288 40 52)\" fill=\"#f4ecd8\"/><circle cx=\"40\" cy=\"52\" r=\"1\" fill=\"#e8862a\"/>", "<ellipse cx=\"32\" cy=\"113\" rx=\"17\" ry=\"4.4\" fill=\"#6e4524\" stroke=\"#1a1410\" stroke-width=\"0.9\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M20 112 q12 -4 24 0\" stroke=\"#8a5a30\" stroke-width=\"1.4\" fill=\"none\"/><path d=\"M32 111 Q35 85.5 32 60\" stroke=\"#1a1410\" stroke-width=\"5.6\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M32 111 Q35 85.5 32 60\" stroke=\"#6b4423\" stroke-width=\"3.6\" fill=\"none\" stroke-linecap=\"round\"/><circle cx=\"20\" cy=\"64\" r=\"12\" fill=\"#3f9a35\" stroke=\"#1a1410\" stroke-width=\"1.4\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><circle cx=\"44\" cy=\"64\" r=\"12\" fill=\"#3f9a35\" stroke=\"#1a1410\" stroke-width=\"1.4\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><circle cx=\"32\" cy=\"52\" r=\"12\" fill=\"#3f9a35\" stroke=\"#1a1410\" stroke-width=\"1.4\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><circle cx=\"26\" cy=\"56\" r=\"12\" fill=\"#3f9a35\" stroke=\"#1a1410\" stroke-width=\"1.4\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><circle cx=\"38\" cy=\"56\" r=\"12\" fill=\"#3f9a35\" stroke=\"#1a1410\" stroke-width=\"1.4\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><circle cx=\"22\" cy=\"62\" r=\"2.2\" fill=\"#5a0f1e\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><circle cx=\"21.2\" cy=\"61.2\" r=\"0.7\" fill=\"rgba(255,255,255,.5)\"/><circle cx=\"24.6\" cy=\"65\" r=\"2.2\" fill=\"#5a0f1e\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><circle cx=\"23.8\" cy=\"64.2\" r=\"0.7\" fill=\"rgba(255,255,255,.5)\"/><circle cx=\"27.2\" cy=\"62\" r=\"2.2\" fill=\"#5a0f1e\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><circle cx=\"26.4\" cy=\"61.2\" r=\"0.7\" fill=\"rgba(255,255,255,.5)\"/><circle cx=\"36\" cy=\"50\" r=\"2.2\" fill=\"#5a0f1e\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><circle cx=\"35.2\" cy=\"49.2\" r=\"0.7\" fill=\"rgba(255,255,255,.5)\"/><circle cx=\"38.6\" cy=\"53\" r=\"2.2\" fill=\"#5a0f1e\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><circle cx=\"37.8\" cy=\"52.2\" r=\"0.7\" fill=\"rgba(255,255,255,.5)\"/><circle cx=\"41.2\" cy=\"50\" r=\"2.2\" fill=\"#5a0f1e\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><circle cx=\"40.4\" cy=\"49.2\" r=\"0.7\" fill=\"rgba(255,255,255,.5)\"/><circle cx=\"42\" cy=\"66\" r=\"2.2\" fill=\"#5a0f1e\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><circle cx=\"41.2\" cy=\"65.2\" r=\"0.7\" fill=\"rgba(255,255,255,.5)\"/><circle cx=\"44.6\" cy=\"69\" r=\"2.2\" fill=\"#5a0f1e\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><circle cx=\"43.8\" cy=\"68.2\" r=\"0.7\" fill=\"rgba(255,255,255,.5)\"/><circle cx=\"47.2\" cy=\"66\" r=\"2.2\" fill=\"#5a0f1e\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><circle cx=\"46.4\" cy=\"65.2\" r=\"0.7\" fill=\"rgba(255,255,255,.5)\"/><circle cx=\"28\" cy=\"70\" r=\"2.2\" fill=\"#5a0f1e\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><circle cx=\"27.2\" cy=\"69.2\" r=\"0.7\" fill=\"rgba(255,255,255,.5)\"/><circle cx=\"30.6\" cy=\"73\" r=\"2.2\" fill=\"#5a0f1e\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><circle cx=\"29.8\" cy=\"72.2\" r=\"0.7\" fill=\"rgba(255,255,255,.5)\"/><circle cx=\"33.2\" cy=\"70\" r=\"2.2\" fill=\"#5a0f1e\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><circle cx=\"32.4\" cy=\"69.2\" r=\"0.7\" fill=\"rgba(255,255,255,.5)\"/>"],
+    girasol:["<ellipse cx=\"32\" cy=\"113\" rx=\"17\" ry=\"4.4\" fill=\"#6e4524\" stroke=\"#1a1410\" stroke-width=\"0.9\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M20 112 q12 -4 24 0\" stroke=\"#8a5a30\" stroke-width=\"1.4\" fill=\"none\"/><ellipse cx=\"32\" cy=\"110\" rx=\"2.4\" ry=\"1.7\" fill=\"#3a2a20\" stroke=\"#1a1410\" stroke-width=\"0.9\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>", "<ellipse cx=\"32\" cy=\"113\" rx=\"17\" ry=\"4.4\" fill=\"#6e4524\" stroke=\"#1a1410\" stroke-width=\"0.9\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M20 112 q12 -4 24 0\" stroke=\"#8a5a30\" stroke-width=\"1.4\" fill=\"none\"/><path d=\"M32 111 Q35 105.5 32 100\" stroke=\"#1a1410\" stroke-width=\"4\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M32 111 Q35 105.5 32 100\" stroke=\"#4b9e3a\" stroke-width=\"2\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M32 102 Q30 96.5 24.2 97.5 Q26.2 103 32 102Z\" fill=\"#4b9e3a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 102 L24.2 97.5\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 101 Q37.8 102 39.8 96.5 Q34 95.5 32 101Z\" fill=\"#4b9e3a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 101 L39.8 96.5\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/>", "<ellipse cx=\"32\" cy=\"113\" rx=\"17\" ry=\"4.4\" fill=\"#6e4524\" stroke=\"#1a1410\" stroke-width=\"0.9\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M20 112 q12 -4 24 0\" stroke=\"#8a5a30\" stroke-width=\"1.4\" fill=\"none\"/><path d=\"M32 111 Q35 91 32 71\" stroke=\"#1a1410\" stroke-width=\"4.4\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M32 111 Q35 91 32 71\" stroke=\"#4b9e3a\" stroke-width=\"2.4\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M32 108 Q28.7 100.9 21.1 102.9 Q24.4 110 32 108Z\" fill=\"#4b9e3a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 108 L21.1 102.9\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 101.3 Q39.6 103.4 42.9 96.3 Q35.3 94.2 32 101.3Z\" fill=\"#4b9e3a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 101.3 L42.9 96.3\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 94.7 Q28.7 87.6 21.1 89.6 Q24.4 96.7 32 94.7Z\" fill=\"#4b9e3a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 94.7 L21.1 89.6\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 88 Q39.6 90 42.9 82.9 Q35.3 80.9 32 88Z\" fill=\"#4b9e3a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 88 L42.9 82.9\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 81.3 Q28.7 74.2 21.1 76.3 Q24.4 83.4 32 81.3Z\" fill=\"#4b9e3a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 81.3 L21.1 76.3\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 74.7 Q39.6 76.7 42.9 69.6 Q35.3 67.6 32 74.7Z\" fill=\"#4b9e3a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 74.7 L42.9 69.6\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/>", "<ellipse cx=\"32\" cy=\"113\" rx=\"17\" ry=\"4.4\" fill=\"#6e4524\" stroke=\"#1a1410\" stroke-width=\"0.9\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M20 112 q12 -4 24 0\" stroke=\"#8a5a30\" stroke-width=\"1.4\" fill=\"none\"/><path d=\"M32 111 Q35 77 32 43\" stroke=\"#1a1410\" stroke-width=\"4.4\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M32 111 Q35 77 32 43\" stroke=\"#4b9e3a\" stroke-width=\"2.4\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M32 108 Q28.1 99.7 19.3 102.1 Q23.2 110.4 32 108Z\" fill=\"#4b9e3a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 108 L19.3 102.1\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 99.5 Q40.8 101.9 44.7 93.6 Q35.9 91.2 32 99.5Z\" fill=\"#4b9e3a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 99.5 L44.7 93.6\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 91 Q28.1 82.7 19.3 85.1 Q23.2 93.4 32 91Z\" fill=\"#4b9e3a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 91 L19.3 85.1\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 82.5 Q40.8 84.9 44.7 76.6 Q35.9 74.2 32 82.5Z\" fill=\"#4b9e3a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 82.5 L44.7 76.6\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 74 Q28.1 65.7 19.3 68.1 Q23.2 76.4 32 74Z\" fill=\"#4b9e3a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 74 L19.3 68.1\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 65.5 Q40.8 67.9 44.7 59.6 Q35.9 57.2 32 65.5Z\" fill=\"#4b9e3a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 65.5 L44.7 59.6\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 57 Q28.1 48.7 19.3 51.1 Q23.2 59.4 32 57Z\" fill=\"#4b9e3a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 57 L19.3 51.1\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 48.5 Q40.8 50.9 44.7 42.6 Q35.9 40.2 32 48.5Z\" fill=\"#4b9e3a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 48.5 L44.7 42.6\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><circle cx=\"32\" cy=\"40\" r=\"6\" fill=\"#4b9e3a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>", "<ellipse cx=\"32\" cy=\"113\" rx=\"17\" ry=\"4.4\" fill=\"#6e4524\" stroke=\"#1a1410\" stroke-width=\"0.9\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M20 112 q12 -4 24 0\" stroke=\"#8a5a30\" stroke-width=\"1.4\" fill=\"none\"/><path d=\"M32 111 Q35 76 32 41\" stroke=\"#1a1410\" stroke-width=\"4.4\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M32 111 Q35 76 32 41\" stroke=\"#4b9e3a\" stroke-width=\"2.4\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M32 108 Q28.1 99.7 19.3 102.1 Q23.2 110.4 32 108Z\" fill=\"#4b9e3a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 108 L19.3 102.1\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 99.3 Q40.8 101.6 44.7 93.3 Q35.9 91 32 99.3Z\" fill=\"#4b9e3a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 99.3 L44.7 93.3\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 90.5 Q28.1 82.2 19.3 84.6 Q23.2 92.9 32 90.5Z\" fill=\"#4b9e3a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 90.5 L19.3 84.6\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 81.8 Q40.8 84.1 44.7 75.8 Q35.9 73.5 32 81.8Z\" fill=\"#4b9e3a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 81.8 L44.7 75.8\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 73 Q28.1 64.7 19.3 67.1 Q23.2 75.4 32 73Z\" fill=\"#4b9e3a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 73 L19.3 67.1\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 64.3 Q40.8 66.6 44.7 58.3 Q35.9 56 32 64.3Z\" fill=\"#4b9e3a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 64.3 L44.7 58.3\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 55.5 Q28.1 47.2 19.3 49.6 Q23.2 57.9 32 55.5Z\" fill=\"#4b9e3a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 55.5 L19.3 49.6\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 46.8 Q40.8 49.1 44.7 40.8 Q35.9 38.5 32 46.8Z\" fill=\"#4b9e3a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 46.8 L44.7 40.8\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><ellipse cx=\"32\" cy=\"22\" rx=\"2.6\" ry=\"7\" transform=\"rotate(0 32 31)\" fill=\"#f7c623\" stroke=\"#1a1410\" stroke-width=\"0.8\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><ellipse cx=\"32\" cy=\"22\" rx=\"2.6\" ry=\"7\" transform=\"rotate(25.714285714285715 32 31)\" fill=\"#f7c623\" stroke=\"#1a1410\" stroke-width=\"0.8\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><ellipse cx=\"32\" cy=\"22\" rx=\"2.6\" ry=\"7\" transform=\"rotate(51.42857142857143 32 31)\" fill=\"#f7c623\" stroke=\"#1a1410\" stroke-width=\"0.8\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><ellipse cx=\"32\" cy=\"22\" rx=\"2.6\" ry=\"7\" transform=\"rotate(77.14285714285714 32 31)\" fill=\"#f7c623\" stroke=\"#1a1410\" stroke-width=\"0.8\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><ellipse cx=\"32\" cy=\"22\" rx=\"2.6\" ry=\"7\" transform=\"rotate(102.85714285714286 32 31)\" fill=\"#f7c623\" stroke=\"#1a1410\" stroke-width=\"0.8\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><ellipse cx=\"32\" cy=\"22\" rx=\"2.6\" ry=\"7\" transform=\"rotate(128.57142857142858 32 31)\" fill=\"#f7c623\" stroke=\"#1a1410\" stroke-width=\"0.8\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><ellipse cx=\"32\" cy=\"22\" rx=\"2.6\" ry=\"7\" transform=\"rotate(154.28571428571428 32 31)\" fill=\"#f7c623\" stroke=\"#1a1410\" stroke-width=\"0.8\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><ellipse cx=\"32\" cy=\"22\" rx=\"2.6\" ry=\"7\" transform=\"rotate(180 32 31)\" fill=\"#f7c623\" stroke=\"#1a1410\" stroke-width=\"0.8\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><ellipse cx=\"32\" cy=\"22\" rx=\"2.6\" ry=\"7\" transform=\"rotate(205.71428571428572 32 31)\" fill=\"#f7c623\" stroke=\"#1a1410\" stroke-width=\"0.8\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><ellipse cx=\"32\" cy=\"22\" rx=\"2.6\" ry=\"7\" transform=\"rotate(231.42857142857142 32 31)\" fill=\"#f7c623\" stroke=\"#1a1410\" stroke-width=\"0.8\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><ellipse cx=\"32\" cy=\"22\" rx=\"2.6\" ry=\"7\" transform=\"rotate(257.14285714285717 32 31)\" fill=\"#f7c623\" stroke=\"#1a1410\" stroke-width=\"0.8\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><ellipse cx=\"32\" cy=\"22\" rx=\"2.6\" ry=\"7\" transform=\"rotate(282.85714285714283 32 31)\" fill=\"#f7c623\" stroke=\"#1a1410\" stroke-width=\"0.8\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><ellipse cx=\"32\" cy=\"22\" rx=\"2.6\" ry=\"7\" transform=\"rotate(308.57142857142856 32 31)\" fill=\"#f7c623\" stroke=\"#1a1410\" stroke-width=\"0.8\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><ellipse cx=\"32\" cy=\"22\" rx=\"2.6\" ry=\"7\" transform=\"rotate(334.2857142857143 32 31)\" fill=\"#f7c623\" stroke=\"#1a1410\" stroke-width=\"0.8\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><circle cx=\"32\" cy=\"31\" r=\"7\" fill=\"#5a3a1e\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><circle cx=\"35.4\" cy=\"31\" r=\".8\" fill=\"#2a1a10\"/><circle cx=\"33.83702783995167\" cy=\"33.861001348346846\" r=\".8\" fill=\"#2a1a10\"/><circle cx=\"30.585100755739717\" cy=\"34.09161125120732\" r=\".8\" fill=\"#2a1a10\"/><circle cx=\"28.634025511558484\" cy=\"31.47980802740355\" r=\".8\" fill=\"#2a1a10\"/><circle cx=\"29.77761168906372\" cy=\"28.426871515953046\" r=\".8\" fill=\"#2a1a10\"/><circle cx=\"32.96445143057497\" cy=\"27.739657466145328\" r=\".8\" fill=\"#2a1a10\"/>"],
+    maguey:["<ellipse cx=\"32\" cy=\"113\" rx=\"17\" ry=\"4.4\" fill=\"#6e4524\" stroke=\"#1a1410\" stroke-width=\"0.9\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M20 112 q12 -4 24 0\" stroke=\"#8a5a30\" stroke-width=\"1.4\" fill=\"none\"/><ellipse cx=\"32\" cy=\"110\" rx=\"2.4\" ry=\"1.7\" fill=\"#5f8f7a\" stroke=\"#1a1410\" stroke-width=\"0.9\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>", "<ellipse cx=\"32\" cy=\"113\" rx=\"17\" ry=\"4.4\" fill=\"#6e4524\" stroke=\"#1a1410\" stroke-width=\"0.9\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M20 112 q12 -4 24 0\" stroke=\"#8a5a30\" stroke-width=\"1.4\" fill=\"none\"/><path d=\"M32.6 106.7 L23.6 108.7 L31.4 113.3Z\" fill=\"#6a9a7a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M33.7 107.1 L23.3 105.5 L30.3 112.9Z\" fill=\"#5f8f7a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M34.8 108 L27.1 103.7 L29.2 112Z\" fill=\"#6a9a7a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M35.3 109.4 L30.3 101.1 L28.7 110.6Z\" fill=\"#5f8f7a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M35.3 110.6 L33.5 102.5 L28.7 109.4Z\" fill=\"#6a9a7a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M34.8 112 L37.7 102.6 L29.2 108Z\" fill=\"#5f8f7a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M33.7 112.9 L39.4 106.2 L30.3 107.1Z\" fill=\"#6a9a7a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32.6 113.3 L41.8 108.4 L31.4 106.7Z\" fill=\"#5f8f7a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>", "<ellipse cx=\"32\" cy=\"113\" rx=\"17\" ry=\"4.4\" fill=\"#6e4524\" stroke=\"#1a1410\" stroke-width=\"0.9\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M20 112 q12 -4 24 0\" stroke=\"#8a5a30\" stroke-width=\"1.4\" fill=\"none\"/><path d=\"M32.6 106.7 L16.9 107.6 L31.4 113.3Z\" fill=\"#6a9a7a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M33.7 107.1 L16.4 101.9 L30.3 112.9Z\" fill=\"#5f8f7a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M34.8 108 L23.2 98.7 L29.2 112Z\" fill=\"#6a9a7a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M35.3 109.4 L28.9 94 L28.7 110.6Z\" fill=\"#5f8f7a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M35.3 110.6 L34.7 96.4 L28.7 109.4Z\" fill=\"#6a9a7a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M34.8 112 L42.3 96.7 L29.2 108Z\" fill=\"#5f8f7a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M33.7 112.9 L45.3 103.1 L30.3 107.1Z\" fill=\"#6a9a7a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32.6 113.3 L49.7 107.2 L31.4 106.7Z\" fill=\"#5f8f7a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>", "<ellipse cx=\"32\" cy=\"113\" rx=\"17\" ry=\"4.4\" fill=\"#6e4524\" stroke=\"#1a1410\" stroke-width=\"0.9\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M20 112 q12 -4 24 0\" stroke=\"#8a5a30\" stroke-width=\"1.4\" fill=\"none\"/><path d=\"M32.6 106.7 L10.2 106.5 L31.4 113.3Z\" fill=\"#6a9a7a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M33.7 107.1 L9.5 98.3 L30.3 112.9Z\" fill=\"#5f8f7a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M34.8 108 L19.3 93.7 L29.2 112Z\" fill=\"#6a9a7a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M35.3 109.4 L27.5 87 L28.7 110.6Z\" fill=\"#5f8f7a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M35.3 110.6 L35.8 90.4 L28.7 109.4Z\" fill=\"#6a9a7a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M34.8 112 L46.9 90.8 L29.2 108Z\" fill=\"#5f8f7a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M33.7 112.9 L51.1 100.1 L30.3 107.1Z\" fill=\"#6a9a7a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32.6 113.3 L57.6 105.9 L31.4 106.7Z\" fill=\"#5f8f7a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>", "<ellipse cx=\"32\" cy=\"113\" rx=\"17\" ry=\"4.4\" fill=\"#6e4524\" stroke=\"#1a1410\" stroke-width=\"0.9\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M20 112 q12 -4 24 0\" stroke=\"#8a5a30\" stroke-width=\"1.4\" fill=\"none\"/><path d=\"M32.6 106.7 L8.6 106.3 L31.4 113.3Z\" fill=\"#6a9a7a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M33.7 107.1 L7.8 97.4 L30.3 112.9Z\" fill=\"#5f8f7a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M34.8 108 L18.3 92.5 L29.2 112Z\" fill=\"#6a9a7a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M35.3 109.4 L27.1 85.2 L28.7 110.6Z\" fill=\"#5f8f7a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M35.3 110.6 L36.1 88.9 L28.7 109.4Z\" fill=\"#6a9a7a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M34.8 112 L48.1 89.4 L29.2 108Z\" fill=\"#5f8f7a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M33.7 112.9 L52.6 99.3 L30.3 107.1Z\" fill=\"#6a9a7a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32.6 113.3 L59.6 105.6 L31.4 106.7Z\" fill=\"#5f8f7a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 104 V20\" stroke=\"#1a1410\" stroke-width=\"5\"/><path d=\"M32 104 V20\" stroke=\"#8a9a5a\" stroke-width=\"3\"/><path d=\"M32 26 h-9\" stroke=\"#8a9a5a\" stroke-width=\"2\"/><circle cx=\"22\" cy=\"25\" r=\"3.4\" fill=\"#efe6c0\" stroke=\"#1a1410\" stroke-width=\"0.9\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 34 h9\" stroke=\"#8a9a5a\" stroke-width=\"2\"/><circle cx=\"42\" cy=\"33\" r=\"3.4\" fill=\"#efe6c0\" stroke=\"#1a1410\" stroke-width=\"0.9\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 42 h-9\" stroke=\"#8a9a5a\" stroke-width=\"2\"/><circle cx=\"22\" cy=\"41\" r=\"3.4\" fill=\"#efe6c0\" stroke=\"#1a1410\" stroke-width=\"0.9\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>"],
+    huauzontle:["<ellipse cx=\"32\" cy=\"113\" rx=\"17\" ry=\"4.4\" fill=\"#6e4524\" stroke=\"#1a1410\" stroke-width=\"0.9\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M20 112 q12 -4 24 0\" stroke=\"#8a5a30\" stroke-width=\"1.4\" fill=\"none\"/><ellipse cx=\"32\" cy=\"110\" rx=\"2.4\" ry=\"1.7\" fill=\"#6a8a3a\" stroke=\"#1a1410\" stroke-width=\"0.9\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>", "<ellipse cx=\"32\" cy=\"113\" rx=\"17\" ry=\"4.4\" fill=\"#6e4524\" stroke=\"#1a1410\" stroke-width=\"0.9\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M20 112 q12 -4 24 0\" stroke=\"#8a5a30\" stroke-width=\"1.4\" fill=\"none\"/><path d=\"M32 111 Q35 105.5 32 100\" stroke=\"#1a1410\" stroke-width=\"4\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M32 111 Q35 105.5 32 100\" stroke=\"#4f8a3a\" stroke-width=\"2\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M32 102 Q30 96.5 24.2 97.5 Q26.2 103 32 102Z\" fill=\"#4f8a3a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 102 L24.2 97.5\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 101 Q37.8 102 39.8 96.5 Q34 95.5 32 101Z\" fill=\"#4f8a3a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 101 L39.8 96.5\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/>", "<ellipse cx=\"32\" cy=\"113\" rx=\"17\" ry=\"4.4\" fill=\"#6e4524\" stroke=\"#1a1410\" stroke-width=\"0.9\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M20 112 q12 -4 24 0\" stroke=\"#8a5a30\" stroke-width=\"1.4\" fill=\"none\"/><path d=\"M32 111 Q35 91 32 71\" stroke=\"#1a1410\" stroke-width=\"4.4\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M32 111 Q35 91 32 71\" stroke=\"#4f8a3a\" stroke-width=\"2.4\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M32 108 Q28.7 100.9 21.1 102.9 Q24.4 110 32 108Z\" fill=\"#4f8a3a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 108 L21.1 102.9\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 101.3 Q39.6 103.4 42.9 96.3 Q35.3 94.2 32 101.3Z\" fill=\"#4f8a3a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 101.3 L42.9 96.3\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 94.7 Q28.7 87.6 21.1 89.6 Q24.4 96.7 32 94.7Z\" fill=\"#4f8a3a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 94.7 L21.1 89.6\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 88 Q39.6 90 42.9 82.9 Q35.3 80.9 32 88Z\" fill=\"#4f8a3a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 88 L42.9 82.9\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 81.3 Q28.7 74.2 21.1 76.3 Q24.4 83.4 32 81.3Z\" fill=\"#4f8a3a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 81.3 L21.1 76.3\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 74.7 Q39.6 76.7 42.9 69.6 Q35.3 67.6 32 74.7Z\" fill=\"#4f8a3a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 74.7 L42.9 69.6\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/>", "<ellipse cx=\"32\" cy=\"113\" rx=\"17\" ry=\"4.4\" fill=\"#6e4524\" stroke=\"#1a1410\" stroke-width=\"0.9\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M20 112 q12 -4 24 0\" stroke=\"#8a5a30\" stroke-width=\"1.4\" fill=\"none\"/><path d=\"M32 111 Q35 78 32 45\" stroke=\"#1a1410\" stroke-width=\"4.4\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M32 111 Q35 78 32 45\" stroke=\"#4f8a3a\" stroke-width=\"2.4\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M32 108 Q28.1 99.7 19.3 102.1 Q23.2 110.4 32 108Z\" fill=\"#4f8a3a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 108 L19.3 102.1\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 99.8 Q40.8 102.1 44.7 93.8 Q35.9 91.5 32 99.8Z\" fill=\"#4f8a3a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 99.8 L44.7 93.8\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 91.5 Q28.1 83.2 19.3 85.6 Q23.2 93.9 32 91.5Z\" fill=\"#4f8a3a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 91.5 L19.3 85.6\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 83.3 Q40.8 85.6 44.7 77.3 Q35.9 75 32 83.3Z\" fill=\"#4f8a3a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 83.3 L44.7 77.3\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 75 Q28.1 66.7 19.3 69.1 Q23.2 77.4 32 75Z\" fill=\"#4f8a3a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 75 L19.3 69.1\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 66.8 Q40.8 69.1 44.7 60.8 Q35.9 58.5 32 66.8Z\" fill=\"#4f8a3a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 66.8 L44.7 60.8\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 58.5 Q28.1 50.2 19.3 52.6 Q23.2 60.9 32 58.5Z\" fill=\"#4f8a3a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 58.5 L19.3 52.6\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 50.3 Q40.8 52.6 44.7 44.3 Q35.9 42 32 50.3Z\" fill=\"#4f8a3a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 50.3 L44.7 44.3\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 46 q-4 -8 0 -14 q4 6 0 14z\" fill=\"#4f8a3a\" stroke=\"#1a1410\" stroke-width=\"0.9\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>", "<ellipse cx=\"32\" cy=\"113\" rx=\"17\" ry=\"4.4\" fill=\"#6e4524\" stroke=\"#1a1410\" stroke-width=\"0.9\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M20 112 q12 -4 24 0\" stroke=\"#8a5a30\" stroke-width=\"1.4\" fill=\"none\"/><path d=\"M32 111 Q35 76 32 41\" stroke=\"#1a1410\" stroke-width=\"4.4\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M32 111 Q35 76 32 41\" stroke=\"#4f8a3a\" stroke-width=\"2.4\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M32 108 Q28.1 99.7 19.3 102.1 Q23.2 110.4 32 108Z\" fill=\"#4f8a3a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 108 L19.3 102.1\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 99.3 Q40.8 101.6 44.7 93.3 Q35.9 91 32 99.3Z\" fill=\"#4f8a3a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 99.3 L44.7 93.3\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 90.5 Q28.1 82.2 19.3 84.6 Q23.2 92.9 32 90.5Z\" fill=\"#4f8a3a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 90.5 L19.3 84.6\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 81.8 Q40.8 84.1 44.7 75.8 Q35.9 73.5 32 81.8Z\" fill=\"#4f8a3a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 81.8 L44.7 75.8\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 73 Q28.1 64.7 19.3 67.1 Q23.2 75.4 32 73Z\" fill=\"#4f8a3a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 73 L19.3 67.1\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 64.3 Q40.8 66.6 44.7 58.3 Q35.9 56 32 64.3Z\" fill=\"#4f8a3a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 64.3 L44.7 58.3\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 55.5 Q28.1 47.2 19.3 49.6 Q23.2 57.9 32 55.5Z\" fill=\"#4f8a3a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 55.5 L19.3 49.6\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 46.8 Q40.8 49.1 44.7 40.8 Q35.9 38.5 32 46.8Z\" fill=\"#4f8a3a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 46.8 L44.7 40.8\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 42 q-5 -10 0 -22 q5 10 0 22z\" transform=\"rotate(0 32 42)\" fill=\"#6a8a3a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><circle cx=\"30\" cy=\"38\" r=\"1.4\" fill=\"rgba(255,255,255,.35)\"/><circle cx=\"34\" cy=\"34\" r=\"1.4\" fill=\"rgba(255,255,255,.35)\"/><circle cx=\"30\" cy=\"30\" r=\"1.4\" fill=\"rgba(255,255,255,.35)\"/><circle cx=\"34\" cy=\"26\" r=\"1.4\" fill=\"rgba(255,255,255,.35)\"/><path d=\"M24 56 q-5 -10 0 -14 q5 10 0 14z\" transform=\"rotate(-25 24 56)\" fill=\"#6a8a3a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><circle cx=\"22\" cy=\"52\" r=\"1.4\" fill=\"rgba(255,255,255,.35)\"/><circle cx=\"26\" cy=\"48\" r=\"1.4\" fill=\"rgba(255,255,255,.35)\"/><circle cx=\"22\" cy=\"44\" r=\"1.4\" fill=\"rgba(255,255,255,.35)\"/><circle cx=\"26\" cy=\"40\" r=\"1.4\" fill=\"rgba(255,255,255,.35)\"/><path d=\"M40 56 q-5 -10 0 -14 q5 10 0 14z\" transform=\"rotate(25 40 56)\" fill=\"#6a8a3a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><circle cx=\"38\" cy=\"52\" r=\"1.4\" fill=\"rgba(255,255,255,.35)\"/><circle cx=\"42\" cy=\"48\" r=\"1.4\" fill=\"rgba(255,255,255,.35)\"/><circle cx=\"38\" cy=\"44\" r=\"1.4\" fill=\"rgba(255,255,255,.35)\"/><circle cx=\"42\" cy=\"40\" r=\"1.4\" fill=\"rgba(255,255,255,.35)\"/>"],
+    tomate_verde:["<ellipse cx=\"32\" cy=\"113\" rx=\"17\" ry=\"4.4\" fill=\"#6e4524\" stroke=\"#1a1410\" stroke-width=\"0.9\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M20 112 q12 -4 24 0\" stroke=\"#8a5a30\" stroke-width=\"1.4\" fill=\"none\"/><ellipse cx=\"32\" cy=\"110\" rx=\"2.4\" ry=\"1.7\" fill=\"#e8d8a0\" stroke=\"#1a1410\" stroke-width=\"0.9\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>", "<ellipse cx=\"32\" cy=\"113\" rx=\"17\" ry=\"4.4\" fill=\"#6e4524\" stroke=\"#1a1410\" stroke-width=\"0.9\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M20 112 q12 -4 24 0\" stroke=\"#8a5a30\" stroke-width=\"1.4\" fill=\"none\"/><path d=\"M32 111 Q35 105.5 32 100\" stroke=\"#1a1410\" stroke-width=\"4\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M32 111 Q35 105.5 32 100\" stroke=\"#4f9a3a\" stroke-width=\"2\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M32 102 Q30 96.5 24.2 97.5 Q26.2 103 32 102Z\" fill=\"#4f9a3a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 102 L24.2 97.5\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 101 Q37.8 102 39.8 96.5 Q34 95.5 32 101Z\" fill=\"#4f9a3a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 101 L39.8 96.5\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/>", "<ellipse cx=\"32\" cy=\"113\" rx=\"17\" ry=\"4.4\" fill=\"#6e4524\" stroke=\"#1a1410\" stroke-width=\"0.9\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M20 112 q12 -4 24 0\" stroke=\"#8a5a30\" stroke-width=\"1.4\" fill=\"none\"/><path d=\"M40 112 V58\" stroke=\"#8a5a30\" stroke-width=\"2.6\"/><path d=\"M32 111 Q35 94 32 77\" stroke=\"#1a1410\" stroke-width=\"4.4\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M32 111 Q35 94 32 77\" stroke=\"#4f9a3a\" stroke-width=\"2.4\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M32 108 Q28.7 100.9 21.1 102.9 Q24.4 110 32 108Z\" fill=\"#4f9a3a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 108 L21.1 102.9\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 102.3 Q39.6 104.4 42.9 97.3 Q35.3 95.2 32 102.3Z\" fill=\"#4f9a3a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 102.3 L42.9 97.3\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 96.7 Q28.7 89.6 21.1 91.6 Q24.4 98.7 32 96.7Z\" fill=\"#4f9a3a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 96.7 L21.1 91.6\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 91 Q39.6 93 42.9 85.9 Q35.3 83.9 32 91Z\" fill=\"#4f9a3a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 91 L42.9 85.9\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 85.3 Q28.7 78.2 21.1 80.3 Q24.4 87.4 32 85.3Z\" fill=\"#4f9a3a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 85.3 L21.1 80.3\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 79.7 Q39.6 81.7 42.9 74.6 Q35.3 72.6 32 79.7Z\" fill=\"#4f9a3a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 79.7 L42.9 74.6\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/>", "<ellipse cx=\"32\" cy=\"113\" rx=\"17\" ry=\"4.4\" fill=\"#6e4524\" stroke=\"#1a1410\" stroke-width=\"0.9\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M20 112 q12 -4 24 0\" stroke=\"#8a5a30\" stroke-width=\"1.4\" fill=\"none\"/><path d=\"M40 112 V42\" stroke=\"#8a5a30\" stroke-width=\"2.6\"/><path d=\"M32 111 Q35 83 32 55\" stroke=\"#1a1410\" stroke-width=\"4.4\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M32 111 Q35 83 32 55\" stroke=\"#4f9a3a\" stroke-width=\"2.4\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M32 108 Q28.1 99.7 19.3 102.1 Q23.2 110.4 32 108Z\" fill=\"#4f9a3a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 108 L19.3 102.1\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 101 Q40.8 103.4 44.7 95.1 Q35.9 92.7 32 101Z\" fill=\"#4f9a3a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 101 L44.7 95.1\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 94 Q28.1 85.7 19.3 88.1 Q23.2 96.4 32 94Z\" fill=\"#4f9a3a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 94 L19.3 88.1\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 87 Q40.8 89.4 44.7 81.1 Q35.9 78.7 32 87Z\" fill=\"#4f9a3a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 87 L44.7 81.1\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 80 Q28.1 71.7 19.3 74.1 Q23.2 82.4 32 80Z\" fill=\"#4f9a3a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 80 L19.3 74.1\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 73 Q40.8 75.4 44.7 67.1 Q35.9 64.7 32 73Z\" fill=\"#4f9a3a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 73 L44.7 67.1\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 66 Q28.1 57.7 19.3 60.1 Q23.2 68.4 32 66Z\" fill=\"#4f9a3a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 66 L19.3 60.1\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 59 Q40.8 61.4 44.7 53.1 Q35.9 50.7 32 59Z\" fill=\"#4f9a3a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 59 L44.7 53.1\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><ellipse cx=\"26\" cy=\"68\" rx=\"1.4\" ry=\"2.2\" transform=\"rotate(0 26 70)\" fill=\"#f2c84a\"/><ellipse cx=\"26\" cy=\"68\" rx=\"1.4\" ry=\"2.2\" transform=\"rotate(72 26 70)\" fill=\"#f2c84a\"/><ellipse cx=\"26\" cy=\"68\" rx=\"1.4\" ry=\"2.2\" transform=\"rotate(144 26 70)\" fill=\"#f2c84a\"/><ellipse cx=\"26\" cy=\"68\" rx=\"1.4\" ry=\"2.2\" transform=\"rotate(216 26 70)\" fill=\"#f2c84a\"/><ellipse cx=\"26\" cy=\"68\" rx=\"1.4\" ry=\"2.2\" transform=\"rotate(288 26 70)\" fill=\"#f2c84a\"/><circle cx=\"26\" cy=\"70\" r=\"1\" fill=\"#e8862a\"/><ellipse cx=\"40\" cy=\"58\" rx=\"1.4\" ry=\"2.2\" transform=\"rotate(0 40 60)\" fill=\"#f2c84a\"/><ellipse cx=\"40\" cy=\"58\" rx=\"1.4\" ry=\"2.2\" transform=\"rotate(72 40 60)\" fill=\"#f2c84a\"/><ellipse cx=\"40\" cy=\"58\" rx=\"1.4\" ry=\"2.2\" transform=\"rotate(144 40 60)\" fill=\"#f2c84a\"/><ellipse cx=\"40\" cy=\"58\" rx=\"1.4\" ry=\"2.2\" transform=\"rotate(216 40 60)\" fill=\"#f2c84a\"/><ellipse cx=\"40\" cy=\"58\" rx=\"1.4\" ry=\"2.2\" transform=\"rotate(288 40 60)\" fill=\"#f2c84a\"/><circle cx=\"40\" cy=\"60\" r=\"1\" fill=\"#e8862a\"/><ellipse cx=\"30\" cy=\"84\" rx=\"1.4\" ry=\"2.2\" transform=\"rotate(0 30 86)\" fill=\"#f2c84a\"/><ellipse cx=\"30\" cy=\"84\" rx=\"1.4\" ry=\"2.2\" transform=\"rotate(72 30 86)\" fill=\"#f2c84a\"/><ellipse cx=\"30\" cy=\"84\" rx=\"1.4\" ry=\"2.2\" transform=\"rotate(144 30 86)\" fill=\"#f2c84a\"/><ellipse cx=\"30\" cy=\"84\" rx=\"1.4\" ry=\"2.2\" transform=\"rotate(216 30 86)\" fill=\"#f2c84a\"/><ellipse cx=\"30\" cy=\"84\" rx=\"1.4\" ry=\"2.2\" transform=\"rotate(288 30 86)\" fill=\"#f2c84a\"/><circle cx=\"30\" cy=\"86\" r=\"1\" fill=\"#e8862a\"/>", "<ellipse cx=\"32\" cy=\"113\" rx=\"17\" ry=\"4.4\" fill=\"#6e4524\" stroke=\"#1a1410\" stroke-width=\"0.9\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M20 112 q12 -4 24 0\" stroke=\"#8a5a30\" stroke-width=\"1.4\" fill=\"none\"/><path d=\"M40 112 V42\" stroke=\"#8a5a30\" stroke-width=\"2.6\"/><path d=\"M32 111 Q35 83 32 55\" stroke=\"#1a1410\" stroke-width=\"4.4\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M32 111 Q35 83 32 55\" stroke=\"#4f9a3a\" stroke-width=\"2.4\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M32 108 Q28.1 99.7 19.3 102.1 Q23.2 110.4 32 108Z\" fill=\"#4f9a3a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 108 L19.3 102.1\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 101 Q40.8 103.4 44.7 95.1 Q35.9 92.7 32 101Z\" fill=\"#4f9a3a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 101 L44.7 95.1\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 94 Q28.1 85.7 19.3 88.1 Q23.2 96.4 32 94Z\" fill=\"#4f9a3a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 94 L19.3 88.1\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 87 Q40.8 89.4 44.7 81.1 Q35.9 78.7 32 87Z\" fill=\"#4f9a3a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 87 L44.7 81.1\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 80 Q28.1 71.7 19.3 74.1 Q23.2 82.4 32 80Z\" fill=\"#4f9a3a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 80 L19.3 74.1\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 73 Q40.8 75.4 44.7 67.1 Q35.9 64.7 32 73Z\" fill=\"#4f9a3a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 73 L44.7 67.1\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 66 Q28.1 57.7 19.3 60.1 Q23.2 68.4 32 66Z\" fill=\"#4f9a3a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 66 L19.3 60.1\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 59 Q40.8 61.4 44.7 53.1 Q35.9 50.7 32 59Z\" fill=\"#4f9a3a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 59 L44.7 53.1\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M19 74 Q24 67 29 74 Q29 81 24 81 Q19 81 19 74Z\" fill=\"#d8e0a0\" stroke=\"#1a1410\" stroke-width=\"0.9\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><circle cx=\"24\" cy=\"77\" r=\"3.4\" fill=\"#8ac040\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><circle cx=\"22.8\" cy=\"75.8\" r=\"1\" fill=\"rgba(255,255,255,.5)\"/><path d=\"M33 64 Q38 57 43 64 Q43 71 38 71 Q33 71 33 64Z\" fill=\"#d8e0a0\" stroke=\"#1a1410\" stroke-width=\"0.9\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><circle cx=\"38\" cy=\"67\" r=\"3.4\" fill=\"#8ac040\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><circle cx=\"36.8\" cy=\"65.8\" r=\"1\" fill=\"rgba(255,255,255,.5)\"/><path d=\"M23 88 Q28 81 33 88 Q33 95 28 95 Q23 95 23 88Z\" fill=\"#d8e0a0\" stroke=\"#1a1410\" stroke-width=\"0.9\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><circle cx=\"28\" cy=\"91\" r=\"3.4\" fill=\"#8ac040\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><circle cx=\"26.8\" cy=\"89.8\" r=\"1\" fill=\"rgba(255,255,255,.5)\"/><path d=\"M37 82 Q42 75 47 82 Q47 89 42 89 Q37 89 37 82Z\" fill=\"#d8e0a0\" stroke=\"#1a1410\" stroke-width=\"0.9\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><circle cx=\"42\" cy=\"85\" r=\"3.4\" fill=\"#8ac040\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><circle cx=\"40.8\" cy=\"83.8\" r=\"1\" fill=\"rgba(255,255,255,.5)\"/><path d=\"M29 56 Q34 49 39 56 Q39 63 34 63 Q29 63 29 56Z\" fill=\"#d8e0a0\" stroke=\"#1a1410\" stroke-width=\"0.9\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><circle cx=\"34\" cy=\"59\" r=\"3.4\" fill=\"#8ac040\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><circle cx=\"32.8\" cy=\"57.8\" r=\"1\" fill=\"rgba(255,255,255,.5)\"/>"],
+    cacahuate:["<ellipse cx=\"32\" cy=\"113\" rx=\"17\" ry=\"4.4\" fill=\"#6e4524\" stroke=\"#1a1410\" stroke-width=\"0.9\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M20 112 q12 -4 24 0\" stroke=\"#8a5a30\" stroke-width=\"1.4\" fill=\"none\"/><ellipse cx=\"32\" cy=\"110\" rx=\"2.4\" ry=\"1.7\" fill=\"#c8a070\" stroke=\"#1a1410\" stroke-width=\"0.9\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>", "<ellipse cx=\"32\" cy=\"113\" rx=\"17\" ry=\"4.4\" fill=\"#6e4524\" stroke=\"#1a1410\" stroke-width=\"0.9\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M20 112 q12 -4 24 0\" stroke=\"#8a5a30\" stroke-width=\"1.4\" fill=\"none\"/><path d=\"M32 111 Q35 105.5 32 100\" stroke=\"#1a1410\" stroke-width=\"4\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M32 111 Q35 105.5 32 100\" stroke=\"#5aa83a\" stroke-width=\"2\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M32 102 Q30 96.5 24.2 97.5 Q26.2 103 32 102Z\" fill=\"#5aa83a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 102 L24.2 97.5\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 101 Q37.8 102 39.8 96.5 Q34 95.5 32 101Z\" fill=\"#5aa83a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 101 L39.8 96.5\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/>", "<ellipse cx=\"32\" cy=\"113\" rx=\"17\" ry=\"4.4\" fill=\"#6e4524\" stroke=\"#1a1410\" stroke-width=\"0.9\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M20 112 q12 -4 24 0\" stroke=\"#8a5a30\" stroke-width=\"1.4\" fill=\"none\"/><path d=\"M32 108 Q27.3 100.3 18.8 103.2 Q23.5 110.9 32 108Z\" fill=\"#5aa83a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 108 L18.8 103.2\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 108 Q33.2 100.4 26 97.6 Q24.8 105.2 32 108Z\" fill=\"#5aa83a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 108 L26 97.6\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 108 Q39.2 105.2 38 97.6 Q30.8 100.4 32 108Z\" fill=\"#5aa83a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 108 L38 97.6\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 108 Q40.5 110.9 45.2 103.2 Q36.7 100.3 32 108Z\" fill=\"#5aa83a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 108 L45.2 103.2\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/>", "<ellipse cx=\"32\" cy=\"113\" rx=\"17\" ry=\"4.4\" fill=\"#6e4524\" stroke=\"#1a1410\" stroke-width=\"0.9\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M20 112 q12 -4 24 0\" stroke=\"#8a5a30\" stroke-width=\"1.4\" fill=\"none\"/><path d=\"M32 108 Q24.4 99.3 14.3 104.9 Q21.9 113.5 32 108Z\" fill=\"#5aa83a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 108 L14.3 104.9\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 108 Q30 98 19.7 97.7 Q21.8 107.8 32 108Z\" fill=\"#5aa83a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 108 L19.7 97.7\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 108 Q35.1 98.9 26.9 93.9 Q23.8 103 32 108Z\" fill=\"#5aa83a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 108 L26.9 93.9\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 108 Q40.2 103 37.1 93.9 Q28.9 98.9 32 108Z\" fill=\"#5aa83a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 108 L37.1 93.9\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 108 Q42.2 107.8 44.3 97.7 Q34 98 32 108Z\" fill=\"#5aa83a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 108 L44.3 97.7\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 108 Q42.1 113.5 49.7 104.9 Q39.6 99.3 32 108Z\" fill=\"#5aa83a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 108 L49.7 104.9\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 108 Q37.6 101 32 94 Q26.4 101 32 108Z\" fill=\"#5aa83a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 108 L32 94\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><ellipse cx=\"24\" cy=\"94\" rx=\"1.4\" ry=\"2.2\" transform=\"rotate(0 24 96)\" fill=\"#f2c84a\"/><ellipse cx=\"24\" cy=\"94\" rx=\"1.4\" ry=\"2.2\" transform=\"rotate(72 24 96)\" fill=\"#f2c84a\"/><ellipse cx=\"24\" cy=\"94\" rx=\"1.4\" ry=\"2.2\" transform=\"rotate(144 24 96)\" fill=\"#f2c84a\"/><ellipse cx=\"24\" cy=\"94\" rx=\"1.4\" ry=\"2.2\" transform=\"rotate(216 24 96)\" fill=\"#f2c84a\"/><ellipse cx=\"24\" cy=\"94\" rx=\"1.4\" ry=\"2.2\" transform=\"rotate(288 24 96)\" fill=\"#f2c84a\"/><circle cx=\"24\" cy=\"96\" r=\"1\" fill=\"#e8862a\"/><ellipse cx=\"40\" cy=\"92\" rx=\"1.4\" ry=\"2.2\" transform=\"rotate(0 40 94)\" fill=\"#f2c84a\"/><ellipse cx=\"40\" cy=\"92\" rx=\"1.4\" ry=\"2.2\" transform=\"rotate(72 40 94)\" fill=\"#f2c84a\"/><ellipse cx=\"40\" cy=\"92\" rx=\"1.4\" ry=\"2.2\" transform=\"rotate(144 40 94)\" fill=\"#f2c84a\"/><ellipse cx=\"40\" cy=\"92\" rx=\"1.4\" ry=\"2.2\" transform=\"rotate(216 40 94)\" fill=\"#f2c84a\"/><ellipse cx=\"40\" cy=\"92\" rx=\"1.4\" ry=\"2.2\" transform=\"rotate(288 40 94)\" fill=\"#f2c84a\"/><circle cx=\"40\" cy=\"94\" r=\"1\" fill=\"#e8862a\"/>", "<ellipse cx=\"32\" cy=\"113\" rx=\"17\" ry=\"4.4\" fill=\"#6e4524\" stroke=\"#1a1410\" stroke-width=\"0.9\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M20 112 q12 -4 24 0\" stroke=\"#8a5a30\" stroke-width=\"1.4\" fill=\"none\"/><path d=\"M32 106 Q24.4 97.3 14.3 102.9 Q21.9 111.5 32 106Z\" fill=\"#5aa83a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 106 L14.3 102.9\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 106 Q30 96 19.7 95.7 Q21.8 105.8 32 106Z\" fill=\"#5aa83a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 106 L19.7 95.7\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 106 Q35.1 96.9 26.9 91.9 Q23.8 101 32 106Z\" fill=\"#5aa83a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 106 L26.9 91.9\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 106 Q40.2 101 37.1 91.9 Q28.9 96.9 32 106Z\" fill=\"#5aa83a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 106 L37.1 91.9\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 106 Q42.2 105.8 44.3 95.7 Q34 96 32 106Z\" fill=\"#5aa83a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 106 L44.3 95.7\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 106 Q42.1 111.5 49.7 102.9 Q39.6 97.3 32 106Z\" fill=\"#5aa83a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 106 L49.7 102.9\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M32 106 Q37.6 99 32 92 Q26.4 99 32 106Z\" fill=\"#5aa83a\" stroke=\"#1a1410\" stroke-width=\"1\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 106 L32 92\" stroke=\"rgba(255,255,230,.45)\" stroke-width=\".8\"/><path d=\"M17 112 q2.5 -4 5 0 q2.5 -4 5 0 q-2.5 4 -5 0 q-2.5 4 -5 0z\" fill=\"#c8a070\" stroke=\"#1a1410\" stroke-width=\"0.9\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M25 114 q2.5 -4 5 0 q2.5 -4 5 0 q-2.5 4 -5 0 q-2.5 4 -5 0z\" fill=\"#c8a070\" stroke=\"#1a1410\" stroke-width=\"0.9\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M35 112 q2.5 -4 5 0 q2.5 -4 5 0 q-2.5 4 -5 0 q-2.5 4 -5 0z\" fill=\"#c8a070\" stroke=\"#1a1410\" stroke-width=\"0.9\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>"],
+  };
+  for (const [tipo, svgs] of Object.entries(ETAPAS)) { CdmMundo.CROPS[tipo] = svgs.map(s => () => s); ARTE_CULTIVO[tipo] = tipo; }
+}
 
 
- 
-(function mapaZoom() {
-  try {
-    if (window.__mapaZoomOk) return;
-    window.__mapaZoomOk = true;
-
-    const _drawMapBase = drawMap;
-    const _mapKeyBase = null;
-
-    function camInit() { 
-      if (!UI.mapCam) { const [tx, ty] = playerTile(); UI.mapCam = { x: tx, y: ty }; }
-      return UI.mapCam;
-    }
-    function camClamp(v, c) {
-      const mw = v.mw, mh = v.mh, sc = v.sc;
-      const hw = mw / sc / 2, hh = mh / sc / 2;
-      c.x = Math.max(hw - 6, Math.min(MW - hw + 6, c.x));
-      c.y = Math.max(hh - 6, Math.min(WORLD_H - hh + 6, c.y));
-    }
-
-    drawMap = function () {
-      const z = UI.mapZoom || 1;
-      if (z <= 1) { UI.mapCam = null; return _drawMapBase(); }
-      const w = VW - 30, h = VH - 110, [x, y] = dialog(w, h);
-      text('Mapa de Tlaxcallan y sus alrededores', x + w/2, y + 40, VW < 500 ? 17 : 20, '#4a2f18', 'center');
-      const mx = x + 20, my = y + 56, mw = w - 40, mh = h - 56 - 96;
-      const sc = Math.min(4 * z, TS); 
-      const c = camInit(), v = { mx, my, mw, mh, sc };
-      camClamp(v, c);
-      const P = (tx, ty) => [mx + mw/2 + (tx - c.x) * sc, my + mh/2 + (ty - c.y) * sc];
-      UI.mapGeomZoom = { mx, my, mw, mh, sc, P, c };
-
-      ctx.save(); ctx.beginPath(); ctx.rect(mx, my, mw, mh); ctx.clip();
-      
-      const pxT = MAP_CV.width / MW;
-      const wx0 = c.x - mw / sc / 2, wy0 = c.y - mh / sc / 2;
-      ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
-      ctx.drawImage(MAP_CV, wx0 * pxT, wy0 * pxT, (mw / sc) * pxT, (mh / sc) * pxT, mx, my, mw, mh);
-      
-      const sx0 = Math.max(0, Math.floor(wx0 / SEEN)), sx1 = Math.min(SEEN_W - 1, Math.floor((wx0 + mw / sc) / SEEN));
-      const sy0 = Math.max(0, Math.floor(wy0 / SEEN)), sy1 = Math.min(SEEN_H - 1, Math.floor((wy0 + mh / sc) / SEEN));
-      for (let cy = sy0; cy <= sy1; cy++) for (let cx = sx0; cx <= sx1; cx++) {
-        if (S.seen?.[cy * SEEN_W + cx]) continue;
-        const [px, py] = P(cx * SEEN, cy * SEEN);
-        rect('#d8c49a', px - .5, py - .5, SEEN * sc + 1, SEEN * sc + 1);
-      }
-      
-      const seenAt = (tx, ty) => !!S.seen?.[Math.floor(ty / SEEN) * SEEN_W + Math.floor(tx / SEEN)];
-      for (const [name, lx, ly] of MAP_LABELS) if (seenAt(lx, ly)) {
-        const [px, py] = P(lx, ly);
-        if (px < mx - 40 || px > mx + mw + 40 || py < my - 20 || py > my + mh + 20) continue;
-        ctx.font = `bold 11px ${FONT}`; const lw = ctx.measureText(name).width + 8;
-        const lx2 = Math.max(mx + lw/2, Math.min(mx + mw - lw/2, px));
-        rect('rgba(42,26,12,.75)', lx2 - lw/2, py - 10, lw, 14); text(name, lx2, py + 1, 11, '#fff6d0', 'center');
-      }
-      
-      if (!UI.mapHide?.has('postas')) for (const b of postaList()) if (S.postas?.[b.id]) {
-        const [px, py] = P(b.x, b.y); rect('#c0392b', px - 2, py - 8, 2, 9); rect('#f2c94c', px, py - 8, 6, 4);
-      }
-      
-      if (!UI.mapHide?.has('templos')) for (const sh of S.shrines || []) {
-        if (!sh.found && !sh.revealed) continue;
-        const [sx, sy] = P(sh.x + 1.5, sh.y + 1.5);
-        if (!sh.found) { circ('#5a3a1e', sx, sy, 7); text('?', sx, sy + 5, 13, '#fff6d0', 'center'); }
-        else { circ(GODS[sh.god].col, sx, sy, 6); ctx.save(); ctx.translate(sx, sy); ctx.scale(.3, .3); GOD_ICON[sh.god](0, 0); ctx.restore(); }
-      }
-      
-      if (!UI.mapHide?.has('marcador') && S.marcador) {
-        const [sx, sy] = P(S.marcador.x + .5, S.marcador.y + .5);
-        circ('#ff6f3a', sx, sy, 8); text('🚩', sx, sy + 4, 12, '#fff', 'center');
-      }
-      
-      const [ptx, pty] = playerTile(), inMine = pty >= WORLD_H;
-      if (!UI.mapHide?.has('player') && !inMine && Math.sin(T * 6) > -.3) {
-        const [px, py] = P(ptx, pty); circ('#fff', px, py, 6); circ('#d9483b', px, py, 4);
-      }
-      ctx.restore();
-      ctx.strokeStyle = '#5a3a1e'; ctx.lineWidth = 2; ctx.strokeRect(mx, my, mw, mh);
-      
-      UI.mapFilterBtns = [];
-      const filters = [['postas', '🚩 Postas'], ['templos', '⛩ Templos'], ['marcador', '🚩 Marcador'], ['player', '● Tú']];
-      const fw = Math.min(120, (w - 40) / filters.length), start = x + w/2 - filters.length * fw / 2, fy = my + mh + 10, fh = UI.touch ? 32 : 26;
-      filters.forEach(([cat, label], i) => {
-        const bx = start + i * fw, on = !UI.mapHide?.has(cat);
-        rect(on ? 'rgba(40,80,40,.9)' : 'rgba(60,20,20,.9)', bx + 3, fy, fw - 6, fh);
-        text(label, bx + fw/2, fy + fh/2 + 4, 11, on ? '#a0f0a0' : '#ff8080', 'center', false);
-        UI.mapFilterBtns.push({ cat, x: bx, y: fy, w: fw, h: fh });
-      });
-      
-      const zb = [{ id:'zin', t:'＋' }, { id:'zout', t:'－' }, { id:'zreset', t:'⊡' }];
-      UI.mapZoomBtns = [];
-      zb.forEach((b, i) => {
-        const bx = x + w - 46, by = my + 10 + i * 40;
-        rect('rgba(42,26,12,.85)', bx, by, 30, 30); rect('rgba(240,220,170,.25)', bx + 2, by + 2, 26, 26);
-        text(b.t, bx + 15, by + 21, 17, '#fff6d0', 'center', false);
-        UI.mapZoomBtns.push({ id: b.id, x: bx, y: by, w: 30, h: 30 });
-      });
-      text(UI.touch ? 'botones ＋－ para acercar · arrastra para moverte' : 'rueda o +/− = acercar · arrastra o flechas = moverte · 0 = ver todo', x + w/2, y + h - 26, 11, '#7a5530', 'center', false);
-    };
-
-    
-    cv.addEventListener('wheel', e => {
-      if (UI.menu !== 'map') return;
-      e.preventDefault(); e.stopImmediatePropagation();
-      const z = UI.mapZoom || 1, nz = Math.max(1, Math.min(12, z * (e.deltaY > 0 ? 1 / 1.25 : 1.25)));
-      if (nz === z) return;
-      UI.mapZoom = nz;
-      if (nz > 1) camInit(); else UI.mapCam = null;
-      UI.mouseMoved = 0;
-    }, { passive:false, capture:true });
-
-    
-    addEventListener('keydown', e => {
-      if (UI.menu !== 'map') return;
-      const k = e.key;
-      if (k === '+' || k === '=') { UI.mapZoom = Math.min(12, (UI.mapZoom || 1) * 1.25); camInit(); }
-      else if (k === '-') { UI.mapZoom = Math.max(1, (UI.mapZoom || 1) / 1.25); if (UI.mapZoom === 1) UI.mapCam = null; }
-      else if (k === '0') { UI.mapZoom = 1; UI.mapCam = null; }
-      else if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(k) && (UI.mapZoom || 1) > 1) {
-        const c = camInit(), g = UI.mapGeomZoom, step = g ? 18 / g.sc : 4;
-        if (k === 'ArrowUp') c.y -= step; else if (k === 'ArrowDown') c.y += step;
-        else if (k === 'ArrowLeft') c.x -= step; else c.x += step;
-      } else return;
-      e.preventDefault(); e.stopImmediatePropagation();
-    }, true);
-
-    
-    let drag = null;
-    cv.addEventListener('mousedown', e => {
-      if (UI.menu !== 'map' || (UI.mapZoom || 1) <= 1) return;
-      const g = UI.mapGeomZoom;
-      if (g && e.clientX >= g.mx && e.clientX <= g.mx + g.mw && e.clientY >= g.my && e.clientY <= g.my + g.mh) {
-        drag = { x: e.clientX, y: e.clientY, cx: UI.mapCam.x, cy: UI.mapCam.y };
-        e.preventDefault(); e.stopImmediatePropagation();
-      }
-    }, true);
-    addEventListener('mousemove', e => {
-      if (!drag || UI.menu !== 'map') return;
-      const g = UI.mapGeomZoom;
-      if (!g) return;
-      UI.mapCam.x = drag.cx - (e.clientX - drag.x) / g.sc;
-      UI.mapCam.y = drag.cy - (e.clientY - drag.y) / g.sc;
-    });
-    addEventListener('mouseup', () => { drag = null; }, true);
-
-    
-    const _pdZoom = pointerDown;
-    pointerDown = function (px, py, button) {
-      if (UI.menu === 'map' && (UI.mapZoom || 1) > 1) {
-        for (const b of UI.mapZoomBtns || []) {
-          if (px >= b.x && px <= b.x + b.w && py >= b.y && py <= b.y + b.h) {
-            if (b.id === 'zin') { UI.mapZoom = Math.min(12, (UI.mapZoom || 1) * 1.4); camInit(); }
-            else if (b.id === 'zout') { UI.mapZoom = Math.max(1, (UI.mapZoom || 1) / 1.4); if (UI.mapZoom === 1) UI.mapCam = null; }
-            else { UI.mapZoom = 1; UI.mapCam = null; }
-            return;
-          }
-        }
-      }
-      return _pdZoom(px, py, button);
-    };
-
-    console.log('MAPA ZOOM cargado');
-  } catch (e) { console.warn('MAPA ZOOM', e); }
-})();
-
-
- 
-(function casaSiete() {
-  try {
-    if (window.__casaSieteOk) return;
-    window.__casaSieteOk = true;
-
-    
-    while (HOUSE_LVLS.length < 8) HOUSE_LVLS.push(null);
-    HOUSE_LVLS[5] = { name:'Casa de dos plantas', energy:50, door:10, price:6000, mats:{ piedra:120, madera:80, lingote_cobre:6 } };
-    HOUSE_LVLS[6] = { name:'Casa del jaguar', energy:70, door:15, price:12000, mats:{ piedra:200, madera:120, lingote_obsidiana:6 } };
-    HOUSE_LVLS[7] = { name:'Tecpan (casa del señor)', energy:100, door:25, price:25000, mats:{ piedra:320, madera:200, lingote_oro:8 } };
-
-    
-    const CASA_PERKS = {
-      5: 'duermes mejor: +20 energía al despertar y el desayuno da +10',
-      6: 'cabe un guardia más (3) y las trampas hieren el doble',
-      7: 'la puerta es casi inexpugnable y cada mañana recibes un regalo',
-    };
-    const _obrasRows7 = SHOPS.obras.rows;
-    SHOPS.obras.rows = function () {
-      const rows = _obrasRows7();
-      const next = HOUSE_LVLS[S.houseLvl + 1];
-      if (next && CASA_PERKS[S.houseLvl + 1] && rows[0]) rows[0] = { ...rows[0], desc: rows[0].desc + ' · ' + CASA_PERKS[S.houseLvl + 1] };
-      return rows;
-    };
-
-    
-    DEFENSES.guard.max = 3;
-
-    
-    const _updateDef7 = updateDefenses;
-    updateDefenses = function (dt, alive) {
-      const r = _updateDef7(dt, alive);
-      try {
-        if (S.houseLvl >= 6 && S.def.traps) {
-          for (const w of alive) for (let i = 0; i < TRAPS.length; i++) {
-            if (w.trap7?.[i] && !w.trap7dmg?.[i]) { (w.trap7dmg ??= [])[i] = true; w.hp -= TRAP_DMG; } 
-            if (w.trapped?.[i] && !w.trap7?.[i]) { (w.trap7 ??= [])[i] = true; }
-          }
-        }
-      } catch (e) {}
-      return r;
-    };
-
-    
-    const _sleep7 = sleep;
-    sleep = function (...a) {
-      const r = _sleep7(...a);
-      try {
-        if (S.houseLvl >= 5) { S.energy = Math.min(S.maxE, S.energy + 20); }
-        if (S.houseLvl >= 7 && S.day !== UI.regalo7) {
-          UI.regalo7 = S.day;
-          const REGALOS7 = [['chocolate', 1], ['flores', 2], ['tort_maiz', 2], ['aguamiel', 1], ['pulque', 1]];
-          const [k, n] = REGALOS7[S.day % REGALOS7.length];
-          addItem(k, n);
-          setTimeout(() => toast(`🏛️ Vivir en el tecpan tiene sus privilegios: tus vecinos te dejaron ${n} × ${ITEM_NAME[k].toLowerCase()}`, '#ffd080', 5), 800);
-        }
-      } catch (e) {}
-      return r;
-    };
-    const _breakfast7 = typeof breakfast === 'function' ? breakfast : null;
-
-    
-    const _drawBuilding7 = drawBuilding;
-    drawBuilding = function (b) {
-      const r = _drawBuilding7(b);
-      try {
-        if (b.t !== 'house' || S.houseLvl < 5) return r;
-        const px = b.x * TS, py = b.y * TS, w = b.w * TS;
-        const night = S.time > 18 * 60;
-        if (S.houseLvl >= 5) { 
-          rect('#8a8274', px + 10, py - 22, w - 20, 24);
-          rect('#b3ab99', px + 12, py - 20, w - 24, 20);
-          for (const wx of [px + 26, px + w - 44]) {
-            rect('#2a1a10', wx, py - 14, 14, 12);
-            if (night) rect('rgba(255,160,70,.65)', wx + 2, py - 12, 10, 8);
-          }
-          rect('#c0392b', px + 8, py - 4, w - 16, 5);
-        }
-        if (S.houseLvl >= 6) { 
-          const cx = px + w / 2, cy = py + TS + 34;
-          circ('#5a3a1e', cx, cy, 13); circ('#f2c94c', cx, cy, 11); circ('#c0392b', cx, cy, 8);
-          circ('#2a1a10', cx - 3, cy - 2, 1.6); circ('#2a1a10', cx + 3, cy - 2, 1.6);
-          ctx.strokeStyle = '#2a1a10'; ctx.lineWidth = 1.5;
-          ctx.beginPath(); ctx.arc(cx, cy + 3, 3.5, 0.2, Math.PI - 0.2); ctx.stroke();
-          greca(px + 2, py + TS + 56, w - 4, '#7a4a9a', '#e8d8b8');
-        }
-        if (S.houseLvl >= 7) { 
-          rect('#c9a24e', px + 10, py - 28, w - 20, 6);
-          for (let i = 0; i < 8; i++) rect('#f2c94c', px + 14 + i * ((w - 28) / 7) - 4, py - 34, 8, 6);
-          greca(px + 2, py + TS + 16, w - 4, '#c9a24e', '#fff2c0');
-          
-          for (const sx of [px + w / 2 - 26, px + w / 2 + 26]) {
-            rect('#6b4423', sx - 1, py + TS + 44, 2, 26);
-            circ('#2f8a5a', sx, py + TS + 42, 5); circ('#f2c94c', sx, py + TS + 40, 2.5);
-          }
-        }
-      } catch (e) {}
-      return r;
-    };
-
-    console.log('CASA 7 NIVELES cargado');
-  } catch (e) { console.warn('CASA 7 NIVELES', e); }
-})();
-
-
- 
-(function pueblosVivos() {
-  try {
-    if (window.__pueblosVivosOk) return;
-    window.__pueblosVivosOk = true;
-
-    const PAPEL_COLS = ['#ff8fb0', '#f2c84a', '#2f8ae8', '#2fae6a', '#c040c0', '#ff6a3a', '#ffffff'];
-    const ROPA_COLS = ['#e8d8b8', '#c0392b', '#2f6aa8', '#2f8a5a', '#f2c84a', '#d9508a'];
-
-    function papelPicado(x0, y0, x1, y1, seed) { 
-      ctx.strokeStyle = 'rgba(60,40,20,.55)'; ctx.lineWidth = 1;
-      ctx.beginPath(); ctx.moveTo(x0, y0);
-      const mx = (x0 + x1) / 2, my = (y0 + y1) / 2 + 7;
-      ctx.quadraticCurveTo(mx, my, x1, y1); ctx.stroke();
-      const n = Math.max(3, Math.round(Math.hypot(x1 - x0, y1 - y0) / 14));
-      for (let i = 1; i < n; i++) {
-        const t = i / n, bx = x0 + (x1 - x0) * t, by = (1 - t) * (1 - t) * y0 + 2 * (1 - t) * t * my + t * t * y1;
-        const sway = Math.sin(T * 2 + i * 1.3 + seed) * 1.6, fw = 7 * Math.min(1.4, Z);
-        ctx.fillStyle = PAPEL_COLS[(i + seed) % PAPEL_COLS.length];
-        ctx.beginPath(); ctx.moveTo(bx - fw / 2, by); ctx.lineTo(bx + fw / 2, by);
-        ctx.lineTo(bx + fw / 2 + sway, by + fw * 1.3); ctx.lineTo(bx - fw / 2 + sway, by + fw * 1.3); ctx.fill();
-      }
-    }
-    function maceta(sx, sy, col, seed) {
-      const k = Z;
-      ell('rgba(30,22,16,.25)', sx, sy + 2 * k, 8 * k, 2.5 * k);
-      rect('#a85a30', sx - 5 * k, sy - 7 * k, 10 * k, 8 * k); rect('#b8693c', sx - 6 * k, sy - 8 * k, 12 * k, 3 * k);
-      ctx.strokeStyle = '#3f8f30'; ctx.lineWidth = Math.max(1, k);
-      for (let i = -1; i <= 1; i++) { ctx.beginPath(); ctx.moveTo(sx, sy - 8 * k); ctx.quadraticCurveTo(sx + i * 5 * k, sy - 13 * k, sx + i * 7 * k, sy - (15 + (seed + i) % 3) * k); ctx.stroke(); }
-      for (let i = 0; i < 3; i++) circ(col, sx + (i - 1) * 6 * k, sy - (13 + ((seed + i) % 3)) * k, 2.2 * k);
-    }
-    function tendedero(x0, y0, x1, y1, seed) {
-      ctx.strokeStyle = 'rgba(80,60,30,.7)'; ctx.lineWidth = 1;
-      ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x1, y1); ctx.stroke();
-      const n = Math.max(2, Math.round(Math.abs(x1 - x0) / 18));
-      for (let i = 1; i < n; i++) {
-        const t = i / n, bx = x0 + (x1 - x0) * t, by = y0 + (y1 - y0) * t;
-        const sway = Math.sin(T * 1.7 + i + seed) * 1.8, k = Z;
-        ctx.fillStyle = ROPA_COLS[(i + seed) % ROPA_COLS.length];
-        ctx.beginPath(); ctx.moveTo(bx - 4 * k, by); ctx.lineTo(bx + 4 * k, by);
-        ctx.lineTo(bx + 4 * k + sway, by + 10 * k); ctx.lineTo(bx - 4 * k + sway, by + 10 * k); ctx.fill();
-      }
-    }
-    function maguey(sx, sy, s, seed) {
-      ctx.fillStyle = '#4a7a6a';
-      for (let i = 0; i < 7; i++) {
-        const a = -Math.PI / 2 + (i - 3) * 0.32, L = (12 - Math.abs(i - 3) * 2) * s;
-        ctx.beginPath(); ctx.moveTo(sx, sy);
-        ctx.quadraticCurveTo(sx + Math.cos(a) * L * 0.5, sy + Math.sin(a) * L * 0.7, sx + Math.cos(a) * L, sy + Math.sin(a) * L);
-        ctx.lineTo(sx + Math.cos(a + 0.14) * L * 0.7, sy + Math.sin(a + 0.14) * L * 0.55);
-        ctx.closePath(); ctx.fill();
-      }
-      ell('#3a5a50', sx, sy, 3 * s, 2 * s);
-    }
-
-    const _drawWorldPueblo = drawWorld;
-    drawWorld = function (...a) {
-      const r = _drawWorldPueblo(...a);
-      try {
-        if (inking || !S || UI.menu || UI.home || UI.inside || UI.edif) return r;
-        const [ptx] = playerTile();
-        if (zone(ptx, Math.floor((S.player.y - 4) / TS)) !== 'town') return r; 
-        ctx.save(); ctx.setTransform(cv.width / VW, 0, 0, cv.width / VW, 0, 0);
-        const S2P = (wx, wy) => [(wx - camX) * Z, (wy - camY) * Z];
-        const vis = sx => sx > -60 && sx < VW + 60;
-
-        
-        for (const ry of [7, 26]) {
-          for (let x = TOWN_X + 2; x < WILD_X - 8; x += 7) {
-            const [ax, ay] = S2P(x * TS, (ry - 0.15) * TS), [bx, by] = S2P((x + 6) * TS, (ry - 0.15) * TS);
-            if (!vis(ax) && !vis(bx)) continue;
-            if (hash(x, ry) < 0.75) papelPicado(ax, ay, bx, by, x + ry);
-          }
-        }
-        
-        for (const b of builds()) {
-          if (!['casita', 'agro', 'herreria', 'bar', 'consultorio', 'temazcal', 'armeria', 'ixtlilton', 'puesto'].includes(b.t)) continue;
-          const [sx, sy] = S2P((b.x - 0.3) * TS, (b.y + b.h + 0.25) * TS);
-          if (!vis(sx)) continue;
-          if (hash(b.x, b.y) < 0.8) maceta(sx, sy, PAPEL_COLS[(b.x + b.y) % PAPEL_COLS.length], b.x + b.y);
-        }
-        
-        for (let x = TOWN_X + 6; x < TOWN_X + 30; x += 9) {
-          const [ax, ay] = S2P(x * TS, 26.6 * TS), [bx, by] = S2P((x + 5) * TS, 26.6 * TS);
-          if (!vis(ax) && !vis(bx)) continue;
-          if (hash(x, 26) < 0.6) tendedero(ax, ay, bx, by, x);
-        }
-        
-        for (let x = TOWN_X - 1; x < WILD_X; x += 5) {
-          for (const yy of [1.5, 29.5]) {
-            const [sx, sy] = S2P((x + 0.5) * TS, yy * TS);
-            if (!vis(sx) || hash(x, yy | 0) > 0.55) continue;
-            maguey(sx, sy, Math.max(0.6, Z * 0.8), x);
-          }
-        }
-        ctx.restore();
-      } catch (e) {}
-      return r;
-    };
-
-    console.log('PUEBLOS VIVOS cargado');
-  } catch (e) { console.warn('PUEBLOS VIVOS', e); }
-})();
-
-
- 
-(function mueblesMejor() {
-  try {
-    if (window.__mueblesMejorOk) return;
-    window.__mueblesMejorOk = true;
-
-    
-    const _rowsM50 = SHOPS.muebles50.rows;
-    SHOPS.muebles50.rows = function () {
-      const rows = _rowsM50();
-      for (const r of rows) {
-        const m = MUEBLES50.find(mm => mm.n === r.name);
-        if (m) r.icon = (x, y) => drawMueble50(m, x, y + 4);
-      }
-      return rows;
-    };
-
-    
-    const TIERS_COMODIDAD = [[12, 2], [25, 4], [40, 6], [55, 8]];
-    const totalMuebles = () => mueblesPuestos().length + (typeof mueblesAla === 'function' ? mueblesAla().length : 0);
-    const tierComodidad = () => { const n = totalMuebles(); let b = 0; for (const [min, v] of TIERS_COMODIDAD) if (n >= min) b = v; return b; };
-
-    const _sleepMuebles = sleep;
-    sleep = function (...a) {
-      const r = _sleepMuebles(...a);
-      try {
-        const b = tierComodidad();
-        if (b) { S.energy = Math.min(S.maxE + totalMuebles(), S.energy + b); }
-        const n = totalMuebles();
-        for (const [min, v] of TIERS_COMODIDAD) {
-          if (n >= min && (UI.tierMuebles || 0) < min) {
-            UI.tierMuebles = min;
-            setTimeout(() => toast(`🛋 Tu casa está de revista (${n} muebles): comodidad nivel ${v / 2} · +${v} energía extra cada mañana`, '#ffd080', 7));
-            break;
-          }
-        }
-      } catch (e) {}
-      return r;
-    };
-
-    
-    const _subM50 = SHOPS.muebles50.sub;
-    SHOPS.muebles50.sub = () => {
-      const b = tierComodidad();
-      return _subM50() + (b ? ` · nivel de comodidad ${b / 2} (+${b} extra)` : ` · a ${12 - totalMuebles()} del nivel 1 de comodidad`);
-    };
-
-    console.log('MUEBLES MEJOR cargado');
-  } catch (e) { console.warn('MUEBLES MEJOR', e); }
-})();
-
-
- 
-(function combateMejor() {
-  try {
-    if (window.__combateMejorOk) return;
-    window.__combateMejorOk = true;
-
-    
-    if (!GEAR.lanza_jaguar) GEAR.lanza_jaguar = { slot:'weapon', name:'Lanza del jaguar', icon:'🐆', dmg:26, reach:52, price:1100, mats:{ lingote_obsidiana:3, madera:8 } };
-    if (!GEAR.macuahuitl_oro) GEAR.macuahuitl_oro = { slot:'weapon', name:'Macuahuitl de oro', icon:'👑', dmg:44, reach:36, price:3200, mats:{ lingote_oro:4, lingote_obsidiana:3 } };
-
-    
-    const CARGA_MAX = 1.0; 
-    addEventListener('keydown', e => {
-      const k = e.key.length === 1 ? e.key.toLowerCase() : e.key;
-      if (k !== 'r' || UI.menu || UI.fish || UI._x0c7a68 || UI._x22f2b0 || e.repeat) return;
-      if (!equipped('weapon')) return; 
-      e.preventDefault(); e.stopImmediatePropagation();
-      if (UI.atkCarga == null) UI.atkCarga = T;
-    }, true);
-    addEventListener('keyup', e => {
-      const k = e.key.length === 1 ? e.key.toLowerCase() : e.key;
-      if (k !== 'r' || UI.atkCarga == null) return;
-      const carga = Math.min(1, (T - UI.atkCarga) / CARGA_MAX);
-      UI.atkCarga = null;
-      UI.atkMul = 1 + carga * 1.2; 
-      attack();
-    }, true);
-
-    const _attackC = attack;
-    attack = function () {
-      const mul = UI.atkMul || 1;
-      if (mul > 1) {
-        const w = equipped('weapon');
-        if (w) {
-          const orig = w.dmg;
-          w.dmg = Math.round(orig * mul);
-          const r = _attackC();
-          w.dmg = orig;
-          UI.atkMul = 0;
-          if (mul > 1.9) { UI.shake = 0.25; sfx('hit'); }
-          return r;
-        }
-      }
-      UI.atkMul = 0;
-      return _attackC();
-    };
-
-    
-    const _drawWorldAtk = drawWorld;
-    drawWorld = function (...a) {
-      const r = _drawWorldAtk(...a);
-      try {
-        if (inking || UI.atkCarga == null || UI.menu) return r;
-        const carga = Math.min(1, (T - UI.atkCarga) / CARGA_MAX);
-        const sx = (S.player.x - camX) * Z, sy = (S.player.y - 52 - camY) * Z;
-        ctx.save(); ctx.setTransform(cv.width / VW, 0, 0, cv.width / VW, 0, 0);
-        ctx.strokeStyle = 'rgba(20,12,8,.6)'; ctx.lineWidth = 5;
-        ctx.beginPath(); ctx.arc(sx, sy, 12, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2); ctx.stroke();
-        ctx.strokeStyle = carga >= 1 ? '#ffd23f' : '#f2c94c'; ctx.lineWidth = 3;
-        ctx.beginPath(); ctx.arc(sx, sy, 12, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * carga); ctx.stroke();
-        if (carga >= 1 && Math.sin(T * 10) > 0) text('¡YA!', sx, sy - 18, 10, '#ffd23f', 'center');
-        ctx.restore();
-      } catch (e) {}
-      return r;
-    };
-
-    console.log('COMBATE MEJOR cargado');
-  } catch (e) { console.warn('COMBATE MEJOR', e); }
-})();
-
+const _drawShopGarza = drawShop;
+drawShop = function (...a) {
+  const r = _drawShopGarza(...a);
+  if (UI.menu === 'shop' && UI.shopId === 'bolsa' && UI.shopBox) {
+    const [x, y, w] = UI.shopBox, s = Math.max(1.6, Math.min(2.6, w / 300));
+    try { garzaCdm(x + w - 22 * s, y + 4 * s, s); } catch (e) {}
+  }
+  return r;
+};
 
 // Textos retirados de la versión pública: no se dibujan.
 const TOKEN_PUBLICO = /(?:·x|_x)[0-9a-f]{6}/;
