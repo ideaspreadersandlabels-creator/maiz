@@ -9002,38 +9002,64 @@ const NPC_LOOK = {
 };
 
 const blinking = x => (T*0.3 + hash(Math.round(x / 9), 17)) % 1 < 0.035;
+
+function suaveRR(c, x, y, w, h, r) { ctx.fillStyle = c; ctx.beginPath(); if (ctx.roundRect) ctx.roundRect(x, y, w, h, r); else ctx.rect(x, y, w, h); ctx.fill(); }
+function suaveLinea(c, lw, x0, y0, x1, y1) { ctx.strokeStyle = c; ctx.lineWidth = lw; ctx.lineCap = 'round'; ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x1, y1); ctx.stroke(); ctx.lineCap = 'butt'; }
+function suaveCurva(c, lw, x0, y0, cx, cy, x1, y1) { ctx.strokeStyle = c; ctx.lineWidth = lw; ctx.lineCap = 'round'; ctx.beginPath(); ctx.moveTo(x0, y0); ctx.quadraticCurveTo(cx, cy, x1, y1); ctx.stroke(); ctx.lineCap = 'butt'; }
+function suaveForma(c, pts) { ctx.fillStyle = c; ctx.beginPath(); ctx.moveTo(pts[0], pts[1]); for (let i = 2; i < pts.length; i += 2) ctx.lineTo(pts[i], pts[i + 1]); ctx.closePath(); ctx.fill(); }
+
+function suaveCabeza(x, yb, o, dir, ancho = 0) {
+  const f = dir === 'left' ? -1 : 1, lado = dir === 'left' || dir === 'right';
+  suaveRR(o.skin, x - 2, yb - 29.6, 5, 5, 1.2);
+  if (dir !== 'right') ell(o.skin, x - 7.2, yb - 34.4, 1.5, 1.9);
+  if (dir !== 'left') ell(o.skin, x + 7.2, yb - 34.4, 1.5, 1.9);
+  suaveRR(o.skin, x - 7, yb - 41.4, 14, 13.6, 5.6);
+  if (lado) suaveForma(o.skin, [x + f * 6.6, yb - 34.8, x + f * 8.7, yb - 31.9, x + f * 6.6, yb - 31]);
+  if (dir !== 'up') { suaveRR('rgba(40,18,8,.2)', x + 4.8, yb - 33, 1.8, 4, 0.9); suaveRR('rgba(255,220,180,.3)', x - 5.6, yb - 40, 3, 4, 1.4); }
+  const a = 7.8 + ancho;
+  ctx.fillStyle = o.hair; ctx.beginPath();
+  if (dir === 'up') {
+    ctx.moveTo(x - a, yb - 35); ctx.quadraticCurveTo(x - a - 0.8, yb - 44.8, x, yb - 45); ctx.quadraticCurveTo(x + a + 0.8, yb - 44.8, x + a, yb - 35);
+    ctx.quadraticCurveTo(x + a - 0.2, yb - 29, x + 4, yb - 28.2); ctx.quadraticCurveTo(x, yb - 27.4, x - 4, yb - 28.2); ctx.quadraticCurveTo(x - a + 0.2, yb - 29, x - a, yb - 35);
+  } else {
+    ctx.moveTo(x - a, yb - 36); ctx.quadraticCurveTo(x - a - 1, yb - 44.8, x, yb - 45); ctx.quadraticCurveTo(x + a + 1, yb - 44.8, x + a, yb - 36);
+    ctx.quadraticCurveTo(x + 7, yb - 38.2, x + 5.6, yb - 38.4); ctx.quadraticCurveTo(x + 2, yb - 37.4, x, yb - 38.4); ctx.quadraticCurveTo(x - 3, yb - 37.4, x - 5.6, yb - 38.4);
+    ctx.quadraticCurveTo(x - 7, yb - 38.2, x - a, yb - 36);
+  }
+  ctx.closePath(); ctx.fill();
+  suaveCurva('rgba(255,255,255,.16)', 0.9, x - 4.6, yb - 43.2, x - 1, yb - 44.2, x + 2.6, yb - 43.5);
+}
 function eyes(x, y, dir, mood = 'calm') {
   if (dir === 'up') return;
-  const blink = blinking(x), h = blink ? 1 : 2, dy = blink ? 1 : 0;
-  const pupil = (px, py) => { rect('#1a1410', px, py + dy, 2, h); if (!blink) rect('#fff6ea', px, py, 1, 1); };
+  const blink = blinking(x), cansado = mood === 'tired';
+  const ojo = px => {
+    if (blink) return suaveLinea('#1a1410', 0.8, px - 1.5, y + 0.8, px + 1.5, y + 0.8);
+    ell('#fff6ea', px, y + 0.5, 1.9, 1.5); circ('#3a2416', px, y + 0.6, 1.15); circ('#1a1410', px, y + 0.6, 0.55); rect('#fff6ea', px - 0.8, y - 0.2, 0.6, 0.6);
+  };
   if (dir === 'down') {
-    const browY = mood === 'tired' ? y - 2 : y - 3;
-    rect('#4a3018', x - 5, browY, 4, 1); rect('#4a3018', x + 1, browY, 4, 1);
-    if (!blink) { rect('#fff6ea', x - 5, y - 1, 4, 3); rect('#fff6ea', x + 1, y - 1, 4, 3); }
-    pupil(x - 4, y); pupil(x + 2, y);
-    rect('#c48a6a', x - 1, y + 3, 2, 2);
-    if (mood === 'tired') { rect('#8a4030', x - 2, y + 6, 4, 1); rect('#8a4030', x - 1, y + 5, 2, 1); }
-    else { rect('#8a4030', x - 2, y + 6, 4, 1); rect('#8a4030', x - 1, y + 7, 2, 1); }
-    rect('rgba(210,90,80,.45)', x - 7, y + 4, 2, 2); rect('rgba(210,90,80,.45)', x + 5, y + 4, 2, 2);
+    suaveLinea('#4a3018', 1.1, x - 5, y - 2.7 + (cansado ? 0.7 : 0), x - 1.4, y - 2.9); suaveLinea('#4a3018', 1.1, x + 1.4, y - 2.9, x + 5, y - 2.7 + (cansado ? 0.7 : 0));
+    ojo(x - 3.1); ojo(x + 3.1);
+    suaveCurva('rgba(120,60,40,.55)', 0.7, x - 0.8, y + 3.2, x, y + 4, x + 0.8, y + 3.2);
+    suaveCurva('#8a4030', 0.85, x - 2, y + 6, x, y + (cansado ? 5.3 : 7.3), x + 2, y + 6);
+    ell('rgba(210,90,80,.4)', x - 5.3, y + 4.4, 1.5, 0.9); ell('rgba(210,90,80,.4)', x + 5.3, y + 4.4, 1.5, 0.9);
   } else {
     const s = dir === 'left' ? -1 : 1;
-    rect('#4a3018', x + s, y - 3, 4, 1);
-    if (!blink) rect('#fff6ea', x + s, y - 1, 4, 3);
-    pupil(x + s * 2, y);
-    rect('#c48a6a', x + s * 4, y + 3, 2, 2);
-    rect('#8a4030', x + s * 2, y + 6, 3, 1);
-    rect('rgba(210,90,80,.4)', x + s * 6, y + 4, 2, 2);
+    suaveLinea('#4a3018', 1.1, x + s * 1.2, y - 2.9 + (cansado ? 0.7 : 0), x + s * 4.8, y - 2.6);
+    ojo(x + s * 3.2);
+    suaveCurva('#8a4030', 0.85, x + s * 3, y + 6.1, x + s * 4.4, y + (cansado ? 5.7 : 6.8), x + s * 5.8, y + 6);
+    ell('rgba(210,90,80,.38)', x + s * 2.6, y + 4.3, 1.5, 0.9);
   }
 }
 
 function arms(x, y, col, dir, step) {
-  const a = step * 3;
+  const a = step * 3, sombra = 'rgba(40,18,8,.18)';
   if (dir === 'left' || dir === 'right') {
     const dx = dir === 'left' ? -a : a;
-    rect(col, x - 1 + dx, y, 3, 9); rect(col, x - 2 + dx, y + 8, 4, 3);
+    suaveLinea(col, 3.4, x + 0.5 + dx * 0.25, y + 1.6, x + 0.5 + dx, y + 8.6); circ(col, x + 0.5 + dx, y + 9.8, 2);
   } else {
-    rect(col, x - 10, y + a, 3, 9); rect(col, x - 11, y + 8 + a, 4, 3);
-    rect(col, x + 7, y - a, 3, 9); rect(col, x + 6, y + 8 - a, 4, 3);
+    suaveLinea(col, 3.4, x - 8.7, y + 1.6 + a * 0.2, x - 9.2, y + 8.6 + a); circ(col, x - 9.2, y + 9.8 + a, 2);
+    suaveLinea(col, 3.4, x + 8.7, y + 1.6 - a * 0.2, x + 9.2, y + 8.6 - a); circ(col, x + 9.2, y + 9.8 - a, 2);
+    suaveLinea(sombra, 0.9, x + 9.9, y + 2.6 - a * 0.2, x + 10.3, y + 8 - a);
   }
 }
 let inking = false;
@@ -9055,18 +9081,18 @@ function drawPerson(x, y, o, dir = 'down', step = 0, name = '', bob = 0) {
   if (o.apache) return drawApache(x, y, o, dir, step, name, bob);
   const shade = 'rgba(40,18,8,.2)', hi = 'rgba(255,220,180,.3)';
   const l1 = -Math.max(0, step)*2.5, l2 = -Math.max(0, -step)*2.5;
-  rect(o.skin, x-6, y-12 + l1, 5, 12); rect(o.skin, x+1, y-12 + l2, 5, 12);
-  rect(shade, x-2, y-12 + l1, 1, 12); rect(shade, x+5, y-12 + l2, 1, 12);
-  if (o.swimwear) {
-    rect(o.skin, x-6, y-4 + l1, 5, 2); rect(o.skin, x+1, y-4 + l2, 5, 2);
-  } else {
-    rect('#5a3818', x-7, y-2 + l1, 7, 2); rect('#5a3818', x, y-2 + l2, 7, 2);
-    rect('#c4a574', x-6, y-4 + l1, 5, 1); rect('#c4a574', x+1, y-4 + l2, 5, 1);
+  for (const [lx, l] of [[x-6, l1], [x+1, l2]]) { 
+    suaveRR(o.skin, lx, y-13 + l, 5, 13, 2.2); suaveRR(shade, lx + 3.6, y-12 + l, 1.4, 11, 0.7);
+    if (o.swimwear) suaveRR(o.skin, lx, y-4 + l, 5, 4, 2);
+    else { suaveRR('#5a3818', lx - 1, y-2.2 + l, 7, 2.2, 1); rect('#c4a574', lx, y-4.4 + l, 5, 0.9); }
   }
   if (o.female) {
     if (o.swimwear) {
       const top=o.swimTop||o.cloth, bottom=o.swimBottom||o.skirt, trim=o.swimTrim||o.accent;
-      rect(o.skin,x-8,y-27-bob,16,20);
+      ctx.fillStyle = o.skin; ctx.beginPath();
+      ctx.moveTo(x-5, y-27.6-bob); ctx.lineTo(x+5, y-27.6-bob); ctx.quadraticCurveTo(x+8.6, y-27.4-bob, x+8, y-23.6-bob);
+      ctx.quadraticCurveTo(x+6.8, y-18-bob, x+8, y-11-bob); ctx.quadraticCurveTo(x+7.4, y-7-bob, x, y-7-bob); ctx.quadraticCurveTo(x-7.4, y-7-bob, x-8, y-11-bob);
+      ctx.quadraticCurveTo(x-6.8, y-18-bob, x-8, y-23.6-bob); ctx.quadraticCurveTo(x-8.6, y-27.4-bob, x-5, y-27.6-bob); ctx.closePath(); ctx.fill();
       ctx.fillStyle=bottom;ctx.beginPath();ctx.moveTo(x-7,y-16-bob);ctx.lineTo(x+7,y-16-bob);ctx.lineTo(x+5,y-8-bob);ctx.lineTo(x,y-6-bob);ctx.lineTo(x-5,y-8-bob);ctx.closePath();ctx.fill();
       rect(trim,x-7,y-16-bob,14,1.5);rect(trim,x-4,y-10-bob,8,1);
       ctx.fillStyle=top;ctx.beginPath();ctx.moveTo(x-8,y-27-bob);ctx.lineTo(x-1,y-26-bob);ctx.lineTo(x-2,y-17-bob);ctx.lineTo(x-8,y-18-bob);ctx.closePath();ctx.fill();
@@ -9078,81 +9104,83 @@ function drawPerson(x, y, o, dir = 'down', step = 0, name = '', bob = 0) {
       if(o.swimPattern==='floral') for(const [fx,fy] of [[-4,-23],[4,-21],[-3,-11],[4,-9]]) {circ(trim,x+fx,y+fy-bob,1.2);circ('#f4d36e',x+fx,y+fy-bob,0.45);}
       if(o.swimPattern==='gold') {rect('rgba(255,245,190,.65)',x-5,y-25-bob,2,1);rect('rgba(255,245,190,.65)',x+3,y-23-bob,2,1);}
     } else {
-      ctx.fillStyle = o.skirt;
-      ctx.beginPath(); ctx.moveTo(x-7, y-16-bob); ctx.lineTo(x+7, y-16-bob); ctx.lineTo(x+10, y-4-bob); ctx.lineTo(x-10, y-4-bob); ctx.fill();
-      rect(shade, x+4, y-15-bob, 4, 10);
-      rect(o.accent, x-10, y-6-bob, 20, 2);
-      for (let i = 0; i < 3; i++) rect('#f4ecd8', x-8 + i*6, y-5-bob, 3, 1);
-      rect(o.cloth, x-9, y-27-bob, 18, 13);
-      rect(shade, x+5, y-27-bob, 4, 13);
-      rect(hi, x-9, y-27-bob, 3, 6);
-      rect(o.skin, x-3, y-27-bob, 6, 3);
-      rect(o.accent, x-1, y-26-bob, 2, 6);
-      rect(o.accent, x-9, y-16-bob, 18, 2);
+      
+      ctx.fillStyle = o.skirt; ctx.beginPath();
+      ctx.moveTo(x-7, y-16-bob); ctx.lineTo(x+7, y-16-bob); ctx.quadraticCurveTo(x+9.6, y-10-bob, x+10, y-4.8-bob);
+      ctx.quadraticCurveTo(x, y-2.8-bob, x-10, y-4.8-bob); ctx.quadraticCurveTo(x-9.6, y-10-bob, x-7, y-16-bob); ctx.closePath(); ctx.fill();
+      suaveForma(shade, [x+4, y-15.5-bob, x+7, y-15.5-bob, x+9.6, y-6-bob, x+6, y-5-bob]);
+      suaveCurva(o.accent, 2, x-9.4, y-6.2-bob, x, y-4.4-bob, x+9.4, y-6.2-bob);
+      for (let i = 0; i < 3; i++) rect('#f4ecd8', x-7.5 + i*6, y-5.9-bob + (i === 1 ? 0.7 : 0), 3, 0.9);
+      
+      suaveRR(o.cloth, x-9, y-27.6-bob, 18, 13.6, [4, 4, 1.5, 1.5]);
+      suaveRR(shade, x+5, y-27.2-bob, 4, 13, [0, 4, 1.5, 0]);
+      suaveRR(hi, x-8.4, y-27-bob, 3, 6, 1.4);
+      if (dir !== 'up') { 
+        ell(o.skin, x, y-27.4-bob, 3.3, 2.5);
+        rect(o.accent, x-1, y-25.2-bob, 2, 5.2);
+        suaveCurva(o.accent, 0.9, x-3.6, y-27-bob, x, y-23.8-bob, x+3.6, y-27-bob);
+      }
+      suaveRR(o.accent, x-9, y-16-bob, 18, 2, 1);
       if (o.pregnant) ell(o.cloth, x + (dir === 'left' ? -5 : dir === 'right' ? 5 : 0), y-17-bob, 9, 6);
       if (o.quech) {
-        ctx.fillStyle = o.quech; ctx.beginPath(); ctx.moveTo(x-11, y-26-bob); ctx.lineTo(x+11, y-26-bob); ctx.lineTo(x, y-12-bob); ctx.fill();
-        rect('#f4ecd8', x-8, y-23-bob, 16, 1.5); rect('#f4ecd8', x-5, y-19-bob, 10, 1.5);
+        ctx.fillStyle = o.quech; ctx.beginPath(); ctx.moveTo(x-11, y-26-bob); ctx.quadraticCurveTo(x, y-29-bob, x+11, y-26-bob); ctx.lineTo(x, y-12-bob); ctx.closePath(); ctx.fill();
+        suaveLinea('#f4ecd8', 1.4, x-7.4, y-22.4-bob, x+7.4, y-22.4-bob); suaveLinea('#f4ecd8', 1.4, x-4.6, y-18.4-bob, x+4.6, y-18.4-bob);
       }
     }
     arms(x, y-25-bob, o.skin, dir, idleMotion);
   } else {
-    rect(o.skin, x-8, y-25-bob, 16, 4);
-    rect(o.skin, x-7, y-22-bob, 14, 10);
-    rect(shade, x+5, y-22-bob, 2, 8);
-    rect(hi, x-8, y-25-bob, 2, 5);
-    rect('#f7f1e4', x-5, y-14-bob, 10, 7);
-    rect(o.accent || '#c0392b', x-5, y-14-bob, 10, 1);
-    rect('#f7f1e4', x-2, y-9-bob, 4, 5);
-    if (!o.bare) {
+    
+    ctx.fillStyle = o.skin; ctx.beginPath();
+    ctx.moveTo(x-5, y-25.6-bob); ctx.lineTo(x+5, y-25.6-bob); ctx.quadraticCurveTo(x+8.5, y-25.4-bob, x+8.2, y-22-bob);
+    ctx.lineTo(x+6.6, y-12-bob); ctx.lineTo(x-6.6, y-12-bob); ctx.lineTo(x-8.2, y-22-bob); ctx.quadraticCurveTo(x-8.5, y-25.4-bob, x-5, y-25.6-bob); ctx.closePath(); ctx.fill();
+    suaveForma(shade, [x+5.4, y-25-bob, x+8.2, y-22.4-bob, x+6.6, y-12-bob, x+4.8, y-12-bob]);
+    suaveRR(hi, x-7.4, y-24.8-bob, 2, 5, 1);
+    suaveCurva(shade, 0.6, x-5, y-19.6-bob, x-2.8, y-18.6-bob, x-0.6, y-19.8-bob); suaveCurva(shade, 0.6, x+0.6, y-19.8-bob, x+2.8, y-18.6-bob, x+5, y-19.6-bob);
+    
+    suaveRR('#f7f1e4', x-5.8, y-14.4-bob, 11.6, 7.2, 2.4);
+    rect(o.accent || '#c0392b', x-5.8, y-14.4-bob, 11.6, 1.2);
+    suaveForma('#f7f1e4', [x-2.2, y-9.4-bob, x+2.2, y-9.4-bob, x+2, y-5.2-bob, x, y-3.6-bob, x-2, y-5.2-bob]);
+    if (!o.bare) { 
       const left = dir === 'left', cx0 = left ? x - 1 : x - 10;
-      rect(o.cloth, cx0, y-27-bob, 12, 18);
-      rect('rgba(0,0,0,.12)', cx0 + 8, y-27-bob, 4, 18);
-      rect(hi, cx0, y-27-bob, 2, 8);
-      rect(o.accent, cx0, y-11-bob, 12, 2);
-      rect('#f4ecd8', cx0 + 2, y-13-bob, 8, 1);
-      circ(o.accent, left ? x - 2 : x + 6, y-25-bob, 2);
+      ctx.fillStyle = o.cloth; ctx.beginPath();
+      ctx.moveTo(cx0 + 2.6, y-27.4-bob); ctx.lineTo(cx0 + 9.4, y-27.4-bob); ctx.quadraticCurveTo(cx0 + 12, y-27.2-bob, cx0 + 12, y-24.4-bob);
+      ctx.lineTo(cx0 + 12.7, y-9-bob); ctx.lineTo(cx0 - 0.7, y-9-bob); ctx.lineTo(cx0, y-24.4-bob); ctx.quadraticCurveTo(cx0, y-27.2-bob, cx0 + 2.6, y-27.4-bob); ctx.closePath(); ctx.fill();
+      suaveForma('rgba(0,0,0,.12)', [cx0 + 8, y-27.4-bob, cx0 + 12, y-25-bob, cx0 + 12.7, y-9-bob, cx0 + 8.4, y-9-bob]);
+      suaveRR(hi, cx0 + 0.6, y-26.6-bob, 2, 8, 1);
+      rect(o.accent, cx0 - 0.6, y-11.2-bob, 13.2, 2.2);
+      rect('#f4ecd8', cx0 + 2, y-13-bob, 8, 0.9);
+      circ(o.accent, left ? x - 2 : x + 6, y-25.4-bob, 2.1); circ('#f4ecd8', left ? x - 2 : x + 6, y-25.4-bob, 0.7);
     }
     arms(x, y-24-bob, o.skin, dir, idleMotion);
-    if (o.herb) { rect('#2f8a5a', x + 6, y - 18 - bob, 4, 6); circ('#d8261e', x + 8, y - 20 - bob, 1.6); circ('#f7c623', x + 6, y - 17 - bob, 1.2); }
+    if (o.herb) { suaveRR('#2f8a5a', x + 6, y - 18 - bob, 4, 6, 1.2); circ('#d8261e', x + 8, y - 20 - bob, 1.6); circ('#f7c623', x + 6, y - 17 - bob, 1.2); }
   }
-  rect(o.skin, x-2, y-29-bob, 5, 5);
-  rect(o.skin, x-6, y-41-bob, 12, 13);
-  rect(o.skin, x-7, y-39-bob, 14, 9);
-  rect(o.skin, x-5, y-30-bob, 10, 2);
-  rect(shade, x+5, y-32-bob, 2, 4);
-  rect(hi, x-6, y-40-bob, 3, 4);
-  if (dir !== 'right') rect(o.skin, x-8, y-36-bob, 2, 3);
-  if (dir !== 'left') rect(o.skin, x+6, y-36-bob, 2, 3);
+  suaveCabeza(x, y - bob, o, dir);
   const cut = hash((o.accent || '#a').charCodeAt(1) || 3, (o.cloth || '#b').charCodeAt(2) || 5);
-  rect(o.hair, x-7, y-44-bob, 14, dir === 'up' ? 16 : 8);
-  rect(o.hair, x-8, y-42-bob, 2, 5); rect(o.hair, x+6, y-42-bob, 2, 5);
-  rect('rgba(255,255,255,.16)', x-5, y-43-bob, 4, 1);
   if (o.female && o.style) drawPeinado(x, y, o, dir, bob); 
   else if (o.female) {
     if (cut < 0.34) {
-      rect(o.hair, x-10, y-37-bob, 3, 16); rect(o.hair, x+7, y-37-bob, 3, 16);
-      rect(o.accent, x-10, y-23-bob, 3, 2); rect(o.accent, x+7, y-23-bob, 3, 2);
+      suaveRR(o.hair, x-10, y-37-bob, 3, 16, 1.5); suaveRR(o.hair, x+7, y-37-bob, 3, 16, 1.5);
+      suaveRR(o.accent, x-10.3, y-23-bob, 3.6, 2, 0.8); suaveRR(o.accent, x+6.7, y-23-bob, 3.6, 2, 0.8);
     } else if (cut < 0.67) {
-      circ(o.hair, x + 1, y-46-bob, 4); rect(o.accent, x-2, y-46-bob, 5, 2);
-      rect(o.hair, x-9, y-37-bob, 2, 8); rect(o.hair, x+7, y-37-bob, 2, 8);
+      circ(o.hair, x + 1, y-46-bob, 4); suaveRR(o.accent, x-2, y-46.4-bob, 5.4, 2, 1);
+      suaveRR(o.hair, x-9, y-37-bob, 2.4, 8, 1.2); suaveRR(o.hair, x+6.6, y-37-bob, 2.4, 8, 1.2);
     } else {
-      rect(o.hair, x-9, y-37-bob, 3, 20); rect(o.hair, x+6, y-37-bob, 3, 20);
-      rect(o.accent, x-6, y-41-bob, 12, 2);
+      suaveRR(o.hair, x-9.4, y-37-bob, 3, 20, 1.5); suaveRR(o.hair, x+6.4, y-37-bob, 3, 20, 1.5);
+      suaveRR(o.accent, x-6.6, y-41.4-bob, 13.2, 2, 1);
     }
   } else {
-    rect(o.hair, x-8, y-38-bob, 3, cut < 0.5 ? 7 : 11);
-    rect(o.hair, x+5, y-38-bob, 3, cut < 0.5 ? 7 : 11);
-    if (o.band) rect(o.band, x-8, y-41-bob, 16, 3);
+    suaveRR(o.hair, x-8.4, y-38.6-bob, 3, cut < 0.5 ? 7 : 11, 1.4);
+    suaveRR(o.hair, x+5.4, y-38.6-bob, 3, cut < 0.5 ? 7 : 11, 1.4);
+    if (o.band) { suaveRR(o.band, x-8.2, y-41.6-bob, 16.4, 3, 1.2); if (dir === 'up') { circ(o.band, x, y-40.1-bob, 1.6); suaveLinea(o.band, 1.3, x, y-39.8-bob, x-1.8, y-35.6-bob); suaveLinea(o.band, 1.3, x, y-39.8-bob, x+1.6, y-36.2-bob); } }
     if (cut >= 0.5) circ(o.hair, x + 3, y-46-bob, 3);
   }
   const mood = o === NPC_LOOK.player && (S.hp < 35 || S.energy < 20) ? 'tired' : 'calm';
   eyes(x, y-33-bob, dir, mood);
   if (o.style) drawAdornos(x, y, o, dir, bob); 
-  if (o.bundle) { rect('#8a5a30', x - 5, y - 30 - bob, 12, 9); rect('#c9a24e', x - 5, y - 32 - bob, 12, 3); }
+  if (o.bundle) { suaveRR('#8a5a30', x - 5, y - 30 - bob, 12, 9, 2); suaveRR('#c9a24e', x - 5, y - 32 - bob, 12, 3, 1.2); }
   if (o.pick) { ctx.strokeStyle = '#6b4423'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(x + 11, y - 6); ctx.lineTo(x + 16, y - 38 - bob); ctx.stroke(); rect('#2a2438', x + 12, y - 42 - bob, 8, 4); }
   if (o.basket) { ell('#c9a24e', x - 12, y - 8 - bob, 5, 4); rect('#6b4423', x - 16, y - 12 - bob, 8, 2); }
-  if (o.brush) { rect('#e6d2a8', x + 10, y - 24 - bob, 8, 10); rect('#3aa0c0', x + 11, y - 22 - bob, 6, 2); ctx.strokeStyle = '#5a3a1e'; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(x + 14, y - 14 - bob); ctx.lineTo(x + 18, y - 4); ctx.stroke(); }
+  if (o.brush) { suaveRR('#e6d2a8', x + 10, y - 24 - bob, 8, 10, 1.5); rect('#3aa0c0', x + 11, y - 22 - bob, 6, 2); ctx.strokeStyle = '#5a3a1e'; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(x + 14, y - 14 - bob); ctx.lineTo(x + 18, y - 4); ctx.stroke(); }
   if (name) { ctx.globalAlpha = 0.95; text(name, x, y - 56, 9, '#fff', 'center'); ctx.globalAlpha = 1; }
 }
 
@@ -9365,29 +9393,25 @@ function drawWarrior(w) {
 
 function drawApache(x, y, o, dir, step, name, bob) {
   const fringe = '#a8805a';
-  rect('#b08a60', x-6, y-6 + (step > 0 ? -2 : 0), 5, 7); rect('#b08a60', x+1, y-6 + (step < 0 ? -2 : 0), 5, 7); 
+  suaveRR('#b08a60', x-6, y-6 + (step > 0 ? -2 : 0), 5, 7, 2); suaveRR('#b08a60', x+1, y-6 + (step < 0 ? -2 : 0), 5, 7, 2); 
   if (o.female && o.bikini) dosPiezasApache(x, y, o, dir, step, bob, fringe); 
   else if (o.female) {
     rect(o.skin, x-6, y-10, 12, 4);
-    rect(o.cloth, x-9, y-27-bob, 18, 18);                                   
+    suaveRR(o.cloth, x-9, y-27.4-bob, 18, 18.4, [4, 4, 1, 1]);                
     if (o.pregnant) ell(o.cloth, x + (dir === 'left' ? -5 : dir === 'right' ? 5 : 0), y-17-bob, 9, 6);
     for (let i = 0; i < 9; i++) rect(fringe, x-9 + i*2, y-10-bob, 1, 3 + (i % 2)); 
     rect(fringe, x-11, y-25-bob, 2, 8); rect(fringe, x+9, y-25-bob, 2, 8);      
     for (let i = 0; i < 5; i++) circ(o.accent, x-4 + i*2, y-24-bob + (i === 2 ? 2 : i % 2), 1.2); 
     for (let i = 0; i < 4; i++) rect(i % 2 ? o.accent : '#b5462f', x-7 + i*4, y-15-bob, 3, 2);        
   } else {
-    rect(o.cloth, x-8, y-25-bob, 16, 12);                                   
+    suaveRR(o.cloth, x-8, y-25.4-bob, 16, 12.4, [3.6, 3.6, 1, 1]);            
     rect(o.accent, x-8, y-21-bob, 16, 2); circ('#f0b020', x, y-18-bob, 2);    
     for (let i = 0; i < 8; i++) rect(fringe, x-8 + i*2, y-13-bob, 1, 2);
     rect(o.skin, x-6, y-12, 12, 4); rect(o.accent, x-3, y-14-bob, 6, 8);      
   }
-  rect(o.skin, x-2, y-29-bob, 5, 4);
-  rect(o.skin, x-6, y-41-bob, 12, 13);
-  rect(o.skin, x-7, y-39-bob, 14, 8);
-  rect('rgba(40,18,8,.2)', x+4, y-39-bob, 3, 10);
-  rect(o.hair, x-8, y-44-bob, 16, dir === 'up' ? 16 : 7);
-  rect(o.hair, x-10, y-38-bob, 3, o.female ? 18 : 14); rect(o.hair, x+7, y-38-bob, 3, o.female ? 18 : 14);
-  rect(o.accent, x-8, y-41-bob, 16, 2);
+  suaveCabeza(x, y - bob, o, dir, 0.4);
+  suaveRR(o.hair, x-10.2, y-38-bob, 3.2, o.female ? 18 : 14, 1.6); suaveRR(o.hair, x+7, y-38-bob, 3.2, o.female ? 18 : 14, 1.6);
+  suaveRR(o.accent, x-8.4, y-41.4-bob, 16.8, 2.2, 1);
   drawPenacho(x, y - 42 - bob, o, dir);
   eyes(x, y-33-bob, dir);
   if (name) { ctx.globalAlpha = 0.95; text(name, x, y - (o.female ? 54 : 58), 9, '#fff', 'center'); ctx.globalAlpha = 1; } 
