@@ -5663,7 +5663,7 @@ function sleep(passedOut, killed) {
   if (bfast && !passedOut) honorNotes.unshift(`🍳 Amaneciste abrazado de ${bfast} y desayunaron tamales con atole. +30 energía`);
   scheduleQuake();
   const help = childHelps(); if (help) honorNotes.push(help);
-  if (festivalToday()) { noteYear('festivals'); honorNotes.push(`🎉 ¡Hoy es la ${FESTIVALS[festSeason()].name}! La plaza está vestida de fiesta`); }
+  if (festivalToday()) { noteYear('festivals'); honorNotes.push(`🎉 ¡Hoy es la ${window.CdmFiestas?.nombre() || FESTIVALS[festSeason()].name}! La plaza está vestida de fiesta`); }
   else if (daysToFestival() <= 2) honorNotes.push(`🎉 En ${daysToFestival()} día(s): ${FESTIVALS[festSeason(daysToFestival())].name}`);
   if (S.houseDmg) honorNotes.push('🧱 Tu casa tiene grietas: duermes mal (80% de energía). Repárala en el menú de la casa');
   if (mourning()) honorNotes.push(`🕯️ La casa está en silencio. El petate de ${S.mourning.name} sigue vacío.${S.baby ? ` Una vecina cuida a ${S.baby.name}.` : ''}`);
@@ -13732,7 +13732,13 @@ updateAudio = function (dt) {
 
 function drawPeinado(x, y, o, dir, bob) {
   const s = o.style, hr = o.hair, y0 = y - bob, back = dir === 'up', dark = anMix(hr, -0.25), hi = anMix(hr, 0.25);
-  const strand = (sx, top, bottom, wave) => { for (let yy = top; yy < bottom; yy += 2) rect(hr, sx + (wave ? Math.round(Math.sin(yy * 0.6 + sx) * 1) : 0), y0 + yy, 3, 2); };
+  
+  const mechon = (sx, top, bottom, wave, lw = 3.4) => {
+    ctx.strokeStyle = hr; ctx.lineWidth = lw; ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.beginPath(); ctx.moveTo(sx, y0 + top);
+    if (wave) { const n = Math.max(2, Math.round((bottom - top) / 5)); for (let i = 0; i < n; i++) { const a = top + (bottom - top) * i / n, b = top + (bottom - top) * (i + 1) / n; ctx.quadraticCurveTo(sx + (i % 2 ? -1.6 : 1.6), y0 + (a + b) / 2, sx, y0 + b); } }
+    else ctx.quadraticCurveTo(sx + (sx < x ? -0.9 : 0.9), y0 + (top + bottom) / 2, sx + (sx < x ? 0.5 : -0.5), y0 + bottom);
+    ctx.stroke(); ctx.lineCap = 'butt'; ctx.lineJoin = 'miter';
+  };
   if (s.hair === 'afro') { 
     for (let i = 0; i < 16; i++) { const a = Math.PI * (0.95 + i * 0.075), r = 11 + (i % 2); circ(i % 3 ? hr : hi, x + Math.cos(a) * r, y0 - 37 + Math.sin(a) * r * 0.9, 3.4); }
     for (const sx of [-1, 1]) for (let i = 0; i < 4; i++) circ(i % 2 ? hr : dark, x + sx * (10 + (i % 2)), y0 - 34 + i * 4, 3);
@@ -13745,42 +13751,64 @@ function drawPeinado(x, y, o, dir, bob) {
     return;
   }
   const len = { long:-14, wavy:-16, bangs:-14 }[s.hair];
-  if (back) { rect(hr, x - 7, y0 - 44, 14, (len ? 44 + len : 22)); rect(dark, x - 1, y0 - 40, 1, 16); }
+  if (back) { 
+    const h = (len ? 44 + len : 22);
+    suaveRR(hr, x - 8, y0 - 44, 16, h, [6, 6, 5, 5]);
+    suaveCurva(dark, 0.7, x - 3, y0 - 39, x - 3.6, y0 - 44 + h * 0.6, x - 2.6, y0 - 46 + h);
+    suaveCurva(dark, 0.7, x + 3, y0 - 39, x + 3.6, y0 - 44 + h * 0.6, x + 2.6, y0 - 46 + h);
+    suaveCurva(hi, 0.7, x - 0.2, y0 - 41, x + 0.3, y0 - 44 + h * 0.5, x, y0 - 47 + h);
+  }
   if (s.hair === 'braid') { 
-    rect(hr, x - 9, y0 - 37, 2, 6);
+    suaveRR(hr, x - 9.2, y0 - 37.4, 2.6, 7, 1.3);
     for (let i = 0; i < 9; i++) { ell(i % 2 ? hr : dark, x + 7 + (i > 4 ? -1 : 0), y0 - 35 + i * 2.6, 2.2, 1.6); }
-    rect(s.tie || '#c0302a', x + 5, y0 - 12, 3, 1.5); return;
+    suaveRR(s.tie || '#c0302a', x + 4.6, y0 - 12.4, 3.6, 1.9, 0.9); circ(hr, x + 6.4, y0 - 9.6, 1.5); return;
   }
   if (s.hair === 'twoBraids') { 
-    for (const sx of [-1, 1]) { for (let i = 0; i < 9; i++) ell(i % 2 ? hr : dark, x + sx * 8, y0 - 35 + i * 2.6, 2.2, 1.6); rect(s.tie || '#4f9a3a', x + sx * 8 - 1.5, y0 - 12, 3, 1.5); }
+    for (const sx of [-1, 1]) { for (let i = 0; i < 9; i++) ell(i % 2 ? hr : dark, x + sx * 8, y0 - 35 + i * 2.6, 2.2, 1.6); suaveRR(s.tie || '#4f9a3a', x + sx * 8 - 1.8, y0 - 12.4, 3.6, 1.9, 0.9); circ(hr, x + sx * 8, y0 - 9.6, 1.5); }
     return;
   }
-  strand(x - 10, -37, len || -20, s.hair === 'wavy'); strand(x + 7, -37, len || -20, s.hair === 'wavy'); 
-  rect(hi, x - 9, y0 - 35, 1, 8);
-  if (s.hair === 'bangs') { rect(hr, x - 7, y0 - 42, 14, 4); for (let i = 0; i < 6; i++) rect(dark, x - 6 + i * 2.4, y0 - 39, 1, 1.5); } 
+  const chino = s.hair === 'wavy';
+  mechon(x - 8.6, -37, len || -20, chino); mechon(x + 8.6, -37, len || -20, chino); 
+  suaveCurva(hi, 0.7, x - 8.8, y0 - 35, x - 9.4, y0 - 31, x - 8.8, y0 - 27);
+  if (s.hair === 'bangs' && !back) { 
+    ctx.fillStyle = hr; ctx.beginPath(); ctx.moveTo(x - 7.4, y0 - 42.5); ctx.lineTo(x + 7.4, y0 - 42.5); ctx.quadraticCurveTo(x + 7.8, y0 - 38.6, x + 6.4, y0 - 37.6);
+    ctx.quadraticCurveTo(x, y0 - 36.6, x - 6.4, y0 - 37.6); ctx.quadraticCurveTo(x - 7.8, y0 - 38.6, x - 7.4, y0 - 42.5); ctx.fill();
+    for (let i = 0; i < 5; i++) suaveLinea(dark, 0.6, x - 4.8 + i * 2.4, y0 - 40.4, x - 4.8 + i * 2.4, y0 - 38.2);
+  }
 }
 function drawAdornos(x, y, o, dir, bob) {
   const s = o.style, y0 = y - bob, front = dir !== 'up', side = dir === 'left' ? -1 : dir === 'right' ? 1 : 0;
-  if (s.wrap) { ell(s.wrap, x, y0 - 43, 9, 4.5); for (let i = 0; i < 4; i++) rect(i % 2 ? '#e8b048' : '#5a1a1a', x - 7 + i * 4, y0 - 44, 2, 1.5); ell(anMix(s.wrap, 0.15), x - 3, y0 - 45, 4, 1.5); }
-  if (s.band) { rect(s.band.col, x - 7, y0 - 42, 14, 2); rect(anMix(s.band.col, -0.25), x - 7, y0 - 40.5, 14, 0.6); if (s.band.gem && front) { circ('#3a2414', x, y0 - 41, 1.9); circ(s.band.gem, x, y0 - 41, 1.4); } }
-  if (s.tiara) { ctx.strokeStyle = s.tiara; ctx.lineWidth = 1.6; ctx.beginPath(); ctx.arc(x, y0 - 45, 3, Math.PI * 0.15, Math.PI * 0.85, true); ctx.stroke(); rect(s.tiara, x - 7, y0 - 42, 14, 1); }
-  if (s.feathers) for (let i = 0; i < 3; i++) { ctx.strokeStyle = i === 1 ? anMix(s.feathers, 0.2) : s.feathers; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(x + 6, y0 - 41); ctx.quadraticCurveTo(x + 10 + i * 2, y0 - 46 - i, x + 9 + i * 3, y0 - 52 + i * 2); ctx.stroke(); }
-  if (s.ribbon) { rect(s.ribbon, x - 9, y0 - 41, 2, 10); rect(s.ribbon, x - 10, y0 - 31, 2, 4); }
+  
+  const cinta = (col, yy, lw) => { ctx.strokeStyle = col; ctx.lineWidth = lw; ctx.lineCap = 'butt'; ctx.beginPath(); ctx.moveTo(x - 7.6, y0 + yy + 0.9); ctx.quadraticCurveTo(x, y0 + yy - 0.9, x + 7.6, y0 + yy + 0.9); ctx.stroke(); };
+  if (s.wrap) { ell(s.wrap, x, y0 - 43, 9, 4.5); for (let i = 0; i < 4; i++) suaveRR(i % 2 ? '#e8b048' : '#5a1a1a', x - 7 + i * 4, y0 - 44.2, 2.2, 1.6, 0.7); ell(anMix(s.wrap, 0.15), x - 3, y0 - 45, 4, 1.5); }
+  if (s.band) { cinta(s.band.col, -41, 2.2); cinta(anMix(s.band.col, -0.25), -39.7, 0.6); if (s.band.gem && front) { circ('#3a2414', x, y0 - 41.6, 1.9); circ(s.band.gem, x, y0 - 41.6, 1.4); circ('rgba(255,255,255,.55)', x - 0.4, y0 - 42, 0.45); } }
+  if (s.tiara) { ctx.strokeStyle = s.tiara; ctx.lineWidth = 1.6; ctx.lineCap = 'round'; ctx.beginPath(); ctx.arc(x, y0 - 45, 3, Math.PI * 0.15, Math.PI * 0.85, true); ctx.stroke(); ctx.lineCap = 'butt'; cinta(s.tiara, -41.6, 1.1); }
+  if (s.feathers) for (let i = 0; i < 3; i++) { ctx.strokeStyle = i === 1 ? anMix(s.feathers, 0.2) : s.feathers; ctx.lineWidth = 2; ctx.lineCap = 'round'; ctx.beginPath(); ctx.moveTo(x + 6, y0 - 41); ctx.quadraticCurveTo(x + 10 + i * 2, y0 - 46 - i, x + 9 + i * 3, y0 - 52 + i * 2); ctx.stroke(); ctx.lineCap = 'butt'; }
+  if (s.ribbon) { suaveCurva(s.ribbon, 2, x - 8.2, y0 - 41, x - 9.4, y0 - 35, x - 8.6, y0 - 29); suaveLinea(s.ribbon, 1.6, x - 8.6, y0 - 29, x - 9.8, y0 - 26.4); }
   if (s.flower) { for (let i = 0; i < 5; i++) circ(s.flower, x + 7 + Math.cos(i * 1.26) * 2, y0 - 42 + Math.sin(i * 1.26) * 2, 1.5); circ('#f2c84a', x + 7, y0 - 42, 0.9); }
   if (s.ear && front) for (const sx of [-1, 1]) { if (side && sx !== side) continue; 
     const ex = x + sx * 8.6; if (s.ear.hoop) { ctx.strokeStyle = s.ear.col; ctx.lineWidth = 0.9; ctx.beginPath(); ctx.arc(ex, y0 - 31.5, 1.8, 0, Math.PI * 2); ctx.stroke(); }
-    else { rect(s.ear.col, ex - 0.6, y0 - 34, 1.2, 2); circ(s.ear.col, ex, y0 - 31, 1.3); } }
-  if (s.freckles && front && !side) for (const [a, b] of [[-4, -31], [-3, -30], [3, -31], [4, -30]]) rect('rgba(150,70,40,.55)', x + a, y0 + b, 0.8, 0.8);
+    else { suaveLinea(s.ear.col, 0.9, ex, y0 - 33.6, ex, y0 - 32); circ(s.ear.col, ex, y0 - 31, 1.3); circ('rgba(255,255,255,.5)', ex - 0.3, y0 - 31.4, 0.4); } }
+  if (s.freckles && front && !side) for (const [a, b] of [[-4, -31], [-3, -30], [3, -31], [4, -30]]) circ('rgba(150,70,40,.55)', x + a + 0.4, y0 + b + 0.4, 0.45);
   if (front) { 
-    if (s.trim) { rect(s.trim, x - 9, y0 - 27, 18, 1.5); for (let i = 0; i < 6; i++) rect('#f4ecd8', x - 8 + i * 3, y0 - 26.6, 1, 0.8); rect(s.trim, x - 10, y0 - 7, 20, 1.5); }
+    if (s.trim) {
+      suaveRR(s.trim, x - 8.6, y0 - 27.2, 17.2, 1.8, 0.9); for (let i = 0; i < 6; i++) circ('#f4ecd8', x - 7.2 + i * 2.9, y0 - 26.3, 0.5);
+      ctx.strokeStyle = s.trim; ctx.lineWidth = 1.6; ctx.lineCap = 'round'; ctx.beginPath(); ctx.moveTo(x - 9.2, y0 - 6.6); ctx.quadraticCurveTo(x, y0 - 5.2, x + 9.2, y0 - 6.6); ctx.stroke(); ctx.lineCap = 'butt';
+    }
     if (s.topFeathers) for (let i = 0; i < 6; i++) ell(s.topFeathers, x - 7.5 + i * 3, y0 - 27, 1.6, 1.1);
-    if (s.skirtFeathers) for (let i = 0; i < 5; i++) { ctx.fillStyle = i % 2 ? s.skirtFeathers : anMix(s.skirtFeathers, -0.2); ctx.beginPath(); ctx.moveTo(x - 9 + i * 4.5, y0 - 5); ctx.lineTo(x - 7 + i * 4.5, y0 - 1); ctx.lineTo(x - 5 + i * 4.5, y0 - 5); ctx.fill(); }
+    if (s.skirtFeathers) for (let i = 0; i < 5; i++) { 
+      const fx = x - 7 + i * 3.5; ctx.fillStyle = i % 2 ? s.skirtFeathers : anMix(s.skirtFeathers, -0.2);
+      ctx.beginPath(); ctx.moveTo(fx - 1.9, y0 - 5.4); ctx.quadraticCurveTo(fx - 1.7, y0 - 1.2, fx, y0 - 0.6); ctx.quadraticCurveTo(fx + 1.7, y0 - 1.2, fx + 1.9, y0 - 5.4); ctx.closePath(); ctx.fill();
+    }
     if (s.neck) { const layers = s.layers || 1; 
       for (let l = 0; l < layers; l++) for (let i = 0; i <= 6; i++) { const t = i / 6; circ(s.neck[(i + l) % s.neck.length], x - 5 + 10 * t, y0 - 24.6 + l * 1.6 + Math.sin(t * Math.PI) * (2.2 + l), 0.85); }
       if (s.pendant) { circ('#3a2414', x, y0 - 20.6 + (s.layers || 1) * 1.2, 1.7); circ(s.pendant, x, y0 - 20.6 + (s.layers || 1) * 1.2, 1.2); } }
   }
-  if (s.armband) { rect(s.armband, x - 12, y0 - 21, 3, 1.6); rect(s.armband, x + 9, y0 - 21, 3, 1.6); }
-  if (s.bracelets) { rect(s.bracelets, x - 12, y0 - 14, 3, 1.4); rect(s.bracelets, x + 9, y0 - 14, 3, 1.4); }
+  if (!side) { 
+    const aro = (col, yy) => { for (const sx of [-1, 1]) { ctx.strokeStyle = col; ctx.lineWidth = 1.5; ctx.lineCap = 'butt'; ctx.beginPath(); ctx.moveTo(x + sx * 9 - 1.9, y0 + yy); ctx.lineTo(x + sx * 9 + 1.9, y0 + yy); ctx.stroke(); } };
+    if (s.armband) aro(s.armband, -22.2);
+    if (s.bracelets) aro(s.bracelets, -17.8);
+  }
 }
 const _x3547f0 = {
   _x44ec20:      { hair:'#141010', cloth:'#c8a46a', skirt:'#b8945a', accent:'#c0306a', style:{ hair:'wavy', band:{ col:'#c8a060', gem:'#d8b048' }, ear:{ col:'#e0b048' }, neck:['#2fa89a', '#e0b048'], layers:2, topFeathers:'#c0306a', skirtFeathers:'#c0306a', bracelets:'#c8a060' } },
@@ -14253,7 +14281,7 @@ function recuerdoLine(name) {
 
 
 const YEAR_DAYS = 112;
-const cumpleDia = name => { const h = S.hijos?.find(k => k.name === name); return h ? (h.dia - 1) % YEAR_DAYS + 1 : 1 + Math.floor(strHash(name + 'cumple') * YEAR_DAYS); };
+const cumpleDia = name => { const h = S.hijos?.find(k => k.name === name); return h ? (h.dia - 1) % YEAR_DAYS + 1 : window.CdmCumple?.[name] || 1 + Math.floor(strHash(name + 'cumple') * YEAR_DAYS); };
 const isCumple = (name, day = S.day) => (day - 1) % YEAR_DAYS + 1 === cumpleDia(name);
 const CUMPLE_ESTACION = ['Primavera', 'Verano', 'Otoño', 'Invierno'];
 const cumpleTexto = name => { const d = cumpleDia(name) - 1; return `${CUMPLE_ESTACION[Math.floor(d / 28)]} ${d % 28 + 1}`; };
@@ -47551,6 +47579,530 @@ drawShop = function (...a) {
   }
   return r;
 };
+
+
+
+{
+  const MJ = { dir:'mejoras/' };
+  
+  
+  const MJ_SFX = { till:'till', water:'water', plant:'plant', harvest:'harvest', hit:'hit', hurt:'hurt', coin:'coin', click:'ui',
+    eat:'eat', sleep:'sleep', thunder:'thunder', chop:'talar', pick:'mine', splash:'pescar_lanzar', bite:'pescar_pica' };
+  
+  const MJ_GAN = { caracol:0.6, guajolote:0.6, gato:0.65, pato:0.65, caballo:0.7, hurt:0.8 };
+  const MJ_OGG = {};
+  function mjOgg(nombre) {
+    let a = MJ_OGG[nombre];
+    if (!a) {
+      a = MJ_OGG[nombre] = new Audio(MJ.dir + 'audio/sfx/' + nombre + '.ogg');
+      a.preload = 'auto';
+      a.addEventListener('error', () => { a._mal = true; });
+    }
+    return a;
+  }
+  function mjSuena(nombre, vol = 1) {
+    if (typeof SND === 'undefined' || !SND.on) return true;
+    const base = mjOgg(nombre);
+    if (base._mal || base.readyState < 3) return false; 
+    const a = base.cloneNode();
+    a.volume = Math.max(0, Math.min(1, 0.8 * PREFS.vol * PREFS.sfx * vol * (MJ_GAN[nombre] || 1)));
+    a.play().catch(() => {});
+    return true;
+  }
+  for (const [k, nombre] of Object.entries(MJ_SFX)) {
+    const viejo = SFX[k];
+    mjOgg(nombre);
+    SFX[k] = arg => { if (!mjSuena(nombre)) viejo?.(arg); };
+  }
+  {
+    const viejo = SFX.step;
+    for (const n of ['step_grass', 'step_stone', 'step_sand']) mjOgg(n);
+    SFX.step = g => {
+      const n = g === G.STONE ? 'step_stone' : (g === G.SAND || g === G.TRAIL) ? 'step_sand' : 'step_grass';
+      if (!mjSuena(n, 0.7)) viejo?.(g);
+    };
+  }
+  
+  for (const n of ['ui_abrir', 'ui_cerrar', 'ui_mover', 'amistad', 'nivel', 'burbuja', 'caracol', 'guajolote', 'pato', 'perro', 'gato', 'caballo', 'dialogo_letra'])
+    if (!SFX[n]) { mjOgg(n); SFX[n] = () => mjSuena(n); }
+
+  
+  
+  const MUS = { el:null, saliente:null, pista:'', activa:false };
+  const MJ_ESTACION = ['primavera', 'verano', 'otono', 'invierno'];
+  function mjPista(mode) {
+    try {
+      if (mode === 'mina') return 'mine';
+      if (mode === 'asalto') return 'asalto';
+      if (mode === 'noche') return 'night';
+      if (mode === 'milpa') return festivalToday() ? (window.CdmFiestas?.musica() || 'fiesta') : MJ_ESTACION[festSeason()] || 'day';
+    } catch (e) {}
+    return '';
+  }
+  function mjVolMusica() { return Math.max(0, Math.min(1, 0.55 * PREFS.vol * PREFS.music)); }
+  function mjCambiaPista(pista) {
+    if (pista === MUS.pista) return;
+    MUS.pista = pista;
+    if (MUS.saliente) { MUS.saliente.pause(); MUS.saliente = null; }
+    if (MUS.el) MUS.saliente = MUS.el;
+    MUS.el = null;
+    if (!pista) return;
+    const a = new Audio(MJ.dir + 'audio/musica/' + pista + '.ogg');
+    a.loop = true; a.volume = 0;
+    a.addEventListener('error', () => { if (MUS.el === a) { MUS.el = null; MUS.activa = false; applyVolumes(); } });
+    a.play().catch(() => {});
+    MUS.el = a;
+  }
+  const _updateAudioMj = updateAudio;
+  updateAudio = function (dt) {
+    _updateAudioMj.apply(this, arguments);
+    if (!SND.ctx || !S) return;
+    const pista = SND.musicOn && !document.hidden ? mjPista(SND.mode) : '';
+    mjCambiaPista(pista);
+    const antes = MUS.activa;
+    MUS.activa = !!(MUS.el && !MUS.el.error);
+    if (MUS.activa !== antes) applyVolumes(); 
+    
+    const paso = (dt || 0.016) / 0.75 * mjVolMusica();
+    if (MUS.saliente) {
+      MUS.saliente.volume = Math.max(0, MUS.saliente.volume - paso);
+      if (MUS.saliente.volume <= 0.001) { MUS.saliente.pause(); MUS.saliente = null; }
+    }
+    if (MUS.el && !MUS.saliente) MUS.el.volume = Math.min(mjVolMusica(), MUS.el.volume + paso);
+    
+    if (MJ.menu !== undefined && UI.menu !== MJ.menu && UI.menu !== 'title' && MJ.menu !== 'title') sfx(UI.menu ? 'ui_abrir' : 'ui_cerrar');
+    MJ.menu = UI.menu;
+    
+    if (MJ.dia !== undefined && S.day !== MJ.dia) try { if (festivalToday()) sfx('caracol'); } catch (e) {}
+    MJ.dia = S.day;
+  };
+  const _applyVolumesMj = applyVolumes;
+  applyVolumes = function () {
+    _applyVolumesMj.apply(this, arguments);
+    if (SND.ctx && MUS.activa) SND.music.gain.setTargetAtTime(0, SND.ctx.currentTime, 0.3);
+    if (MUS.el && !MUS.saliente) MUS.el.volume = Math.min(MUS.el.volume, mjVolMusica());
+  };
+  document.addEventListener('visibilitychange', () => {
+    if (!MUS.el) return;
+    if (document.hidden) MUS.el.pause(); else MUS.el.play().catch(() => {});
+  });
+
+  
+  const MJ_IMG = {};
+  function mjImg(ruta) {
+    let im = MJ_IMG[ruta];
+    if (!im) { im = MJ_IMG[ruta] = new Image(); im.src = MJ.dir + ruta; }
+    return im.complete && im.naturalWidth ? im : null;
+  }
+
+  
+  
+  const MJ_CAJAS = {frijol:[[24,219,80,32],[24,201,80,50],[16,129,96,122],[0,84,125,167],[0,77,128,174]], camote:[[24,219,80,32],[24,202,80,49],[13,188,91,63],[0,179,119,72],[0,176,128,75]], jitomate:[[24,219,80,32],[24,203,80,48],[24,160,80,91],[6,120,121,131],[0,114,128,137]], chile:[[24,219,80,32],[24,201,80,50],[24,149,83,102],[2,113,126,138],[0,107,128,144]], nopal:[[24,219,80,32],[24,166,80,85],[24,162,80,89],[24,127,80,124],[24,127,80,124]], amaranto:[[24,219,80,32],[24,197,80,54],[24,135,80,116],[24,35,80,216],[24,15,80,236]], capulin:[[24,219,80,32],[24,203,80,48],[23,145,82,106],[0,91,128,160],[0,81,128,170]], girasol:[[24,219,80,32],[24,197,80,54],[24,135,80,116],[24,37,80,214],[24,17,80,234]], maiz:[[24,219,80,32],[24,193,80,58],[24,133,81,118],[19,42,92,209],[14,22,102,229]], calabaza:[[24,219,80,32],[24,202,80,49],[13,188,91,63],[0,179,119,72],[0,176,128,75]], maguey:[[24,219,80,32],[24,222,80,29],[24,195,80,56],[11,178,106,73],[11,75,106,176]], huauzontle:[[24,219,80,32],[24,197,80,54],[24,135,80,116],[24,35,80,216],[24,15,80,236]], cacahuate:[[24,219,80,32],[24,201,80,50],[15,152,89,99],[0,121,128,130],[0,115,128,136]], tomate_verde:[[24,219,80,32],[24,201,80,50],[21,154,90,97],[0,115,128,136],[0,105,128,146]]};
+  const MJ_ALTO = [0.6, 1.0, 1.3, 1.5, 2.0];
+  const MJ_CULT = { maiz_azul:'maiz' };
+  const _drawCropMj = drawCrop;
+  drawCrop = function (px, py, o) {
+    const c = CROPS[o.c];
+    const carpeta = c && (MJ_CULT[c.id] || c.id), cajas = carpeta && MJ_CAJAS[carpeta];
+    if (!cajas || o.bug) return _drawCropMj(px, py, o);
+    const listo = o.g >= c.days, f = o.g / c.days;
+    const etapa = listo ? 4 : o.g <= 0 ? 0 : f < 0.4 ? 1 : f < 0.7 ? 2 : 3;
+    const e = Math.min(etapa, cajas.length - 1), im = mjImg(`cultivos/${carpeta}/etapa_${e}.png`);
+    if (!im) return _drawCropMj(px, py, o);
+    const [bx, by, bw, bh] = cajas[e];
+    const s = Math.min(MJ_ALTO[etapa] * TS / bh, 1.6 * TS / bw), dw = bw * s, dh = bh * s;
+    ctx.drawImage(im, bx, by, bw, bh, px + TS / 2 - dw / 2, py + TS - 2 - dh, dw, dh);
+    const tx = Math.floor(px / TS), ty = Math.floor(py / TS);
+    if (S.ground[ty]?.[tx] !== G.CHINAMPA && !S.wet[ty]?.[tx] && !listo) { 
+      const gy = py + 2 + Math.sin(T * 3 + px) * 1.5;
+      ctx.fillStyle = 'rgba(90,170,255,.85)'; ctx.beginPath(); ctx.moveTo(px + 26, gy - 4); ctx.quadraticCurveTo(px + 30, gy + 2, px + 26, gy + 3); ctx.quadraticCurveTo(px + 22, gy + 2, px + 26, gy - 4); ctx.fill();
+    }
+    if (listo && Math.sin(T * 3 + px) > 0.6) circ('rgba(255,255,180,.8)', px + 25, py + 4, 1.5);
+  };
+
+  
+  
+  const MJ_VECINOS = ['daniel', 'doni', 'guard', 'ocelotl', 'priest', 'tlatoani', 'yaotl'];
+  const MJ_FILA = { down:0, left:1, right:2, up:3 };
+  const MJ_DE = new Map();
+  for (const id of MJ_VECINOS) if (NPC_LOOK[id]) MJ_DE.set(NPC_LOOK[id], id);
+  
+  const MJ_PUEBLO = ['acatl', 'cozca', 'ichtaca', 'xochico', 'atl', 'chalchi', 'tezca', 'michin'];
+  for (const v of VILLAGERS) { const id = v.name.toLowerCase(); if (MJ_PUEBLO.includes(id) && v.look) MJ_DE.set(v.look, id); }
+  const _drawPersonMj = drawPerson;
+  drawPerson = function (x, y, o, dir = 'down', step = 0, name = '', bob = 0) {
+    const id = o && MJ_DE.get(o);
+    const enMundo = typeof R37 !== 'undefined' && R37.inWorld && !R37.rendering;
+    if (!id || !enMundo || (typeof inking !== 'undefined' && inking) || MJ_FILA[dir] === undefined) return _drawPersonMj.apply(this, arguments);
+    const hoja = mjImg(`personajes/${id}/hoja_caminar.png`);
+    if (!hoja) return _drawPersonMj.apply(this, arguments);
+    const cuadro = Math.abs(step) > 0.015 ? Math.floor(T * 8 + x * 0.05) % 4 : 0;
+    ctx.drawImage(hoja, cuadro * 128, MJ_FILA[dir] * 192, 128, 192, Math.round(x - 16), Math.round(y - 44), 32, 48);
+    if (name) { ctx.globalAlpha = 0.95; text(name, x, y - 52, 9, '#fff', 'center'); ctx.globalAlpha = 1; }
+  };
+  const _drawPortraitMj = drawPortrait;
+  drawPortrait = function (look, cx, cy, r) {
+    const id = look && MJ_DE.get(look);
+    const im = id && ((MJ.cara && mjImg(`personajes/${id}/retrato_${MJ.cara}.png`)) || mjImg(`personajes/${id}/retrato.png`));
+    if (!im) return _drawPortraitMj.apply(this, arguments);
+    circ('#7a4a3a', cx, cy, r + 4); circ('#e8a830', cx, cy, r + 2); circ('#fbf4e4', cx, cy, r);
+    ctx.save(); ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.clip();
+    ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
+    ctx.drawImage(im, cx - r * 1.15, cy - r * 1.0, r * 2.3, r * 2.3);
+    ctx.restore();
+  };
+  window.CdmMejoras = { MJ, MUS, sfx:mjSuena, cara:c => { MJ.cara = c; } };
+
+  
+  const _drawTitleMj = drawTitle;
+  drawTitle = function () {
+    _drawTitleMj.apply(this, arguments);
+    const logo = mjImg('ui/logo_titulo.png');
+    if (!logo) return;
+    const lw = Math.min(600, VW - 24), lh = Math.round(Math.min(110, Math.max(80, VH * 0.15)));
+    const lx = Math.round(VW / 2 - lw / 2), ly = Math.round(Math.max(10, VH * 0.03));
+    codexPanel(lx, ly, lw, lh);
+    const k = Math.min((lw - 24) / logo.naturalWidth, (lh - 16) / logo.naturalHeight), w = logo.naturalWidth * k, h = logo.naturalHeight * k;
+    ctx.drawImage(logo, VW / 2 - w / 2, ly + lh / 2 - h / 2, w, h);
+  };
+}
+
+
+
+
+{
+  
+  const AMISTAD = [
+    { min:0,   n:'Conocido' },
+    { min:25,  n:'Conocido de confianza', favor:'te saluda por tu nombre y te cuenta chismes del pueblo' },
+    { min:60,  n:'Amigo',   favor:'te tiene confianza' },
+    { min:120, n:'Amigo del alma', favor:'te defiende de los chismes' },
+  ];
+  const amistadLvl = name => { const p = rel(name).pts; let l = 0; AMISTAD.forEach((a, i) => { if (p >= a.min) l = i; }); return l; };
+  
+  
+  const MJ_FIESTAS = [
+    { id:'siembra', est:0, dia:14, nombre:'Fiesta de la siembra', desc:'Se bendicen las semillas: en el tianguis cuestan la mitad todo el día.' },
+    { id:'flores', est:0, dia:27, nombre:'Xochilhuitl, fiesta de las flores', desc:'Xochitl adorna la plaza. Regalar flores vale el doble.' },
+    { id:'lluvia', est:1, dia:10, nombre:'Rogativa a Tláloc', desc:'Ofrenda en el templo: mañana llueve seguro.' },
+    { id:'voladores', est:1, dia:22, nombre:'Los voladores', desc:'Los totonacas vuelan desde el palo y hay puestos de comida.' },
+    { id:'cosecha', est:2, dia:12, nombre:'Fiesta de la cosecha', desc:'Concurso de la mejor cosecha y se aprende a hacer pozole.' },
+    { id:'miccailhuitl', est:2, dia:27, nombre:'Miccailhuitl, fiesta de los muertos', desc:'Ofrendas con cempasúchil y copal. Dejar una ofrenda da honra.', musica:'night' },
+    { id:'camaxtli', est:3, dia:8, nombre:'Desfile de los guerreros de Camaxtli', desc:'Los guerreros desfilan y hay danza con tambores.' },
+    { id:'fuego_nuevo', est:3, dia:28, nombre:'Fuego nuevo', desc:'Se apagan los fogones y se enciende el fuego nuevo. Empieza otro año.', musica:'titulo' },
+  ];
+  const mjFiestaPaq = (ahead = 0) => {
+    try {
+      if (!S || !S.day) return null;
+      const d = S.day + ahead, est = Math.floor((d - 1) / 28) % 4, dia = (d - 1) % 28 + 1;
+      return MJ_FIESTAS.find(f => f.est === est && f.dia === dia) || null;
+    } catch (e) { return null; }
+  };
+  const _festivalTodayMj = festivalToday;
+  festivalToday = () => _festivalTodayMj() || !!mjFiestaPaq();
+  window.CdmFiestas = {
+    hoy:() => mjFiestaPaq(),
+    nombre:() => {
+      const p = mjFiestaPaq();
+      if (_festivalTodayMj()) return FESTIVALS[festSeason()].name + (p ? ` y la ${p.nombre}` : '');
+      return p ? p.nombre : '';
+    },
+    musica:() => { const p = mjFiestaPaq(); return (!_festivalTodayMj() && p?.musica) || 'fiesta'; },
+  };
+  const hecho = id => (S.mjFiesta?.dia === S.day && S.mjFiesta.hecho[id]);
+  const marca = id => { if (S.mjFiesta?.dia !== S.day) S.mjFiesta = { dia:S.day, hecho:{} }; S.mjFiesta.hecho[id] = true; };
+  const ACCIONES = {
+    siembra:() => [{ icon:emojiIcon('🌱'), name:'Semillas benditas', price:'-50%', desc:'hoy todas las semillas del tianguis de Xochitl cuestan la mitad', buy:() => toast('🌱 Ve al tianguis de Xochitl: hoy las semillas cuestan la mitad.', '#c8f7a0', 4) }],
+    flores:() => [{ icon:emojiIcon('💐'), name:'Día de regalar flores', price:'×2', desc:'un ramo de flores vale el doble de cariño y de amistad', buy:() => toast('💐 Hoy un ramo de flores vale el doble.', '#ffc0d0', 4) }],
+    lluvia:() => [{ icon:emojiIcon('🌧️'), name:'Dejar ofrenda a Tláloc', price:hecho('lluvia') ? '✔' : '1 maíz', desc:'Tláloc manda la lluvia mañana', buy:() => {
+      if (hecho('lluvia')) return toast('Ya dejaste tu ofrenda a Tláloc.');
+      if (!(S.inv.maiz > 0)) return toast('Necesitas 1 maíz para la ofrenda.', '#ffb3b3');
+      S.inv.maiz--; marca('lluvia'); S.rainTomorrow = true; addHonor(2, 'dejaste ofrenda a Tláloc');
+      toast('🌧️ Tláloc recibió tu ofrenda: mañana llueve.', '#9fd3ff', 5);
+    } }],
+    voladores:() => [{ icon:emojiIcon('🪶'), name:'Ver a los voladores', price:hecho('voladores') ? '✔' : '+30 ⚡', desc:'cuatro hombres bajan girando desde lo alto del palo', buy:() => {
+      if (hecho('voladores')) return toast('Ya viste a los voladores.');
+      marca('voladores'); S.energy = Math.min(S.maxE, S.energy + 30); addHonor(2, 'fuiste a ver a los voladores');
+      toast('🪶 Los voladores bajan girando con el sonido de la flauta y el tambor. (+30 energía)', '#ffd080', 5);
+    } }],
+    cosecha:() => [
+      { icon:emojiIcon('🍲'), name:'Aprender a hacer pozole', price:hecho('pozole') ? '✔' : '🎁', desc:'te regalan dos platos y la receta queda en tu cocina', buy:() => {
+        if (hecho('pozole')) return toast('Ya aprendiste a hacer pozole.');
+        marca('pozole'); addItem('pozole', 2); toast('🍲 Las cocineras te enseñan a hacer pozole y te regalan dos platos.', '#ffe0a0', 5);
+      } },
+      ...(SHOPS.feria ? [{ icon:emojiIcon('🏆'), name:'Concurso de la mejor cosecha', price:'', desc:'presenta tu mejor cosecha', buy:() => openMenu('feria') }] : []),
+    ],
+    miccailhuitl:() => [{ icon:emojiIcon('🕯️'), name:'Dejar ofrenda a los muertos', price:hecho('ofrenda') ? '✔' : '1 flores', desc:'cempasúchil y copal para los que se fueron · +5 honra', buy:() => {
+      if (hecho('ofrenda')) return toast('Ya dejaste tu ofrenda.');
+      if (!(S.inv.flores > 0)) return toast('Necesitas un ramo de flores para la ofrenda.', '#ffb3b3');
+      S.inv.flores--; marca('ofrenda'); addHonor(5, 'dejaste ofrenda en Miccailhuitl');
+      toast('🕯️ Pones las flores en la ofrenda. El copal huele a recuerdos.', '#ffd9a8', 5);
+    } }],
+    camaxtli:() => [{ icon:emojiIcon('🥁'), name:'Ver el desfile de los guerreros', price:hecho('desfile') ? '✔' : '+20 ⚡', desc:'guerreros águila y jaguar desfilan por la plaza', buy:() => {
+      if (hecho('desfile')) return toast('Ya viste el desfile.');
+      marca('desfile'); S.energy = Math.min(S.maxE, S.energy + 20); addHonor(2, 'acompañaste el desfile de Camaxtli');
+      toast('🥁 Los guerreros desfilan al ritmo del huéhuetl. (+20 energía)', '#ffd080', 5);
+    } }],
+    fuego_nuevo:() => [{ icon:emojiIcon('🔥'), name:'Encender el fuego nuevo', price:hecho('fuego') ? '✔' : 'energía llena', desc:'los fogones se vuelven a encender: empieza otro año', buy:() => {
+      if (hecho('fuego')) return toast('Ya encendiste el fuego nuevo.');
+      marca('fuego'); S.energy = S.maxE; addHonor(3, 'encendiste el fuego nuevo');
+      toast('🔥 Prendes tu fogón con el fuego nuevo. ¡Empieza otro año!', '#ffb060', 5);
+    } }],
+  };
+  const fs = SHOPS.fiesta, filasFiesta = fs.rows, tituloFiesta = fs.title, subFiesta = fs.sub;
+  fs.title = () => { const p = mjFiestaPaq(); return _festivalTodayMj() || !p ? (typeof tituloFiesta === 'function' ? tituloFiesta() : tituloFiesta) : p.nombre; };
+  fs.sub = () => { const p = mjFiestaPaq(), base = typeof subFiesta === 'function' ? subFiesta() : subFiesta || ''; return _festivalTodayMj() ? base + (p ? ` · ${p.nombre}` : '') : p ? p.desc : base; };
+  fs.rows = function () {
+    const p = mjFiestaPaq(), principal = _festivalTodayMj();
+    const rows = principal ? filasFiesta.apply(this, arguments)
+      : [{ icon:emojiIcon('🔊'), name:'Bailar en la plaza', price:S.festDance === S.day ? '✔' : '+40 ⚡', desc:'al ritmo del huéhuetl y el teponaztli', buy:festDance }];
+    if (p && ACCIONES[p.id]) rows.push(...ACCIONES[p.id]());
+    return rows;
+  };
+  
+  const _buyItemFi = buyItem;
+  buyItem = function (id, name, price) {
+    if (mjFiestaPaq()?.id === 'siembra' && BAG.some(b => b.id === id && b.crop !== undefined)) price = Math.ceil(price / 2);
+    return _buyItemFi.call(this, id, name, price);
+  };
+
+  
+  
+  const ID = { wood:'madera', stone:'piedra', tamale:'tortilla', tlaxcalli:'tort_maiz', mole:'mole_casa', caldo:'sopa_cal', elote:'queso', tlacoyo:'tlacoyos', cempasuchil:'flores', cacao:'chocolate' };
+  const EST = { primavera:0, verano:1, otono:2, invierno:3 };
+  const g = (nombre, tienda, encanta, gusta, odia, est, dia) => ({ nombre, tienda, encanta, gusta, odia, cumple:EST[est] * 28 + dia });
+  const GENTE = {
+    xochitl:  g('Xochitl', 'agro', ['flores', 'cempasuchil', 'chocolate'], ['miel', 'girasol', 'tamale'], ['carbon', 'stone'], 'primavera', 7),
+    citlalli: g('Citlalli', 'bar', ['chile', 'cacao', 'mole'], ['jitomate', 'huevo', 'maiz'], ['peyote', 'estiercol'], 'verano', 12),
+    doni:     g('Doni', 'otomi', ['ayate', 'fibra', 'tlacoyo'], ['maiz_azul', 'nopal', 'tuna'], ['oro', 'joya_oro'], 'otono', 5),
+    ocelotl:  g('Ocelotl', 'herreria', ['lingote_cobre', 'obsidiana', 'pulque'], ['carbon', 'pozole', 'wood'], ['flores', 'cempasuchil'], 'invierno', 9),
+    yaotl:    g('Yaotl', 'armeria', ['lingote_obsidiana', 'pozole'], ['carne_conejo', 'pulque'], ['flores', 'miel'], 'otono', 18),
+    tlatoani: g('Xicohténcatl', 'historia', ['joya_oro', 'collar_jade', 'chocolate'], ['mole', 'cacao'], ['estiercol', 'fibra'], 'otono', 25),
+    daniel:   g('Daniel', 'farmacia', ['hongos', 'miel', 'amaranto'], ['nopal', 'aguamiel', 'caldo'], ['pulque'], 'primavera', 15),
+    
+    yolotl:   g('Yolotl', null, ['flores', 'ayate', 'atole'], ['frijol', 'calabaza', 'cempasuchil'], ['carbon', 'pulque'], 'primavera', 12),
+    xiuhtzin: g('Xiuhtzin', null, ['chocolate', 'huevo_grande'], ['huevo', 'tamale'], ['bagre'], 'invierno', 18),
+    quetzalli:g('Quetzalli', null, ['flores', 'collar_jade'], ['girasol', 'capulin'], ['estiercol', 'stone'], 'verano', 16),
+    tonalli:  g('Tonalli', null, ['chocolate', 'girasol', 'elote'], ['maiz', 'miel', 'tlaxcalli'], ['carbon'], 'verano', 1),
+    
+    acatl:    g('Acatl', null, ['pozole', 'lingote_obsidiana'], ['maiz', 'tamale'], ['flores'], 'verano', 20),
+    cozca:    g('Cozca', null, ['mole', 'chile'], ['tamale', 'pulque'], ['bagre'], 'invierno', 4),
+    ichtaca:  g('Ichtaca', null, ['cacao', 'joya_oro'], ['hongos', 'wood'], ['estiercol'], 'otono', 11),
+    xochico:  g('Xochico', null, ['fibra', 'flores'], ['girasol', 'atole'], ['carbon'], 'primavera', 3),
+    atl:      g('Atl', null, ['pescado_blanco', 'trucha'], ['mojarra', 'pescado_asado', 'charal'], ['peyote'], 'verano', 8),
+    chalchi:  g('Chalchi', null, ['ajolote', 'jade'], ['acocil', 'tlacoyo', 'flores'], ['carbon'], 'invierno', 15),
+    tezca:    g('Tezca', null, ['cacao'], ['maiz', 'amaranto', 'aguamiel'], ['hongos'], 'otono', 2),
+    michin:   g('Michin', null, ['charal'], ['camote', 'tuna', 'miel'], ['peyote'], 'verano', 25),
+  };
+  const PUEBLO = ['acatl', 'cozca', 'ichtaca', 'xochico', 'atl', 'chalchi', 'tezca', 'michin'];
+  for (const id of PUEBLO) GENTE[id].vecino = true;
+  const existe = k => !!(ITEM_NAME[k] || GIFTS[k]);
+  const limpia = l => [...new Set(l.map(k => ID[k] || k))].filter(existe);
+  const POR_NOMBRE = {};
+  for (const [id, p] of Object.entries(GENTE)) { p.id = id; POR_NOMBRE[p.nombre] = p; }
+  
+  window.CdmCumple = {};
+  for (const p of Object.values(GENTE)) window.CdmCumple[p.nombre] = p.cumple;
+  const nomCosa = k => (GIFTS[k]?.name || invName(k)).toLowerCase();
+  const lista = l => l.length ? l.map(nomCosa).join(', ') : '—';
+  const cumpleHoy = p => (S.day - 1) % YEAR_DAYS + 1 === p.cumple;
+  const fechaCumple = p => `${CUMPLE_ESTACION[Math.floor((p.cumple - 1) / 28)]} ${(p.cumple - 1) % 28 + 1}`;
+
+  
+  const cara = c => { try { window.CdmMejoras?.cara(c); } catch (e) {} };
+  const caraBase = p => {
+    if (cumpleHoy(p)) return 'feliz';
+    if (honorRank().love === 0) return 'enojado';
+    if (honorRank().love < 1) return 'triste';
+    return amistadLvl(p.nombre) >= 2 || festivalToday() ? 'feliz' : '';
+  };
+  const _openMenuCa = openMenu;
+  openMenu = function (id) {
+    const p = Object.values(GENTE).find(q => q.tienda === id);
+    cara(p ? caraBase(p) : '');
+    return _openMenuCa.apply(this, arguments);
+  };
+
+  function regalar(p, k) {
+    const r = rel(p.nombre);
+    if (r.mjRegalo === S.day) { cara('apenado'); return toast(`${p.nombre}: "¡Ya me diste algo hoy! Mañana, ¿sí?"`, '#ffd9a8', 4); }
+    if (!(S.inv[k] > 0)) return toast(`No tienes ${nomCosa(k)}.`, '#ffb3b3');
+    S.inv[k]--; r.mjRegalo = S.day;
+    const enc = p.encanta.includes(k), gus = p.gusta.includes(k), odi = p.odia.includes(k), cumple = cumpleHoy(p);
+    let pts = enc ? 45 : gus ? 20 : odi ? -25 : 8;
+    if (k === 'flores' && mjFiestaPaq()?.id === 'flores' && pts > 0) pts *= 2;
+    if (cumple && pts > 0) pts *= 3;
+    const antes = amistadLvl(p.nombre);
+    r.pts = Math.max(0, Math.min(MAX_PTS, r.pts + pts));
+    if (odi) { cara('enojado'); sfx('hurt'); toast(`${p.nombre}: "¿${nomCosa(k)}? No me gusta nada..." 😠`, '#ffb3b3', 5); }
+    else {
+      cara(cumple ? 'sorprendido' : enc ? 'feliz' : gus ? 'feliz' : 'apenado');
+      sfx('amistad');
+      toast(cumple ? `🎂 ${p.nombre}: "¡Te acordaste de mi cumpleaños!" ${enc ? '❤❤❤' : '❤❤'}`
+        : enc ? `${p.nombre}: "¡${nomCosa(k)}! ¡Me encanta!" ❤❤` : gus ? `${p.nombre}: "Gracias, me gusta mucho." ❤` : `${p.nombre}: "Gracias."`, '#ffd9a8', 5);
+    }
+    const ahora = amistadLvl(p.nombre);
+    if (ahora > antes) { sfx('nivel'); toast(`🤝 ${p.nombre} ahora te considera: ${AMISTAD[ahora].n}.${AMISTAD[ahora].favor ? ` ${AMISTAD[ahora].favor}.` : ''}`, '#ffd24a', 6); }
+  }
+  function filasRegalo(p) {
+    const r = rel(p.nombre), lvl = amistadLvl(p.nombre), hoy = cumpleHoy(p);
+    const rows = [{ cat:'Regalar', icon:emojiIcon(hoy ? '🎂' : '🤝'), name:`${p.nombre}: ${AMISTAD[lvl].n}`, price:`${r.pts} pts`,
+      desc:`${hoy ? '¡hoy es su cumpleaños! · ' : `cumple: ${fechaCumple(p)} · `}le encanta: ${lista(p.encanta)} · le gusta: ${lista(p.gusta)}`, buy:() => {} }];
+    for (const k of [...new Set([...p.encanta, ...p.gusta, ...p.odia])]) {
+      if (!(S.inv[k] > 0)) continue;
+      const enc = p.encanta.includes(k), gus = p.gusta.includes(k);
+      rows.push({ cat:'Regalar', icon:(x, y) => itemIcon(k, x, y), name:`Regalar ${nomCosa(k)} ×${S.inv[k]}`, price:enc ? '❤❤' : gus ? '❤' : '✖',
+        desc:r.mjRegalo === S.day ? 'ya le diste un regalo hoy' : enc ? 'le encanta' : gus ? 'le gusta' : 'no le gusta nada', buy:() => regalar(p, k) });
+    }
+    if (rows.length === 1) rows.push({ cat:'Regalar', icon:emojiIcon('🎁'), name:'No traes nada de lo que le gusta', price:'', desc:`búscale: ${lista(p.encanta)}`, buy:() => {} });
+    return rows;
+  }
+  for (const p of Object.values(GENTE)) {
+    const sh = p.tienda && SHOPS[p.tienda];
+    if (!sh) continue;
+    const base = sh.rows;
+    sh.rows = function () { return [...base.apply(this, arguments), ...filasRegalo(p)]; };
+    if (sh.tabs && !sh.tabs.includes('Regalar')) sh.tabs.push('Regalar');
+  }
+  
+  const _giveGiftGu = giveGift;
+  giveGift = function (v, id) {
+    const antes = S.inv[id] || 0, res = _giveGiftGu.apply(this, arguments);
+    try {
+      const p = POR_NOMBRE[v.name];
+      if ((S.inv[id] || 0) < antes) {
+        const r = rel(v.name); let extra = 0;
+        if (p?.encanta.includes(id) && v.fav !== id) { extra += 15; toast(`${v.name}: "¡Me encanta ${nomCosa(id)}!" ❤`, '#ffc0d0', 4); }
+        else if (p?.odia.includes(id)) { extra -= 20; toast(`${v.name}: "Eso no me gusta mucho..." 😕`, '#ffb3b3', 4); }
+        if (id === 'flores' && mjFiestaPaq()?.id === 'flores') { extra += GIFTS.flores.pts; toast('💐 Xochilhuitl: hoy las flores valen el doble.', '#ffc0d0', 4); }
+        if (extra) r.pts = Math.max(0, Math.min(MAX_PTS, r.pts + extra));
+      }
+    } catch (e) {}
+    return res;
+  };
+
+  
+  const _farmMorningPq = farmMorning;
+  farmMorning = function () {
+    const notes = _farmMorningPq.apply(this, arguments) || [];
+    try {
+      const p = mjFiestaPaq();
+      if (p?.id === 'lluvia') S.rainTomorrow = true;
+      if (p && !_festivalTodayMj()) notes.push(`🎉 ${p.desc}`);
+      const m = mjFiestaPaq(1);
+      if (m) notes.push(`📅 Mañana: ${m.nombre}.`);
+      for (const q of Object.values(GENTE)) if ((q.tienda || q.vecino) && cumpleHoy(q)) notes.push(`🎂 Hoy es el cumpleaños de ${q.nombre}: le encanta ${lista(q.encanta)}.`);
+    } catch (e) {}
+    return notes;
+  };
+
+  
+  
+  
+  const NUEVAS = [
+    { id:'atole', name:'Atole de maíz con miel', icon:'🍵', energy:130, hp:20, sell:220, need:{ maiz:1, miel:1 }, ensena:'Citlalli' },
+    { id:'salsa', name:'Salsa de molcajete', icon:'🌶️', energy:70, sell:300, need:{ jitomate:1, chile:1 }, ensena:'Xochitl' },
+  ];
+  for (const r of NUEVAS) if (!RECIPES.some(x => x.id === r.id)) {
+    RECIPES.push(r); ITEM_NAME[r.id] = r.name; ITEM_PRICE[r.id] = r.sell; FOOD_ICON[r.id] = r.icon;
+  }
+  const sabe = r => !r.ensena || amistadLvl(r.ensena) >= 1;
+  const _cookPq = cook;
+  cook = function (r) {
+    if (r && !sabe(r)) return toast(`Todavía no sabes hacer ${r.name.toLowerCase()}: ${r.ensena} te enseña cuando sean de confianza (regálale lo que le gusta).`, '#ffb3b3', 5);
+    return _cookPq.apply(this, arguments);
+  };
+  if (SHOPS.cocina) {
+    const baseCo = SHOPS.cocina.rows;
+    SHOPS.cocina.rows = function () {
+      return baseCo.apply(this, arguments).map(row => {
+        const r = NUEVAS.find(n => n.name === row.name);
+        return r && !sabe(r) ? { ...row, name:`🔒 ${row.name}`, desc:`te la enseña ${r.ensena} cuando sean de confianza` } : row;
+      });
+    };
+  }
+
+  
+  Object.assign(FISH, {
+    trucha:{ name:'Trucha', a:'una', sell:120, energy:45, window:0.6 },
+    bagre: { name:'Bagre', a:'un', sell:95, energy:40, window:0.7 },
+  });
+  for (const k of ['trucha', 'bagre']) { ITEM_NAME[k] = FISH[k].name; ITEM_PRICE[k] = FISH[k].sell; }
+  const _pickFishPq = pickFish;
+  pickFish = function (x, y) {
+    const k = _pickFishPq.apply(this, arguments);
+    try {
+      const area = inEllipse(x, y, LAKE) ? 'lago' : zone(x, y), est = festSeason(), h = Math.floor(S.time / 60) % 24;
+      if (['sierra', 'otomi', 'wild'].includes(area) && [2, 3, 0].includes(est) && h >= 5 && h < 11 && Math.random() < 0.18) return 'trucha';
+      if (['wild', 'farm', 'otomi'].includes(area) && [1, 2].includes(est) && h >= 17 && Math.random() < 0.2) return 'bagre';
+    } catch (e) {}
+    return k;
+  };
+
+  for (const p of Object.values(GENTE)) { p.encanta = limpia(p.encanta); p.gusta = limpia(p.gusta); p.odia = limpia(p.odia); }
+
+  
+  SHOPS.mjVecino = { title:() => UI.mjVecino?.nombre || 'Vecino', compact:true, verb:'elegir',
+    sub:() => 'Dale algo que le guste para hacerse amigos',
+    rows:() => UI.mjVecino ? filasRegalo(UI.mjVecino).map(r => ({ ...r, cat:undefined })) : [] };
+  const _shopLookPq = shopLook;
+  shopLook = function () {
+    if (UI.shopId === 'mjVecino') return VILLAGERS.find(v => v.name === UI.mjVecino?.nombre)?.look;
+    return _shopLookPq.apply(this, arguments);
+  };
+  const _interactPq = interact;
+  interact = function () {
+    let v = null, p = null;
+    try {
+      if (!UI.menu) { const [x, y] = target(); v = villagerAt(x, y) || (UI.keyAct && !buildingAt(x, y) && !S.obj[y]?.[x] ? villagerNear() : null); p = v && POR_NOMBRE[v.name]; }
+    } catch (e) {}
+    if (p?.vecino && S.request?.name !== v.name) {
+      const vistos = S.mjVisto ??= {};
+      if (vistos[v.name] === S.day) {
+        v.wait = 4; v.moving = false;
+        UI.mjVecino = p; openMenu('mjVecino'); cara(caraBase(p));
+        return;
+      }
+      vistos[v.name] = S.day;
+      const res = _interactPq.apply(this, arguments);
+      if (!UI.menu) toast(`🎁 Háblale otra vez a ${v.name} para darle un regalo.`, '#ffe0a0', 4);
+      return res;
+    }
+    return _interactPq.apply(this, arguments);
+  };
+
+  
+  const _dawnLinesPq = dawnLines;
+  dawnLines = function () {
+    const lines = _dawnLinesPq.apply(this, arguments) || [];
+    try {
+      if (!lines.length) return lines;
+      const avisos = [];
+      if (festivalToday()) {
+        const p = mjFiestaPaq();
+        avisos.push(`🎉 ¡Hoy es la ${window.CdmFiestas.nombre()}! Busca al juez de la fiesta en la plaza.`);
+        if (p) avisos.push(`🎉 ${p.desc}`);
+      } else {
+        const m = mjFiestaPaq(1), mananaEst = Math.floor(S.day / 28) % 4;
+        if (m) avisos.push(`📅 Mañana: ${m.nombre}.`);
+        else if (S.day % 28 + 1 === FEST_DAY) avisos.push(`📅 Mañana: ${FESTIVALS[mananaEst].name}.`);
+      }
+      for (const q of Object.values(GENTE)) if ((q.tienda || q.vecino) && cumpleHoy(q)) avisos.push(`🎂 Hoy es el cumpleaños de ${q.nombre}: le encanta ${lista(q.encanta)}.`);
+      if (!avisos.length) return lines;
+      const resto = lines.slice(1).filter(l => !/^🎉 ¡Hoy es la |^🎉 |^📅 Mañana: |^🎂 Hoy es el cumpleaños de /.test(l) || !avisos.some(a => a.slice(0, 14) === l.slice(0, 14)));
+      return [lines[0], ...avisos, ...resto].slice(0, 6);
+    } catch (e) { return lines; }
+  };
+
+  
+  const _updateAudioCa = updateAudio;
+  updateAudio = function () {
+    _updateAudioCa.apply(this, arguments);
+    try { if (!UI.menu && window.CdmMejoras?.MJ.cara) cara(''); } catch (e) {}
+  };
+}
+
+
 
 
 
