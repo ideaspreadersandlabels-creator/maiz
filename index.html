@@ -11248,7 +11248,7 @@ function drawShop() {
   const shop = SHOPS[UI.shopId], tabs = shop.tabs;
   if (UI.drawnShop !== UI.shopId) { UI.drawnShop = UI.shopId; UI.shopTab = 0; UI.shopScroll = 0; }
   UI.shopTab = Math.min(UI.shopTab || 0, (tabs?.length || 1) - 1);
-  const all = shop.rows(), tab = tabs?.[UI.shopTab];
+  const all = shop.rows().filter(Boolean).map(r => (r.name == null && r.nombre != null && (r.name = r.nombre), r)), tab = tabs?.[UI.shopTab]; 
   const rows = UI.curRows = !tabs || tab === 'Todo' ? all : all.filter(r => r.cat === tab);
   const wide = VW >= 740 && !shop.compact, listW = shop.compact ? Math.min(420, VW - 40) : wide ? 410 : Math.min(470, VW - 40), detW = wide ? 240 : 0;
   const w = listW + detW + (wide ? 56 : 40), rh = 44;
@@ -43826,7 +43826,8 @@ const _drawMapChicas = drawMap;
 drawMap = function () {
   _drawMapChicas();
   const G = mapGeom(), { w, h, x, y } = G;
-  const visto = v => { const tx = Math.floor(v.x / TS), ty = Math.floor((v.y - 4) / TS); return ty < WORLD_H && S.seen[Math.floor(ty / SEEN) * SEEN_W + Math.floor(tx / SEEN)]; };
+  if (!S.seen) markSeen();
+  const visto = v => { const tx = Math.floor(v.x / TS), ty = Math.floor((v.y - 4) / TS); return ty < WORLD_H && S.seen?.[Math.floor(ty / SEEN) * SEEN_W + Math.floor(tx / SEEN)]; };
   for (const v of VILLAGERS) {
     if (!v.look?.female || !(v.romance || v.amanteTribu) || !visto(v)) continue;
     const amante = !!AMANTE_DE[v.name], [px, py] = G.P(v.x / TS, (v.y - 4) / TS);
