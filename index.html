@@ -4286,10 +4286,10 @@ function drawDeer(d) {
   const x = Math.round(d.x), y = Math.round(d.y), f = d.face, step = d.moving ? Math.sin(T*(d.wait > 0.5 ? 18 : 10) + x) : 0;
   const body = d.hurt > 0 ? '#e8b090' : '#a07850', dark = '#7a5838';
   if (!inking) sunShadow(x, y, 13);
-  for (const [lx, s] of [[-8, step], [-4, -step], [5, step], [9, -step]]) rect(dark, x + lx*f - 1, y - 12 + s*2, 3, 12 - Math.abs(s)*2); 
+  for (const [lx, s] of [[-8, step], [-4, -step], [5, step], [9, -step]]) { suaveLinea(dark, 2.8, x + lx*f + 0.5, y - 11 + s*2, x + lx*f + 0.5 + s*0.8, y - 1.6); suaveRR('#2a1a10', x + lx*f - 1 + s*0.8, y - 2.2, 3, 2.2, 0.8); } 
   ell(body, x, y - 15, 13, 7); ell('#c8a07a', x, y - 12, 9, 3);       
   ell('#f4ecd8', x - f*12, y - 18, 3, 3);                              
-  rect(body, x + f*8 - 2, y - 27, 5, 12);                              
+  suaveLinea(body, 5.4, x + f*8, y - 17, x + f*10.5, y - 26.5);          
   ell(body, x + f*12, y - 28, 6, 4); circ('#2a1a10', x + f*17, y - 28, 1.5); circ('#1a1410', x + f*11, y - 30, 1.2); 
   ell(dark, x + f*7, y - 33, 2, 3.5);                                  
   if (d.buck) { ctx.strokeStyle = '#d8c8a0'; ctx.lineWidth = 1.5; ctx.beginPath(); 
@@ -8442,7 +8442,7 @@ function drawChicken(c) {
   const peck = !walking && Math.sin(T*3 + c.y) > 0.8 ? 3 : 0;
   const fan = !walking && Math.sin(T*0.7 + c.x) > 0.7; 
   if (!inking) sunShadow(x, y, 9);
-  rect('#c98a7a', x-3, y-4, 2, 5); rect('#c98a7a', x+1, y-4, 2, 5);
+  suaveLinea('#c98a7a', 1.7, x-2, y-4, x-2, y-0.4); suaveLinea('#c98a7a', 1.7, x+2, y-4, x+2, y-0.4); suaveLinea('#c98a7a', 1.3, x-2, y-0.3, x-2+f*2.2, y-0.3); suaveLinea('#c98a7a', 1.3, x+2, y-0.3, x+2+f*2.2, y-0.3);
   if (fan) {
     for (let i = -3; i <= 3; i++) {
       const a = -Math.PI/2 + i*0.32;
@@ -8452,12 +8452,12 @@ function drawChicken(c) {
     }
   } else ell('#3a2a20', x - f*8, y-11-bob, 5, 6);
   ell('#4a3628', x, y-9-bob, 10, 7);
-  for (let i = 0; i < 3; i++) rect('#6a5040', x-6 + i*4, y-12-bob, 2, 6); 
-  rect('#4a3628', x + f*5 - 2, y-19-bob+peck, 4, 9); 
+  for (let i = 0; i < 3; i++) suaveCurva('#6a5040', 1.7, x-5 + i*4, y-12.4-bob, x-4 + i*4, y-9.4-bob, x-5 + i*4, y-6.6-bob); 
+  suaveLinea('#4a3628', 4.2, x + f*5, y-11-bob, x + f*6, y-18.5-bob+peck); 
   circ('#b8c8e0', x + f*7, y-20-bob+peck, 4);         
   ell('#d9483b', x + f*9, y-15-bob+peck, 2, 3.5);      
-  rect('#e8b070', x + f*10, y-21-bob+peck, 3, 2);
-  rect('#222', x + f*8 - 1, y-21-bob+peck, 2, 2);
+  suaveForma('#e8b070', [x + f*10, y-21.4-bob+peck, x + f*14, y-19.8-bob+peck, x + f*10, y-18.8-bob+peck]);
+  circ('#222', x + f*8, y-20.4-bob+peck, 1.1); circ('#fff', x + f*8 - 0.3, y-20.8-bob+peck, 0.35);
   if (c.pet) { ctx.globalAlpha = 0.8; text('❤', x, y-30, 10, '#ff6b8a', 'center', false); ctx.globalAlpha = 1; }
 }
 
@@ -8481,7 +8481,7 @@ function drawDuck(a) {
   const kid = !isAdult('pato', a), k = kid ? 0.6 : 1, f = a.face, swim = S.ground[Math.floor((a.y - 2)/TS)]?.[Math.floor(a.x/TS)] === G.WATER;
   ctx.save(); ctx.translate(a.x, a.y); ctx.scale(k, k);
   if (swim) { const w = (T + a.x) % 1; ctx.strokeStyle = `rgba(255,255,255,${0.5*(1 - w)})`; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.ellipse(0, -2, 10 + w*6, 3 + w*2, 0, 0, Math.PI*2); ctx.stroke(); }
-  else { if (!inking) sunShadow(0, 1, 8); rect('#e8a040', -3, -4, 2, 4); rect('#e8a040', 2, -4, 2, 4); }
+  else { if (!inking) sunShadow(0, 1, 8); suaveLinea('#e8a040', 1.6, -2, -4, -2, -0.6); suaveLinea('#e8a040', 1.6, 3, -4, 3, -0.6); ell('#e8a040', -2 + f*1.2, -0.3, 2.2, 0.9); ell('#e8a040', 3 + f*1.2, -0.3, 2.2, 0.9); }
   const by = swim ? 2 : 0, bob = swim ? Math.sin(T*2 + a.x) : 0;
   ell(kid ? '#f0d860' : '#2a2a30', 0, -8 + by + bob, 10, 6); ell(kid ? '#f8e890' : '#f4ecd8', -f*3, -9 + by + bob, 5, 3); 
   circ(kid ? '#f0d860' : '#2a2a30', f*8, -15 + by + bob, 4.5);
@@ -10809,7 +10809,7 @@ function drawMenusInner() {
       text(PETS[type].name, bx + bw/2, by + 150, 13, '#7a5530', 'center', false);
       UI.petCards.push({ type, x:bx, y:by, w:bw, h:bh });
     });
-    text('Pulsa 1 o 2, o haz clic', cx, y+284, 13, '#d9483b', 'center');
+    text('Pulsa 1 o 2, o haz clic', cx, y+270, 13, '#d9483b', 'center');
   }
   if (m === 'templeAsk') {
     const [x, y] = dialog(520, 230), cx = x + 260;
@@ -11313,7 +11313,7 @@ function drawShop() {
     UI.shopRows.push({ i, x:lx, y:ry, w:listW, h:rh - 4 });
   }
   if (UI.shopScroll > 0) text('▲', lx + listW/2, ly - 3, 12, '#b5462f', 'center');
-  if (UI.shopScroll + vis < rows.length) text(`▼ ${rows.length - UI.shopScroll - vis} más`, lx + listW/2, ly + vis*rh + 9, 11, '#b5462f', 'center');
+  if (UI.shopScroll + vis < rows.length) text(`▼ ${rows.length - UI.shopScroll - vis} más`, lx + listW/2, ly + vis*rh + 4, 11, '#b5462f', 'center');
   
   const r = rows[UI.shopSel];
   if (r?.woman && x > 200) {
@@ -11340,7 +11340,7 @@ function drawShop() {
   const verb = shop.verb || { obras:'construir', comer:'comer', cocina:'cocinar', horno:'fundir', romance:'elegir', spouse:'elegir', equipo:'equipar o quitar' }[UI.shopId];
   const hint = w < 520 ? `Toca o Enter = ${verb || 'comprar'} · Esc = salir`
     : `${tabs ? '◀ ▶ categoría  ·  ' : ''}▲▼ + Enter o clic = ${verb || 'comprar (Shift = x10)'}  ·  Esc = salir`;
-  text(hint, x + w/2, y + h - 18, 12, '#7a5530', 'center');
+  text(hint, x + w/2, y + h - (shop.compact ? 27 : 24), 12, '#7a5530', 'center');
 }
 
 
@@ -13146,10 +13146,10 @@ function drawHorse(x, y, dir, moving, col = '#7a4a22', mane = '#2a1a10') {
   const f = dir === 'left' ? -1 : 1, ph = moving ? T * 14 : 0;
   ell('rgba(0,0,0,.22)', x, y + 1, 20, 5);
   ctx.save(); ctx.translate(x, y); ctx.scale(f, 1);
-  for (const [lx, o] of [[-11, 0], [-6, Math.PI], [8, Math.PI], [12, 0]]) { const a = Math.sin(ph + o) * 4; rect(col, lx + a * 0.3, -10, 3.5, 11); rect('#1a1410', lx + a * 0.3, -1, 3.5, 2); } 
+  for (const [lx, o] of [[-11, 0], [-6, Math.PI], [8, Math.PI], [12, 0]]) { const a = Math.sin(ph + o) * 4; suaveLinea(col, 3.5, lx + 1.75, -9, lx + 1.75 + a * 0.45, -1.6); suaveRR('#1a1410', lx + a * 0.45, -1.4, 3.6, 2.4, 0.9); } 
   ctx.fillStyle = col; ctx.beginPath(); ctx.ellipse(0, -14, 17, 8, 0, 0, Math.PI * 2); ctx.fill(); 
   ell('rgba(255,255,255,.12)', -2, -18, 10, 3);
-  ctx.beginPath(); ctx.moveTo(10, -18); ctx.lineTo(19, -32); ctx.lineTo(25, -30); ctx.lineTo(17, -13); ctx.fill(); 
+  ctx.fillStyle = col; ctx.beginPath(); ctx.moveTo(9, -19); ctx.quadraticCurveTo(15, -27, 19, -33); ctx.lineTo(25.5, -30); ctx.quadraticCurveTo(22, -20, 16, -11); ctx.closePath(); ctx.fill(); 
   ctx.save(); ctx.translate(24, -31); ctx.rotate(0.5); ell(col, 0, 0, 7, 4); ctx.restore(); circ('#1a1410', 25, -33, 1); 
   ctx.strokeStyle = mane; ctx.lineWidth = 3; ctx.lineCap = 'round';
   ctx.beginPath(); ctx.moveTo(11, -20); ctx.lineTo(19, -33); ctx.stroke(); 
@@ -13162,7 +13162,7 @@ drawPlayer = function () {
   if (!p.horse || p.boat) return _drawPlayerBase();
   drawHorse(Math.round(p.x), Math.round(p.y) + 2, p.dir === 'left' ? 'left' : p.dir === 'right' ? 'right' : (UI.horseFace || 'right'), UI.moving, S.caballo?.col);
   if (p.dir === 'left' || p.dir === 'right') UI.horseFace = p.dir;
-  rect('#8a2a20', Math.round(p.x) - 7, Math.round(p.y) - 20, 14, 5); 
+  suaveRR('#8a2a20', Math.round(p.x) - 7.5, Math.round(p.y) - 20.5, 15, 5.6, 2.4); 
   ctx.save(); ctx.translate(0, -16); _drawPlayerBase(); ctx.restore();
 };
 const _boardBoatBase = boardBoat;
@@ -44576,7 +44576,7 @@ const ORIGENES = {
   comerciante: { ico:'🎒', n:'Hijo de comerciante', d:'empiezas con 3,000 cacao más y un ramo de flores para regalar', fx:() => { S.money += 3000; addItem('flores', 3); } },
   sacerdote:   { ico:'⛩', n:'Hijo de sacerdote',  d:'los dioses te conocen: +1 de favor con todas las diosas y +5 de honra', fx:() => { const f = (S.favor ??= {}); for (const d of DIOSAS()) f[d.name] = Math.max(f[d.name] || 0, 1); addHonor(5, 'tu familia sirve a los dioses', true); } },
 };
-SHOPS.origen = { title:'¿De dónde vienes?', compact:true, sub:() => 'Escoge tu origen: cambia cómo empiezas', rows:() => Object.entries(ORIGENES).map(([k, o]) => ({ icon:emojiIcon(o.ico), name:o.n, price:'', desc:o.d,
+SHOPS.origen = { title:'¿De dónde vienes?', compact:true, verb:'elegir', sub:() => 'Escoge tu origen: cambia cómo empiezas', rows:() => Object.entries(ORIGENES).map(([k, o]) => ({ icon:emojiIcon(o.ico), name:o.n, price:'', desc:o.d,
   buy:() => { S.origen = k; o.fx(); UI.menu = 'intro'; toast(`${o.ico} Eres ${o.n.toLowerCase()}. Tu historia empieza.`, '#fff6a0', 5); } })) };
 const _newGameOrigen = newGame;
 newGame = function (...a) { const r = _newGameOrigen(...a); UI.pideOrigen = true; return r; };
@@ -48298,6 +48298,280 @@ drawShop = function (...a) {
     pluma(x + 5.4, yb - 49.6, 0.42);
   };
 }
+
+
+
+
+const OCHO_MEJORAS = true;
+(function ochoMejorasFamiliar() {
+  try {
+    const hs = s => strHash(String(s));
+    const DX2F = typeof DX2 !== 'undefined' ? DX2 : 0;
+    
+    
+    {
+      const _b = builds;
+      let previo = null;
+      const igual = (a, b) => a === b || (a && b && a.t === b.t && a.x === b.x && a.y === b.y && a.w === b.w && a.h === b.h);
+      builds = function () {
+        const r = _b.apply(this, arguments);
+        if (!OCHO_MEJORAS || !Array.isArray(r)) return r;
+        if (previo && previo.length === r.length) {
+          let ok = true;
+          for (let i = 0; i < r.length; i++) if (!igual(previo[i], r[i])) { ok = false; break; }
+          if (ok) return previo;
+        }
+        previo = r; return r;
+      };
+    }
+
+    
+    {
+      const pats = new WeakMap(), _g = greca;
+      greca = function (x, y, w, col, bg) {
+        if (!OCHO_MEJORAS || !ctx.createPattern) return _g.apply(this, arguments);
+        let m = pats.get(ctx); if (!m) { m = new Map(); pats.set(ctx, m); }
+        const k = col + '|' + bg; let p = m.get(k);
+        if (!p) {
+          const c = document.createElement('canvas'); c.width = 8; c.height = 8; const g = c.getContext('2d');
+          g.fillStyle = bg; g.fillRect(0, 0, 8, 8); g.fillStyle = col; g.fillRect(0, 4, 4, 4); g.fillRect(4, 0, 4, 4);
+          p = ctx.createPattern(c, 'repeat'); if (!p) return _g.apply(this, arguments); m.set(k, p);
+        }
+        const wp = Math.floor(w / 8) * 8;
+        if (wp < w) rect(bg, x + wp, y, w - wp, 8);
+        ctx.save(); ctx.translate(x, y); ctx.fillStyle = p; ctx.fillRect(0, 0, wp, 8); ctx.restore();
+      };
+    }
+
+    
+    const ROPA_TIPO = {
+      Yaretzi:{ tipo:'huipil', top:'#f4f0e6', bottom:'#f4f0e6' },
+      Coatzin:{ tipo:'selva', top:'#c8a476', bottom:'#c0996a', banda:false }, Amani:{ tipo:'selva', top:'#c4a070', bottom:'#b8925e' },
+      Atziri:{ tipo:'selva', top:'#cdae80', bottom:'#c4a274', diadema:'#e8d8b0', plumas:true }, Itzayana:{ tipo:'selva', top:'#d8c8a8', bottom:'#c8b088', diadema:'#c8a070' },
+      Quetzalli:{ tipo:'plumas', top:'#2f8a5a', bottom:'#4a4020' },
+      Citlalcue:{ tipo:'vestido', top:'#6a6a2a', cinto:'#7a4a22' }, Tlanextli:{ tipo:'vestido', top:'#8a4a28', cinto:'#5a2a14' }, Miahuatl:{ tipo:'vestido', top:'#1f5a6a', cinto:'#173f4a' },
+      Malinalli:{ penacho:true }, Nalin:{ escudo:true, lanza:true }, Doli:{ lanza:true }, Kaya:{ lanza:true }, Nizhoni:{ lanza:true },
+      Ameyal:{ diadema:'#c8a070' }, Ixchel:{ rayas:true },
+    };
+    const CORTO = new Set(['Yolotl', 'Xiuhtzin', 'Izel', 'Tonalli', 'Necahual', 'Citlalmina', 'Tlazohtzin', 'Xilonen', 'Nenetl', 'Ameyal', 'Xiadani']);
+    const tipoMuneca = new WeakMap();
+    const tipoDe = o => {
+      if (!o || !o.female) return null;
+      if (tipoMuneca.has(o)) return tipoMuneca.get(o);
+      let r = null;
+      try {
+        const lista = [...(typeof _x23a38c !== 'undefined' ? _x23a38c : []), ...(typeof TRANS_GIRLS !== 'undefined' ? TRANS_GIRLS : []), ...VILLAGERS];
+        if (typeof AMANTES_TRIBU !== 'undefined' && Array.isArray(AMANTES_TRIBU)) lista.push(...AMANTES_TRIBU);
+        try { if (typeof DIOSAS === 'function') lista.push(...DIOSAS()); } catch (e) {}
+        const c = lista.find(x => x && x.look === o);
+        if (c) { r = ROPA_TIPO[c.name] ? { ...ROPA_TIPO[c.name] } : null; if (!r && CORTO.has(c.name)) r = { tipo:'corto' }; if (r && !r.tipo && CORTO.has(c.name)) r.tipo = 'corto'; }
+      } catch (e) {}
+      tipoMuneca.set(o, r); return r;
+    };
+    globalThis.ROPA_MUNECA = tipoDe;
+    const _dp = drawPerson;
+    drawPerson = function (x, y, o, dir = 'down', step = 0, name = '', bob = 0) {
+      const r = _dp.apply(this, arguments);
+      if (!OCHO_MEJORAS || inking || !o || !o.female) return r;
+      const R = tipoDe(o); if (!R) return r;
+      try {
+        if (!step && !bob) bob = Math.sin(T * 2.2 + x * 0.13) * 0.8;
+        const [sx, sy] = globalThis.MUNECA_ESCALA ? MUNECA_ESCALA(o) : [1, 1];
+        ctx.save(); ctx.translate(x, y); ctx.scale(sx, sy); ctx.translate(-x, -y);
+        const b = bob, sk = o.skin;
+        if (R.tipo === 'corto' && !o.swimwear) { 
+          suaveRR(sk, x - 7, y - 20.4 - b, 14, 4.8, 1.8); suaveRR('rgba(40,18,8,.16)', x + 3.6, y - 20.4 - b, 3.4, 4.8, 1.6); circ('rgba(60,25,15,.5)', x, y - 18 - b, 0.6);
+        } else if (R.tipo === 'huipil') {
+          ctx.fillStyle = R.bottom; ctx.beginPath(); ctx.moveTo(x - 8, y - 16 - b); ctx.lineTo(x + 8, y - 16 - b); ctx.lineTo(x + 10, y - 2 - b); ctx.lineTo(x - 10, y - 2 - b); ctx.fill();
+          for (let i = 0; i < 7; i++) rect('#f4f0e6', x - 9 + i * 3, y - 2 - b, 1, 3);
+          suaveRR(R.top, x - 9, y - 27 - b, 18, 13, [4, 4, 1, 1]);
+          for (const [yy, cs] of [[-25, ['#e83a5a', '#2f8a5a', '#f0b020']], [-17, ['#2f6aa8', '#e83a5a', '#f0b020']], [-8, ['#e83a5a', '#2f8a5a', '#2f6aa8']]]) for (let i = 0; i < 6; i++) { ctx.fillStyle = cs[i % 3]; ctx.fillRect(x - 8 + i * 3, y + yy - b, 2, 2); }
+          rect(o.skin, x - 3, y - 27 - b, 6, 2);
+        } else if (R.tipo === 'vestido') {
+          ctx.fillStyle = R.top; ctx.beginPath(); ctx.moveTo(x - 9, y - 27 - b); ctx.lineTo(x + 9, y - 27 - b); ctx.lineTo(x + 10, y - 3 - b); ctx.lineTo(x - 10, y - 3 - b); ctx.fill();
+          rect('rgba(0,0,0,.12)', x + 5, y - 27 - b, 4, 24); rect(R.cinto || '#5a3a1a', x - 9, y - 17 - b, 18, 2);
+          rect(o.skin, x - 3, y - 27 - b, 6, 3); ctx.fillStyle = o.skin; ctx.beginPath(); ctx.moveTo(x - 3, y - 24 - b); ctx.lineTo(x + 3, y - 24 - b); ctx.lineTo(x, y - 20 - b); ctx.fill();
+        } else if (R.tipo === 'selva') {
+          rect(sk, x - 9, y - 27 - b, 18, 13); rect(sk, x - 8, y - 16 - b, 16, 3);
+          ctx.fillStyle = R.top; ctx.beginPath(); ctx.moveTo(x - 9, y - 26 - b); ctx.lineTo(x + 9, y - 26 - b); ctx.lineTo(x + 8, y - 20 - b); ctx.lineTo(x - 8, y - 20 - b); ctx.fill();
+          for (let i = 0; i < 6; i++) rect(R.top, x - 8 + i * 3, y - 20 - b, 1, 2);
+          ctx.fillStyle = R.bottom; ctx.beginPath(); ctx.moveTo(x - 8, y - 15 - b); ctx.lineTo(x + 8, y - 15 - b); ctx.lineTo(x + 9, y - 8 - b); ctx.lineTo(x - 9, y - 8 - b); ctx.fill();
+          for (let i = 0; i < 7; i++) rect(R.bottom, x - 9 + i * 3, y - 8 - b, 1, 3 + (i % 2));
+          rect('#5a3a1a', x - 8, y - 15 - b, 16, 1);
+          circ('#8a5a2a', x - 2, y - 24 - b, 0.6); circ('#c0392b', x + 2, y - 24 - b, 0.6);
+        } else if (R.tipo === 'plumas') {
+          rect(sk, x - 9, y - 27 - b, 18, 13);
+          for (let i = 0; i < 7; i++) { ctx.fillStyle = i % 2 ? '#2f8a5a' : '#3fb070'; ctx.beginPath(); ctx.moveTo(x - 9 + i * 3, y - 27 - b); ctx.lineTo(x - 7 + i * 3, y - 27 - b); ctx.lineTo(x - 8 + i * 3, y - 19 - b); ctx.fill(); }
+          rect('#c0392b', x - 9, y - 27 - b, 18, 1.5); rect(R.bottom, x - 8, y - 15 - b, 16, 2);
+        }
+        if (R.rayas && o.swimwear) for (let i = 0; i < 4; i++) rect(['#e83a5a', '#f0b020', '#2fb8a8', '#7a4ab0'][i], x - 8 + i * 4, y - 22 - b, 3, 1);
+        
+        const hy = y - 38 - b;
+        if (R.diadema) { suaveCurva(R.diadema, 2, x - 7.4, hy - 1.6, x, hy - 3.4, x + 7.4, hy - 1.6); if (R.plumas) for (let i = 0; i < 3; i++) { ctx.fillStyle = ['#2f6aa8', '#e8d8b0', '#c0392b'][i]; ctx.beginPath(); ctx.moveTo(x - 2 + i * 2, hy - 3); ctx.lineTo(x - 1 + i * 2, hy - 12); ctx.lineTo(x + i * 2, hy - 3); ctx.fill(); } }
+        if (R.penacho) for (let i = 0; i < 9; i++) { const a = -Math.PI * 0.85 + i * Math.PI * 0.7 / 8; ctx.fillStyle = ['#2f8a5a', '#c0392b', '#f0b020', '#2f6aa8'][i % 4]; ctx.beginPath(); ctx.moveTo(x + Math.cos(a) * 6, hy - 2 + Math.sin(a) * 4); ctx.lineTo(x + Math.cos(a) * 16, hy - 2 + Math.sin(a) * 14); ctx.lineTo(x + Math.cos(a + 0.12) * 6, hy - 2 + Math.sin(a + 0.12) * 4); ctx.fill(); }
+        if (R.lanza) { ctx.strokeStyle = '#6a4a2a'; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.moveTo(x + 11, y - 2 - b); ctx.lineTo(x + 11, y - 46 - b); ctx.stroke(); ctx.fillStyle = '#3a3a44'; ctx.beginPath(); ctx.moveTo(x + 9.5, y - 46 - b); ctx.lineTo(x + 12.5, y - 46 - b); ctx.lineTo(x + 11, y - 52 - b); ctx.fill(); }
+        if (R.escudo) { circ('#8a6a3a', x - 11, y - 20 - b, 5.5); circ('#c8a070', x - 11, y - 20 - b, 3.5); circ('#c0392b', x - 11, y - 20 - b, 1.2); }
+        ctx.restore();
+      } catch (e) { try { ctx.restore(); } catch (e2) {} }
+      return r;
+    };
+
+    
+    const FIESTA_EXTRA = [
+      { alias:'Tlacaxipehualiztli, la siembra', comida:['tamal_dulce', 'tamales de flor de calabaza'], adorno:'flores', noche:'flores', ico:'🌱' },
+      { alias:'Huey Tozoztli, el maíz tierno', comida:['tort_maiz', 'elotes asados y atole'], adorno:'mazorcas', noche:'fiesta', ico:'🌽' },
+      { alias:'Quecholli, la cacería', comida:['tort_maiz', 'tamales de venado y pulque'], adorno:'banderas', noche:'fiesta', ico:'🏹' },
+      { alias:'Panquetzaliztli, las banderas', comida:['tort_maiz', 'tamales y champurrado'], adorno:'banderas', noche:'fiesta', ico:'🏳' },
+      { alias:'Izcalli, el fuego nuevo', comida:['chocolate', 'chocolate caliente y amaranto'], adorno:'velas', noche:'fiesta', ico:'🔥' },
+      { alias:'Miccailhuitl, Día de Muertos', comida:['chocolate', 'pan de muerto y chocolate'], adorno:'cempasuchil', noche:'velas', ico:'💀' },
+      { alias:'Citlalin, la lluvia de estrellas', comida:['tamal_dulce', 'tamales dulces y atole'], adorno:'flores', noche:'flores', ico:'🌠' },
+      { alias:'Tonatiuh, la fiesta del sol', comida:['tort_maiz', 'elotes y agua de chía'], adorno:'mazorcas', noche:'fiesta', ico:'☀️' },
+    ];
+    const fx = (i = festSeason()) => FIESTA_EXTRA[i] || FIESTA_EXTRA[0];
+    globalThis.FIESTA_EXTRA = FIESTA_EXTRA;
+    for (let i = 0; i < FESTIVALS.length; i++) if (FESTIVALS[i] && !FESTIVALS[i].alias) FESTIVALS[i].alias = fx(i).alias;
+    if (SHOPS.fiesta) {
+      const t0 = SHOPS.fiesta.title, r0 = SHOPS.fiesta.rows;
+      SHOPS.fiesta.title = () => { const f = FESTIVALS[festSeason()] || FESTIVALS[0], x = fx(); return `${x.ico} ${f.name} · ${x.alias}`; };
+      SHOPS.fiesta.rows = function () {
+        const rows = r0.apply(this, arguments), x = fx();
+        rows.push({ icon:emojiIcon('🍲'), name:`Comer en la fiesta: ${x.comida[1]}`, price:S.festComida === S.day ? '✔' : '10 cacao', desc:'energía y algo para llevar', buy:() => {
+          if (S.festComida === S.day) return toast('Ya comiste en la fiesta. ¡Qué rico estaba! 😋');
+          if (S.money < 10) return toast('Te faltan granos de cacao.', '#ffb3b3');
+          S.money -= 10; S.festComida = S.day; S.energy = Math.min(S.maxE, S.energy + 30); try { addItem(x.comida[0], 1); } catch (e) {}
+          toast(`🍲 Comes ${x.comida[1]} en la plaza (+30 energía) y te llevas un poco.`, '#ffd080', 4);
+        } });
+        return rows;
+      };
+    }
+    const adornoFiesta = () => {
+      if (!festivalToday()) return;
+      const x = fx(), X0 = (55 + DX + DX2F) * TS, X1 = (69 + DX + DX2F) * TS, cx = (62 + DX + DX2F) * TS;
+      if (x.adorno === 'cempasuchil') {
+        for (let i = 0; i < 26; i++) circ(i % 2 ? '#f08a24' : '#ffb020', X0 + (i / 25) * (X1 - X0), 17 * TS + Math.sin(i) * 3, 3.5);
+        for (let i = 0; i < 8; i++) { const vx = X0 + 20 + i * ((X1 - X0 - 40) / 7), vy = 16 * TS + 6; rect('#f4ecd8', vx - 1.5, vy - 6, 3, 6); circ(`rgba(255,200,90,${0.6 + Math.sin(T * 9 + i) * 0.3})`, vx, vy - 8, 2.2); }
+        text('💀', cx - 40, 11 * TS, 14, '#fff', 'center'); text('💀', cx + 40, 11 * TS, 14, '#fff', 'center');
+      } else if (x.adorno === 'banderas') {
+        for (let i = 0; i < 10; i++) { const fx = X0 + i * ((X1 - X0) / 9), fy = 9 * TS + 2; rect('#6b4423', fx, fy - 18, 1.5, 18); ctx.fillStyle = i % 2 ? '#2f6aa8' : '#5aa0e0'; ctx.beginPath(); ctx.moveTo(fx + 1.5, fy - 18); ctx.lineTo(fx + 12 + Math.sin(T * 4 + i) * 2, fy - 14); ctx.lineTo(fx + 1.5, fy - 10); ctx.fill(); }
+      } else if (x.adorno === 'mazorcas') {
+        for (let i = 0; i < 12; i++) { const mx = X0 + 10 + i * ((X1 - X0 - 20) / 11), my = 17 * TS; ell('#f7c623', mx, my, 2.5, 6); ctx.fillStyle = '#7ab040'; ctx.beginPath(); ctx.moveTo(mx - 3, my + 4); ctx.lineTo(mx, my - 2); ctx.lineTo(mx + 3, my + 4); ctx.fill(); }
+      } else if (x.adorno === 'velas') {
+        for (let i = 0; i < 12; i++) { const vx = X0 + 10 + i * ((X1 - X0 - 20) / 11), vy = 17 * TS; rect('#f4ecd8', vx - 1.5, vy - 7, 3, 7); circ(`rgba(255,190,80,${0.6 + Math.sin(T * 8 + i) * 0.3})`, vx, vy - 9, 2.4); }
+      } else if (x.adorno === 'flores') {
+        for (let i = 0; i < 14; i++) { const sx = X0 + 8 + i * ((X1 - X0 - 16) / 13), sy = 17 * TS; rect('#4a8a3a', sx, sy - 6, 1, 6); circ(['#ff7aa8', '#ffd94a', '#ffffff'][i % 3], sx, sy - 7, 2.2); }
+      }
+    };
+
+    
+    const _sleep = sleep;
+    sleep = function (...a) {
+      const r = _sleep.apply(this, a);
+      try {
+        if (OCHO_MEJORAS && S) {
+          const si = typeof seasonIdx === 'function' ? seasonIdx() : 0;
+          S.nieblaHoy = !S.rainToday && Math.random() < [0.15, 0.08, 0.25, 0.3][si];
+          if (S.nieblaHoy) toast('🌫 Amaneció con neblina: no se ve muy lejos hasta el mediodía.', '#d8dce8', 5);
+        }
+      } catch (e) {}
+      return r;
+    };
+    
+    let NIEBLA = null;
+    const texturaNiebla = () => {
+      if (NIEBLA) return NIEBLA;
+      const c = document.createElement('canvas'); c.width = 512; c.height = 256;
+      const g = c.getContext('2d');
+      for (let i = 0; i < 26; i++) { const x = (i * 97) % 512, y = 40 + (i * 53) % 176, r = 60 + (i * 37) % 70; const gr = g.createRadialGradient(x, y, 0, x, y, r); gr.addColorStop(0, 'rgba(232,236,242,.55)'); gr.addColorStop(1, 'rgba(232,236,242,0)'); g.fillStyle = gr; g.fillRect(x - r, y - r, r * 2, r * 2); for (const dx of [-512, 512]) { g.save(); g.translate(dx, 0); g.fillRect(x - r, y - r, r * 2, r * 2); g.restore(); } }
+      NIEBLA = c; return c;
+    };
+    const nieblaFuerza = () => {
+      if (!S?.nieblaHoy) return 0;
+      const m = S.time; if (m >= 13 * 60 && m < 18 * 60) return 0;
+      if (m < 5 * 60 || m >= 18 * 60) return 0.45;
+      if (m < 13 * 60) return 0.6 * (1 - Math.max(0, (m - 10 * 60) / 180));
+      return 0;
+    };
+    globalThis.NIEBLA_FUERZA = nieblaFuerza;
+    const dibujarNiebla = () => {
+      const k = nieblaFuerza(); if (k < 0.02) return;
+      let where = ''; try { where = zone(...playerTile()); } catch (e) {}
+      if (where === 'mine') return;
+      const tx = texturaNiebla(), w = VW * 1.2, h = VH * 0.6, off = (T * 12) % w;
+      ctx.save(); ctx.setTransform(cv.width / VW, 0, 0, cv.width / VW, 0, 0); ctx.globalAlpha = k;
+      rect(`rgba(220,226,234,${0.18 * k})`, 0, 0, VW, VH);
+      for (const yy of [VH * 0.05, VH * 0.45]) { ctx.drawImage(tx, -off, yy, w, h); ctx.drawImage(tx, w - off, yy, w, h); }
+      ctx.restore();
+    };
+    
+    let refugios = null, refDia = -1;
+    const listaRefugios = () => {
+      if (refugios && refDia === S.day) return refugios;
+      refDia = S.day; refugios = [];
+      try { for (const b of builds()) if (ROOFED.has(b.t)) for (let x = b.x; x < b.x + b.w; x++) { const y = b.y + b.h; if (!solid(x, y) && !buildingAt(x, y)) refugios.push([x, y]); } } catch (e) {}
+      return refugios;
+    };
+    const FRASES_LLUVIA = ["·x638e10", "·xfa7632", "·x088e60", "·xa9b5f3", "·x71dcc9", "·x382975"];
+    const burbujas = new Map(), refugioDe = new WeakMap();
+    const _uv = updateVillagers;
+    updateVillagers = function (dt) {
+      const r = _uv.apply(this, arguments);
+      if (!OCHO_MEJORAS || !S.rainToday || festivalToday()) return r;
+      try {
+        const ref = listaRefugios(); if (!ref.length) return r;
+        for (const v of VILLAGERS) {
+          if (!inTown(v) || v.area) continue;
+          let st = refugioDe.get(v);
+          if (!st || st.dia !== S.day) {
+            const orden = ref.map((p, k) => [k, Math.hypot((p[0] + 0.5) * TS - v.x, (p[1] + 0.7) * TS - v.y)]).sort((a, b) => a[1] - b[1]).slice(0, 6).map(q => q[0]);
+            st = { dia:S.day, orden, n:0, x:v.x, y:v.y, quieto:0 }; refugioDe.set(v, st);
+          }
+          const [rx, ry] = ref[st.orden[st.n % st.orden.length]], tx = (rx + 0.5) * TS, ty = (ry + 0.7) * TS;
+          
+          if (st.x0 == null) { st.x0 = v.x; st.y0 = v.y; }
+          const ddx = tx - v.x, ddy = ty - v.y, d = Math.hypot(ddx, ddy);
+          if (d > 2) {
+            const paso = Math.min(d, 46 * dt), nx = v.x + ddx / d * paso, ny = v.y + ddy / d * paso;
+            if (!solid(Math.floor(nx / TS), Math.floor((ny - 4) / TS))) { v.x = nx; v.y = ny; }
+            else if (!solid(Math.floor(nx / TS), Math.floor((v.y - 4) / TS))) v.x = nx;
+            else if (!solid(Math.floor(v.x / TS), Math.floor((ny - 4) / TS))) v.y = ny;
+            else st.quieto += dt;
+            if (st.quieto > 2) { v.x = tx; v.y = ty; }
+            v.moving = true; v.dir = Math.abs(ddx) > Math.abs(ddy) ? (ddx > 0 ? 'right' : 'left') : (ddy > 0 ? 'down' : 'up');
+          }
+          v.tx = tx; v.ty = ty; v.wait = Math.max(v.wait || 0, 0.5);
+          if (Math.hypot(v.x - tx, v.y - ty) < 3) {
+            v.wait = Math.max(v.wait || 0, 2); v.moving = false; v.dir = 'down';
+            const bb = burbujas.get(v);
+            if (!bb || T > bb.hasta + 9 + hs(v.name) * 10) { if (Math.random() < dt * 0.15) burbujas.set(v, { s:pickOne(FRASES_LLUVIA), hasta:T + 3.5 }); }
+          }
+        }
+      } catch (e) {}
+      return r;
+    };
+    const dibujarBurbujas = () => {
+      if (!S.rainToday || !burbujas.size) return;
+      for (const [v, b] of burbujas) {
+        if (T > b.hasta) continue;
+        const w = Math.max(40, b.s.length * 5.4), x = v.x, y = v.y - 58;
+        ctx.fillStyle = 'rgba(255,255,255,.92)'; ctx.fillRect(x - w / 2, y - 12, w, 16);
+        ctx.beginPath(); ctx.moveTo(x - 3, y + 4); ctx.lineTo(x + 3, y + 4); ctx.lineTo(x, y + 8); ctx.fill();
+        text(b.s, x, y, 9, '#2a3a5a', 'center', false);
+      }
+    };
+
+    const _dw = drawWorld;
+    drawWorld = function () {
+      const r = _dw.apply(this, arguments);
+      if (!OCHO_MEJORAS || !S) return r;
+      try {
+        ctx.save(); ctx.scale(Z, Z); ctx.translate(-Math.round(camX), -Math.round(camY));
+        try { adornoFiesta(); dibujarBurbujas(); } finally { ctx.restore(); }
+        dibujarNiebla();
+      } catch (e) {}
+      return r;
+    };
+  } catch (e) { console.warn('MEJORAS DEL PUEBLO', e); }
+})();
 
 // Textos retirados de la versión pública: no se dibujan.
 const TOKEN_PUBLICO = /(?:·x|_x)[0-9a-f]{6}/;
