@@ -9054,8 +9054,9 @@ function eyes(x, y, dir, mood = 'calm') {
 function arms(x, y, col, dir, step) {
   const a = step * 3, sombra = 'rgba(40,18,8,.18)';
   if (dir === 'left' || dir === 'right') {
-    const dx = dir === 'left' ? -a : a;
-    suaveLinea(col, 3.4, x + 0.5 + dx * 0.25, y + 1.6, x + 0.5 + dx, y + 8.6); circ(col, x + 0.5 + dx, y + 9.8, 2);
+    const dx = dir === 'left' ? -a : a, bx = x + (dir === 'left' ? 1.2 : -0.2); 
+    suaveLinea('rgba(40,18,8,.32)', 4.6, bx + dx * 0.25, y + 2.2, bx + dx, y + 8.6); circ('rgba(40,18,8,.32)', bx + dx, y + 9.8, 2.6); 
+    suaveLinea(col, 3.4, bx + dx * 0.25, y + 2.2, bx + dx, y + 8.6); circ(col, bx + dx, y + 9.8, 2);
   } else {
     suaveLinea(col, 3.4, x - 8.7, y + 1.6 + a * 0.2, x - 9.2, y + 8.6 + a); circ(col, x - 9.2, y + 9.8 + a, 2);
     suaveLinea(col, 3.4, x + 8.7, y + 1.6 - a * 0.2, x + 9.2, y + 8.6 - a); circ(col, x + 9.2, y + 9.8 - a, 2);
@@ -9073,6 +9074,28 @@ function inkPass(again) {
   ctx.restore();
   inking = false;
 }
+
+
+function cargaEspalda(x, y, dir, bob, detras) {
+  const b = bob, cafe = '#8a5a30', tapa = '#c9a24e', soga = '#6b4423';
+  if (detras) {
+    if (dir === 'up') return;
+    const s = dir === 'left' ? 1 : dir === 'right' ? -1 : 0; 
+    const bx = x - 7 + s * 7;
+    suaveRR(cafe, bx, y - 33 - b, 14, 17, 3); suaveRR(tapa, bx, y - 34.5 - b, 14, 3.5, 1.4);
+    suaveRR('rgba(40,18,8,.22)', bx + 9, y - 33 - b, 5, 17, [0, 3, 3, 0]);
+    suaveLinea(soga, 0.9, bx + 1, y - 26 - b, bx + 13, y - 26 - b);
+    return;
+  }
+  if (dir === 'up') { 
+    suaveRR(cafe, x - 7, y - 33 - b, 14, 17, 3); suaveRR(tapa, x - 7, y - 34.5 - b, 14, 3.5, 1.4);
+    suaveRR('rgba(40,18,8,.22)', x + 2, y - 33 - b, 5, 17, [0, 3, 3, 0]);
+    suaveLinea(soga, 0.9, x - 6, y - 26 - b, x + 6, y - 26 - b); suaveLinea(soga, 0.9, x, y - 34 - b, x, y - 17 - b);
+  }
+  
+  if (dir === 'down') { suaveCurva(soga, 1.4, x - 7.6, y - 39 - b, x, y - 40.6 - b, x + 7.6, y - 39 - b); }
+  else if (dir !== 'up') { const s = dir === 'left' ? 1 : -1; suaveLinea(soga, 1.2, x + s * 3, y - 41 - b, x + s * 8, y - 34 - b); } 
+}
 function drawPerson(x, y, o, dir = 'down', step = 0, name = '', bob = 0) {
   if (!inking) inkPassAt(x, y, () => drawPerson(x, y, o, dir, step, '', bob));
   if (!inking) sunShadow(x, y, 10);
@@ -9080,6 +9103,7 @@ function drawPerson(x, y, o, dir = 'down', step = 0, name = '', bob = 0) {
   const idleMotion = step || Math.sin(T*1.35 + x*0.07) * 0.16;
   if (o.apache) return drawApache(x, y, o, dir, step, name, bob);
   const shade = 'rgba(40,18,8,.2)', hi = 'rgba(255,220,180,.3)';
+  if (o.bundle) cargaEspalda(x, y, dir, bob, true); 
   const l1 = -Math.max(0, step)*2.5, l2 = -Math.max(0, -step)*2.5;
   for (const [lx, l] of [[x-6, l1], [x+1, l2]]) { 
     suaveRR(o.skin, lx, y-13 + l, 5, 13, 2.2); suaveRR(shade, lx + 3.6, y-12 + l, 1.4, 11, 0.7);
@@ -9177,7 +9201,7 @@ function drawPerson(x, y, o, dir = 'down', step = 0, name = '', bob = 0) {
   const mood = o === NPC_LOOK.player && (S.hp < 35 || S.energy < 20) ? 'tired' : 'calm';
   eyes(x, y-33-bob, dir, mood);
   if (o.style) drawAdornos(x, y, o, dir, bob); 
-  if (o.bundle) { suaveRR('#8a5a30', x - 5, y - 30 - bob, 12, 9, 2); suaveRR('#c9a24e', x - 5, y - 32 - bob, 12, 3, 1.2); }
+  if (o.bundle) cargaEspalda(x, y, dir, bob, false); 
   if (o.pick) { ctx.strokeStyle = '#6b4423'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(x + 11, y - 6); ctx.lineTo(x + 16, y - 38 - bob); ctx.stroke(); rect('#2a2438', x + 12, y - 42 - bob, 8, 4); }
   if (o.basket) { ell('#c9a24e', x - 12, y - 8 - bob, 5, 4); rect('#6b4423', x - 16, y - 12 - bob, 8, 2); }
   if (o.brush) { suaveRR('#e6d2a8', x + 10, y - 24 - bob, 8, 10, 1.5); rect('#3aa0c0', x + 11, y - 22 - bob, 6, 2); ctx.strokeStyle = '#5a3a1e'; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(x + 14, y - 14 - bob); ctx.lineTo(x + 18, y - 4); ctx.stroke(); }
@@ -9392,22 +9416,29 @@ function drawWarrior(w) {
 
 
 function drawApache(x, y, o, dir, step, name, bob) {
-  const fringe = '#a8805a';
-  suaveRR('#b08a60', x-6, y-6 + (step > 0 ? -2 : 0), 5, 7, 2); suaveRR('#b08a60', x+1, y-6 + (step < 0 ? -2 : 0), 5, 7, 2); 
+  const fringe = '#a8805a', sombra = 'rgba(40,18,8,.2)';
+  const l1 = step > 0 ? -2 : 0, l2 = step < 0 ? -2 : 0, mov = step || Math.sin(T*1.35 + x*0.07) * 0.16;
+  if (!(o.female && o.bikini)) for (const [lx, l] of [[x-6, l1], [x+1, l2]]) { suaveRR(o.skin, lx, y-13 + l, 5, 10, 2.2); suaveRR(sombra, lx + 3.6, y-12 + l, 1.4, 8, 0.7); } 
+  suaveRR('#b08a60', x-6, y-6 + l1, 5, 7, 2); suaveRR('#b08a60', x+1, y-6 + l2, 5, 7, 2); 
+  suaveRR('#8f6c46', x-6, y-1.6 + l1, 5, 1.6, 0.8); suaveRR('#8f6c46', x+1, y-1.6 + l2, 5, 1.6, 0.8); 
   if (o.female && o.bikini) dosPiezasApache(x, y, o, dir, step, bob, fringe); 
   else if (o.female) {
-    rect(o.skin, x-6, y-10, 12, 4);
-    suaveRR(o.cloth, x-9, y-27.4-bob, 18, 18.4, [4, 4, 1, 1]);                
+    suaveRR(o.cloth, x-9, y-27.4-bob, 18, 18.4, [4, 4, 2, 2]);                
+    suaveRR(sombra, x+5, y-27-bob, 4, 18, [0, 4, 2, 0]);
     if (o.pregnant) ell(o.cloth, x + (dir === 'left' ? -5 : dir === 'right' ? 5 : 0), y-17-bob, 9, 6);
-    for (let i = 0; i < 9; i++) rect(fringe, x-9 + i*2, y-10-bob, 1, 3 + (i % 2)); 
-    rect(fringe, x-11, y-25-bob, 2, 8); rect(fringe, x+9, y-25-bob, 2, 8);      
-    for (let i = 0; i < 5; i++) circ(o.accent, x-4 + i*2, y-24-bob + (i === 2 ? 2 : i % 2), 1.2); 
-    for (let i = 0; i < 4; i++) rect(i % 2 ? o.accent : '#b5462f', x-7 + i*4, y-15-bob, 3, 2);        
+    for (let i = 0; i < 9; i++) suaveRR(fringe, x-9 + i*2, y-10-bob, 1.2, 3 + (i % 2), 0.6); 
+    arms(x, y-25-bob, o.skin, dir, mov);
+    if (dir === 'down' || dir === 'up') { suaveRR(fringe, x-11.4, y-25-bob, 1.6, 7, 0.8); suaveRR(fringe, x+9.8, y-25-bob, 1.6, 7, 0.8); } 
+    if (dir !== 'up') for (let i = 0; i < 5; i++) circ(o.accent, x-4 + i*2, y-24-bob + (i === 2 ? 2 : i % 2), 1.2); 
+    for (let i = 0; i < 4; i++) suaveRR(i % 2 ? o.accent : '#b5462f', x-7 + i*4, y-15-bob, 3, 2, 0.6); 
   } else {
-    suaveRR(o.cloth, x-8, y-25.4-bob, 16, 12.4, [3.6, 3.6, 1, 1]);            
-    rect(o.accent, x-8, y-21-bob, 16, 2); circ('#f0b020', x, y-18-bob, 2);    
-    for (let i = 0; i < 8; i++) rect(fringe, x-8 + i*2, y-13-bob, 1, 2);
-    rect(o.skin, x-6, y-12, 12, 4); rect(o.accent, x-3, y-14-bob, 6, 8);      
+    suaveRR('#e8dcc4', x-5.4, y-14.6-bob, 10.8, 5, 1.6);                       
+    suaveRR(o.cloth, x-8, y-25.4-bob, 16, 12.4, [3.6, 3.6, 1.5, 1.5]);        
+    suaveRR(sombra, x+4.4, y-25-bob, 3.6, 12, [0, 3.6, 1.5, 0]);
+    if (dir !== 'up') { rect(o.accent, x-8, y-21-bob, 16, 2); circ('#f0b020', x, y-18-bob, 2); } 
+    for (let i = 0; i < 8; i++) suaveRR(fringe, x-8 + i*2, y-13.2-bob, 1.2, 2.2, 0.6);
+    suaveRR(o.accent, x-3, y-13-bob, 6, 7, [0, 0, 2, 2]);                     
+    arms(x, y-24-bob, o.skin, dir, mov);
   }
   suaveCabeza(x, y - bob, o, dir, 0.4);
   suaveRR(o.hair, x-10.2, y-38-bob, 3.2, o.female ? 18 : 14, 1.6); suaveRR(o.hair, x+7, y-38-bob, 3.2, o.female ? 18 : 14, 1.6);
@@ -47739,7 +47770,7 @@ drawShop = function (...a) {
     const id = o && MJ_DE.get(o);
     const enMundo = typeof R37 !== 'undefined' && R37.inWorld && !R37.rendering;
     if (!id || !enMundo || !globalThis.VECINOS_HOJAS || (typeof inking !== 'undefined' && inking) || MJ_FILA[dir] === undefined) return _drawPersonMj.apply(this, arguments);
-    const hoja = mjImg(`personajes/${id}/hoja_caminar.png`);
+    const hoja = mjImg(`personajes/${id}/hoja_caminar.webp`);
     if (!hoja) return _drawPersonMj.apply(this, arguments);
     const cuadro = Math.abs(step) > 0.015 ? Math.floor(T * 8 + x * 0.05) % 4 : 0;
     ctx.drawImage(hoja, cuadro * 128, MJ_FILA[dir] * 192, 128, 192, Math.round(x - 16), Math.round(y - 44), 32, 48);
@@ -47748,7 +47779,7 @@ drawShop = function (...a) {
   const _drawPortraitMj = drawPortrait;
   drawPortrait = function (look, cx, cy, r) {
     const id = look && MJ_DE.get(look);
-    const im = id && ((MJ.cara && mjImg(`personajes/${id}/retrato_${MJ.cara}.png`)) || mjImg(`personajes/${id}/retrato.png`));
+    const im = id && ((MJ.cara && mjImg(`personajes/${id}/retrato_${MJ.cara}.webp`)) || mjImg(`personajes/${id}/retrato.webp`));
     if (!im) return _drawPortraitMj.apply(this, arguments);
     circ('#7a4a3a', cx, cy, r + 4); circ('#e8a830', cx, cy, r + 2); circ('#fbf4e4', cx, cy, r);
     ctx.save(); ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.clip();
@@ -48385,7 +48416,12 @@ const OCHO_MEJORAS = true;
         ctx.save(); ctx.translate(x, y); ctx.scale(sx, sy); ctx.translate(-x, -y);
         const b = bob, sk = o.skin;
         if (R.tipo === 'corto' && !o.swimwear) { 
-          suaveRR(sk, x - 7, y - 20.4 - b, 14, 4.8, 1.8); suaveRR('rgba(40,18,8,.16)', x + 3.6, y - 20.4 - b, 3.4, 4.8, 1.6); circ('rgba(60,25,15,.5)', x, y - 18 - b, 0.6);
+          const w = dir === 'left' || dir === 'right' ? 4.6 : 6;
+          suaveRR(sk, x - w, y - 19.8 - b, w * 2, 3.8, 1.2);
+          suaveRR('rgba(40,18,8,.14)', x + w - 2, y - 19.8 - b, 2, 3.8, 1);
+          rect('rgba(40,18,8,.25)', x - w, y - 19.9 - b, w * 2, 0.6); 
+          if (dir === 'down') circ('rgba(60,25,15,.45)', x, y - 17.8 - b, 0.5);
+          arms(x, y - 25 - b, sk, dir, step || Math.sin(T * 1.35 + x * 0.07) * 0.16);
         } else if (R.tipo === 'huipil') {
           ctx.fillStyle = R.bottom; ctx.beginPath(); ctx.moveTo(x - 8, y - 16 - b); ctx.lineTo(x + 8, y - 16 - b); ctx.lineTo(x + 10, y - 2 - b); ctx.lineTo(x - 10, y - 2 - b); ctx.fill();
           for (let i = 0; i < 7; i++) rect('#f4f0e6', x - 9 + i * 3, y - 2 - b, 1, 3);
@@ -49582,6 +49618,107 @@ const MENTE_ACTIVA = true;
       return r;
     };
   } catch (e) { console.warn('[nueve mejoras]', e); }
+})();
+
+
+
+
+
+
+
+const RENDIMIENTO = { bloques:true, congelar:true, armados:0 };
+(function rendimiento() {
+  try {
+    const C = 8, PAD = 8, MAXB = 30;
+    const BLOQ = new Map();                
+    let cuadro = 0, armadosCuadro = -1, vacia = 0;
+    const dibujadoS = new Set(), dibujadoP = new Set();
+    const _clear = TERRAIN_CACHE.clear.bind(TERRAIN_CACHE);
+    TERRAIN_CACHE.clear = function () { vacia++; BLOQ.clear(); return _clear(); };
+    const enCasa = (x0, y0, x1, y1) => (typeof HOME_BEDS !== 'undefined' ? HOME_BEDS : []).some(b => x0 < b.x1 + 1 && x1 > b.x0 - 1 && y0 < b.y1 + 1 && y1 > b.y0 - 1);
+    
+    const claveBloque = (cx, cy) => {
+      const x0 = cx * C, y0 = cy * C, x1 = Math.min(MW, x0 + C), y1 = Math.min(MH, y0 + C);
+      if (enCasa(x0, y0, x1, y1)) return null;
+      let h = 7;
+      for (let y = y0 - 1; y <= y1; y++) {
+        const fila = S.ground[y]; if (!fila) continue;
+        for (let x = x0 - 1; x <= x1; x++) {
+          const g = fila[x]; if (g === undefined) continue;
+          if (!terrainCacheable(g)) return null;
+          h = (h * 31 + g + 1) | 0;
+        }
+      }
+      return `${TERRENO_GEN}:${seasonIdx()}:${vacia}:${h}`;
+    };
+    const armar = (cx, cy, key) => {
+      const W = C * TS + PAD * 2, x0 = cx * C, y0 = cy * C, x1 = Math.min(MW, x0 + C), y1 = Math.min(MH, y0 + C);
+      const viejo = BLOQ.get(cx + ',' + cy);
+      const suelo = viejo?.suelo || document.createElement('canvas'), pasto = viejo?.pasto || document.createElement('canvas');
+      suelo.width = pasto.width = suelo.height = pasto.height = W;
+      const principal = ctx, oldRen = typeof R28 !== 'undefined' ? R28.activo : false;
+      try {
+        for (const [cv2, fn] of [[suelo, drawGround], [pasto, grassTufts]]) {
+          ctx = cv2.getContext('2d'); ctx.imageSmoothingEnabled = false;
+          ctx.save(); ctx.translate(-x0 * TS + PAD, -y0 * TS + PAD);
+          for (let y = y0; y < y1; y++) for (let x = x0; x < x1; x++) fn(x, y);
+          ctx.restore();
+        }
+      } finally { ctx = principal; }
+      for (let y = y0; y < y1; y++) for (let x = x0; x < x1; x++) TERRAIN_CACHE.delete(y * MW + x); 
+      BLOQ.delete(cx + ',' + cy); BLOQ.set(cx + ',' + cy, { key, suelo, pasto });
+      if (BLOQ.size > MAXB) for (const k of BLOQ.keys()) { if (!dibujadoS.has(k)) { BLOQ.delete(k); break; } } 
+      RENDIMIENTO.armados++;
+    };
+    const usable = () => RENDIMIENTO.bloques && ctx.canvas === cv && !(typeof R28 !== 'undefined' && R28.activo);
+    const _suelo = drawCachedGround, _pasto = drawCachedTufts;
+    drawCachedGround = function (x, y) {
+      if (!usable()) return _suelo(x, y);
+      const cx = Math.floor(x / C), cy = Math.floor(y / C), id = cx + ',' + cy;
+      if (dibujadoS.has(id)) return;
+      const key = claveBloque(cx, cy);
+      if (key == null) return _suelo(x, y);
+      let b = BLOQ.get(id);
+      if (b?.key !== key) {
+        if (armadosCuadro === cuadro) { dibujadoS.add(id + '!'); return _suelo(x, y); } 
+        armadosCuadro = cuadro; armar(cx, cy, key); b = BLOQ.get(id);
+      }
+      dibujadoS.add(id);
+      ctx.drawImage(b.suelo, cx * C * TS - PAD, cy * C * TS - PAD);
+    };
+    drawCachedTufts = function (x, y) {
+      if (!usable()) return _pasto(x, y);
+      const cx = Math.floor(x / C), cy = Math.floor(y / C), id = cx + ',' + cy;
+      if (!dibujadoS.has(id)) return _pasto(x, y); 
+      if (dibujadoP.has(id)) return;
+      const b = BLOQ.get(id);
+      if (!b) return _pasto(x, y); 
+      dibujadoP.add(id);
+      ctx.drawImage(b.pasto, cx * C * TS - PAD, cy * C * TS - PAD);
+    };
+
+    
+    const foto = document.createElement('canvas'); let fotoOk = false, fotoT = 0;
+    const congelable = () => RENDIMIENTO.congelar && (UI.menu === 'shop' || UI.menu === 'map') && ctx.canvas === cv;
+    const _mundo = drawWorld;
+    drawWorld = function () {
+      cuadro++; dibujadoS.clear(); dibujadoP.clear();
+      if (!congelable()) { fotoOk = false; return _mundo.apply(this, arguments); }
+      const ahora = performance.now();
+      if (fotoOk && foto.width === cv.width && foto.height === cv.height && ahora - fotoT < 2000) {
+        ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over'; ctx.filter = 'none';
+        ctx.drawImage(foto, 0, 0); ctx.restore();
+        return;
+      }
+      const r = _mundo.apply(this, arguments);
+      try {
+        if (foto.width !== cv.width || foto.height !== cv.height) { foto.width = cv.width; foto.height = cv.height; }
+        const g = foto.getContext('2d'); g.clearRect(0, 0, foto.width, foto.height); g.drawImage(cv, 0, 0);
+        fotoOk = true; fotoT = ahora;
+      } catch (e) { fotoOk = false; }
+      return r;
+    };
+  } catch (e) { console.warn('[rendimiento]', e); }
 })();
 
 
