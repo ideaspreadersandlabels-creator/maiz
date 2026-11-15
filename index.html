@@ -2305,7 +2305,7 @@ function _x0575a2(id) {
   UI.actsUsed?.add(id);
   if (id !== UI._x108bc2 && UI._x0c7a68 === "_xab155a") {
     UI.combo = UI.comboT && T - UI.comboT < 12 ? (UI.combo || 1) + 1 : 1; UI.comboT = T;
-    if (UI.combo >= 5 && UI.combo % 5 === 0) { UI._xc28808.her = Math.min(100, UI._xc28808.her + 20); gainLoveXP(5); toast("·x8b63ed", '#ffd060', 4); }
+    if (UI.combo >= 5 && UI.combo % 5 === 0) { if (UI._xc28808) UI._xc28808.her = Math.min(100, UI._xc28808.her + 20); gainLoveXP(5); toast("·x8b63ed", '#ffd060', 4); }
   }
   if (UI.marathon && !UI.marathon.done && marathonCount() >= UI.marathon.goal) { UI.marathon.done = true; toast("·x221818", '#ffd060', 5); }
   const ord = UI.actsOrder ??= [];
@@ -2353,7 +2353,7 @@ const SUBS = [{ id:"_x9c6424", name:"·x335201" }, { id:'s_venda', name:"·x1e36
 function useSub(id) {
   if (!transPartner() || UI._x0c7a68 !== "_xab155a") return;
   const s = UI.sub ??= {};
-  if (id === "_xbdbb74") { UI._xc28808.me = Math.min(100, UI._xc28808.me + 5); UI._x7f9654 = Math.min(1, (UI._x7f9654 || 0) + 0.35); sfx("_x95898f"); }
+  if (id === "_xbdbb74") { if (UI._xc28808) UI._xc28808.me = Math.min(100, UI._xc28808.me + 5); UI._x7f9654 = Math.min(1, (UI._x7f9654 || 0) + 0.35); sfx("_x95898f"); }
   else s[id] = !s[id];
   if (!UI._x58dc4e && Math.random() < 0.6) sayLine(pickOne(["·x94b559", "·x273ebd", "·x5cd4b3"]), _xdb11f2(_x15aa92()));
 }
@@ -2483,7 +2483,7 @@ function takeAfro(id) {
   if (!(inv[id] > 0)) return toast("·xa22b21", '#ffd0e0', 2);
   if (UI.afro?.[id]) return toast("·x59c8e9", '#ffd0e0', 2);
   inv[id]--; (UI.afro ??= {})[id] = true;
-  if (id === 'vainilla') { UI._xc28808.me = Math.max(UI._xc28808.me, 15); UI._xc28808.her = Math.min(100, UI._xc28808.her + 15); }
+  if (id === 'vainilla') { if (UI._xc28808) UI._xc28808.me = Math.max(UI._xc28808.me, 15); UI._xc28808.her = Math.min(100, UI._xc28808.her + 15); }
   toast("·xbea69d", '#ffd0e0', 3);
 }
 const nightMarketOpen = () => S.time >= 20 * 60 || S.time < 4 * 60;
@@ -2560,7 +2560,7 @@ function seduceChoose(i) {
   s.said = liked ? pickOne(["·x6fca77", "·x74ed7d", "·xa32880"]) : pickOne(["·x0131ff", "·xa38abd", "·xfa6480"]);
   if (++s.round >= 3) {
     const c = s.c, score = s.score; UI.seduce = null;
-    _x94ab39(c); UI._xc28808.her = Math.max(UI._xc28808.her, score * 14);
+    _x94ab39(c); if (UI._xc28808) UI._xc28808.her = Math.max(UI._xc28808.her, score * 14);
     return toast(score >= 2 ? "·xf70fc5" : score ? "·xff8a06" : "·x9fd225", '#ffd0e0', 4);
   }
   s.opts = [...SEDUCE_OPTS].sort(() => Math.random() - 0.5).slice(0, 3);
@@ -2641,11 +2641,11 @@ function _xe4a6fd(id) {
   (known._xf7639b ??= {})[id] = likes;
   if (!likes) {
     (K.stop ??= {})[id] = true; K[id] = false;
-    UI._xc28808.her = Math.max(0, UI._xc28808.her - 10);
+    if (UI._xc28808) UI._xc28808.her = Math.max(0, UI._xc28808.her - 10);
     return sayLine("·x70e2ed", taste);
   }
   if (k.tap) {
-    UI._xc28808.her = Math.min(100, UI._xc28808.her + 6);
+    if (UI._xc28808) UI._xc28808.her = Math.min(100, UI._xc28808.her + 6);
     if (id === "_x636631") { UI._x0cd734 = (UI._x0cd734 || 0) + 1; const pal = owns('paleta'); UI._x95898f = Math.min(1, (UI._x95898f || 0) + (pal ? 0.5 : 0.35)); UI._x46be18 = pal ? 0.35 : 0.25; if (pal) UI._xc28808.her = Math.min(100, UI._xc28808.her + 3); sfx("_x95898f"); }
     else { (UI.wax ??= []).push([hash(UI.wax.length, 3), hash(UI.wax.length, 7)]); sfx('wax'); }
   } else K[id] = true;
@@ -2823,7 +2823,7 @@ function _x08c229(menu) {
   UI.theme = menu === "_x871ab5" && deLaCasa(UI._x601af7 || _x89dbd0) ? themeTonight() : null; 
   if (UI.theme) setTimeout(() => UI.menu === menu && toast("·xb325fa", '#ffd0e0', 5), 300);
   const name = _x15aa92();
-  UI._xc28808.her = Math.min(20, _x603cc7(name) * 2);
+  if (UI._xc28808) UI._xc28808.her = Math.min(20, _x603cc7(name) * 2);
   if (menu === "_x871ab5" && courtJealous(name)) UI._xc28808.her = 0;
   setTimeout(() => UI.menu === menu && sayLine(memoryLine(name), _xdb11f2(name)), 400);
 }
@@ -2842,8 +2842,8 @@ function startPrep() {
 }
 function finishSpa() {
   const kind = UI._x0c7a68;
-  if (kind === 'prep') { UI.prepDone = true; UI._xc28808.her = Math.min(60, UI._xc28808.her + 10); UI._x0c7a68 = 'fore'; UI._xe96af7 = { act:'prep', ph:UI._x69476e, t:0.6 }; return sayLine("·xcdff00", _xdb11f2(_x15aa92())); }
-  if (kind === 'baile') { UI.danceDone = true; UI._xc28808.her = Math.min(60, UI._xc28808.her + 10); UI._xc28808.me = Math.min(60, UI._xc28808.me + 8); UI._x0c7a68 = 'fore'; UI._xe96af7 = { act:'baile', ph:UI._x69476e, t:0.6 }; return; }
+  if (kind === 'prep') { UI.prepDone = true; if (UI._xc28808) UI._xc28808.her = Math.min(60, UI._xc28808.her + 10); UI._x0c7a68 = 'fore'; UI._xe96af7 = { act:'prep', ph:UI._x69476e, t:0.6 }; return sayLine("·xcdff00", _xdb11f2(_x15aa92())); }
+  if (kind === 'baile') { UI.danceDone = true; if (UI._xc28808) UI._xc28808.her = Math.min(60, UI._xc28808.her + 10); UI._xc28808.me = Math.min(60, UI._xc28808.me + 8); UI._x0c7a68 = 'fore'; UI._xe96af7 = { act:'baile', ph:UI._x69476e, t:0.6 }; return; }
   UI._xc28808.her = Math.min(60, UI._xc28808.her + (kind === "_xe16daf" && UI.oiled ? 22 : 12));
   if (kind === 'bano') { UI.bathDone = true; UI._xe58477 = UI.placeBefore || UI._xe58477; } else UI.massageDone = true;
   UI._x0c7a68 = 'fore'; UI._xe96af7 = { act:kind, ph:UI._x69476e, t:0.6 };
@@ -2858,20 +2858,20 @@ function _x761b6e() {
   const n = _x15aa92();
   if (subLvl(n) < 3 && !UI.slaveGame) return toast("·x83dbda", '#ffd0e0', 3);
   UI._x95898f = Math.min(1, (UI._x95898f || 0) + 0.6); UI._x46be18 = 0.4; UI._xf580e3 = 0.5; UI._x0cd734 = (UI._x0cd734 || 0) + 2;
-  UI._xc28808.her = Math.min(100, UI._xc28808.her + 10); sfx("_x95898f");
+  if (UI._xc28808) UI._xc28808.her = Math.min(100, UI._xc28808.her + 10); sfx("_x95898f");
   if (!UI._x58dc4e && Math.random() < 0.5) sayLine(pickOne(["·x28f0ee", "·x12215e", "·xa47385"]), _xdb11f2(n));
 }
 function _xbadc0a() {
   if (!owns("_xfc1fea") || UI._x0c7a68 !== "_xab155a") return;
   const name = _x15aa92(), K = UI._xf7639b || (UI._xf7639b = {});
-  if (!_x406bf7(name)._x636631) { (K.stop ??= {})._x636631 = true; UI._xc28808.her = Math.max(0, UI._xc28808.her - 8); return sayLine("·xb4365a", _xdb11f2(name)); }
+  if (!_x406bf7(name)._x636631) { (K.stop ??= {})._x636631 = true; if (UI._xc28808) UI._xc28808.her = Math.max(0, UI._xc28808.her - 8); return sayLine("·xb4365a", _xdb11f2(name)); }
   UI._xc28808.her = Math.min(100, UI._xc28808.her + 5); UI._x95898f = Math.min(1, (UI._x95898f || 0) + 0.2); UI._x46be18 = 0.2; UI._xf580e3 = 0.35; K.used = true;
   sfx('swish');
   if (!UI._x58dc4e && Math.random() < 0.5) sayLine(pickOne(_x261832.ok), _xdb11f2(name));
 }
 function useFeather() {
   if (!owns('pluma') || UI._x0c7a68 !== "_xab155a") return;
-  UI.featherT = 0.8; UI._xc28808.her = Math.min(100, UI._xc28808.her + 4);
+  UI.featherT = 0.8; if (UI._xc28808) UI._xc28808.her = Math.min(100, UI._xc28808.her + 4);
   if (!UI._x58dc4e && Math.random() < 0.5) sayLine("·xee7637", _xdb11f2(_x15aa92()));
 }
 function _x0e4e4f() {
@@ -2921,7 +2921,7 @@ function _xbf6678(dt) {
   }
   if (UI._x0c7a68 === 'bano' || UI._x0c7a68 === "_xe16daf" || UI._x0c7a68 === 'baile' || UI._x0c7a68 === 'prep') {
     UI._x69476e = (UI._x69476e || 0) + dt * (UI._x0c7a68 === "_xe16daf" || UI._x0c7a68 === 'prep' ? 2.4 : UI._x0c7a68 === 'baile' ? 3 : 1.5);
-    UI._xc28808.her = Math.min(60, UI._xc28808.her + dt * 1.2);
+    if (UI._xc28808) UI._xc28808.her = Math.min(60, UI._xc28808.her + dt * 1.2);
     if ((UI.spaT += dt) >= SPA_SECS) finishSpa();
     return;
   }
@@ -2976,10 +2976,10 @@ function _xbf6678(dt) {
   if (UI.contestOn) { const nm = _x601af7().name; UI.pleaseYou[nm] = (UI.pleaseYou[nm] || 0) + meGain * (favAct ? 1.5 : 1) * (1 + P.her / 200); }
   for (const o of others()) UI.groupPl[o.name] = Math.min(100, (UI.groupPl[o.name] || 0) + dt * (transPair().includes(o) ? 2.6 : 1.4) * rough);
   if (UI.purify && UI._x0c7a68 === "_xab155a" && (UI.purify.t += dt) >= 5) {
-    UI.purify.t = 0; const k = Math.floor(T) % 3; UI._xc28808.me = Math.min(99, UI._xc28808.me + 2);
+    UI.purify.t = 0; const k = Math.floor(T) % 3; if (UI._xc28808) UI._xc28808.me = Math.min(99, UI._xc28808.me + 2);
     toast(["·xb59a31", "·x24a7bf", "·xac093e"][k], '#ffd0e0', 2);
   }
-  if (UI.court && UI._x0c7a68 === "_xab155a" && (UI.court.t += dt) >= 8) { UI.court.t = 0; UI._xc28808.her = Math.min(100, UI._xc28808.her + 3); toast(pickOne(["·xb8ab6d", "·x3feaf9", "·xdd2714", "·xba84c2"]), '#ffd060', 2); }
+  if (UI.court && UI._x0c7a68 === "_xab155a" && (UI.court.t += dt) >= 8) { UI.court.t = 0; if (UI._xc28808) UI._xc28808.her = Math.min(100, UI._xc28808.her + 3); toast(pickOne(["·xb8ab6d", "·x3feaf9", "·xdd2714", "·xba84c2"]), '#ffd060', 2); }
   if (UI.challenge && !UI.challenge.done && UI._x0c7a68 === "_xab155a") {
     if (UI.herCame) { UI.challenge.done = 'win'; S.money += 150; toast("·x53821b", '#ffd060', 5); }
     else if (_x3a8ddf(UI._x108bc2) && (UI.challenge.t += dt) >= UI.challenge.limit) { UI.challenge.done = 'lose'; UI._x79ab63 = true; UI.routineStep = true; _x0575a2("_x76e261"); UI.routineStep = false; sayLine("·xa44f78", taste); toast("·x66b427", '#ffd0e0', 5); }
@@ -2991,12 +2991,12 @@ function _xbf6678(dt) {
   if (UI.elim === true && !others().length) { UI.elim = 'done'; const w = _x601af7().name; (S._xb0ef25 ??= {})[w] = _x603cc7(w) + 3; toast("·x09ab62", '#ffd060', 6); }
   if (UI.autoSwitch && others().length && UI._x0c7a68 === "_xab155a" && (UI.autoSwitch.t += dt) >= 20) { UI.autoSwitch.t = 0; UI.elimSwitch = true; withWoman(others()[0]); UI.elimSwitch = false; toast("·xed5ec3", '#ffd0e0', 2); }
   if (UI.publicShow && UI._x0c7a68 === "_xab155a" && (UI.publicShow.t += dt) >= 7) {
-    UI.publicShow.t = 0; UI._x95898f = Math.min(1, (UI._x95898f || 0) + 0.25); UI._x46be18 = 0.25; UI._x0cd734 = (UI._x0cd734 || 0) + 1; UI._xc28808.her = Math.min(100, UI._xc28808.her + 4); sfx("_x95898f");
+    UI.publicShow.t = 0; UI._x95898f = Math.min(1, (UI._x95898f || 0) + 0.25); UI._x46be18 = 0.25; UI._x0cd734 = (UI._x0cd734 || 0) + 1; if (UI._xc28808) UI._xc28808.her = Math.min(100, UI._xc28808.her + 4); sfx("_x95898f");
     toast(pickOne(["·xe6125b", "·x70d23d", "·x2f4870", "·x613822"]), '#ffd060', 2);
   }
   if (UI.immob) {
     UI.immob.t += dt; P.her = Math.min(100, P.her + dt * 0.6);
-    if (UI.immob.t >= 40) { const K = UI._xf7639b; for (const id of ["_x96d352", "_x04b748", 'collar', "_x357e96"]) K[id] = false; UI.immob = null; UI._xc28808.her = Math.min(100, UI._xc28808.her + 15); toast("·x9bb81d", '#ff9ac0', 5); }
+    if (UI.immob.t >= 40) { const K = UI._xf7639b; for (const id of ["_x96d352", "_x04b748", 'collar', "_x357e96"]) K[id] = false; UI.immob = null; if (UI._xc28808) UI._xc28808.her = Math.min(100, UI._xc28808.her + 15); toast("·x9bb81d", '#ff9ac0', 5); }
   }
   if (UI.nonstop) {
     if (_x3a8ddf(UI._x108bc2) && (UI._xc9f8eb ?? 1) >= 1) UI.nonstop.t += dt;
@@ -3009,7 +3009,7 @@ function _xbf6678(dt) {
     toast("·xb40f19", '#ffd0e0', 4);
   }
   if (UI.gapeContest && _x3a8ddf(UI._x108bc2) && UI._x0c7a68 === "_xab155a") { const n = (UI._x108bc2 === "_xad8709" ? _x0cd73a() : _x601af7()).name; UI.gapeContest[n] = (UI.gapeContest[n] || 0) + dt * (1 + _xc39c0c(n) * 0.3); }
-  if (UI.punish) { UI.punish.t += dt; if (UI.punish.t >= 3) { UI.punish.t = 0; UI._x0cd734 = (UI._x0cd734 || 0) + 1; UI._x95898f = Math.min(1, (UI._x95898f || 0) + 0.25); UI._x46be18 = 0.25; UI._xc28808.her = Math.min(100, UI._xc28808.her + 3); sfx("_x95898f"); if (Math.random() < 0.3 && !UI._x58dc4e) sayLine("·x533c4c", _xdb11f2(UI.punish.by), UI.punish.by); } }
+  if (UI.punish) { UI.punish.t += dt; if (UI.punish.t >= 3) { UI.punish.t = 0; UI._x0cd734 = (UI._x0cd734 || 0) + 1; UI._x95898f = Math.min(1, (UI._x95898f || 0) + 0.25); UI._x46be18 = 0.25; if (UI._xc28808) UI._xc28808.her = Math.min(100, UI._xc28808.her + 3); sfx("_x95898f"); if (Math.random() < 0.3 && !UI._x58dc4e) sayLine("·x533c4c", _xdb11f2(UI.punish.by), UI.punish.by); } }
   if (UI._x159c0e && _x3a8ddf(UI._x108bc2) && (UI._xc9f8eb ?? 1) === 2 && UI._x0c7a68 === "_xab155a") { const n = (UI._x108bc2 === "_xad8709" ? _x0cd73a() : _x601af7()).name; UI._x159c0e[n] = (UI._x159c0e[n] || 0) + dt; }
   if (UI._x108bc2 === "_x82958e" && others()[0]) UI.groupPl[others()[0].name] = Math.min(100, (UI.groupPl[others()[0].name] || 0) + dt * 3);
   if (ROT_LIST[UI._x108bc2]) {
@@ -3236,7 +3236,7 @@ function startBlind() {
 function blindGuess(i) {
   if (!UI.blind || UI.blindGuess) return;
   const pick = UI.blindOpts[i], c = _x601af7(); UI.blindGuess = true;
-  if (pick === c) { (S._xb0ef25 ??= {})[c.name] = _x603cc7(c.name) + 2; UI._xc28808.her = Math.min(100, UI._xc28808.her + 15); S.money += 50; toast("·x279365", '#ffd060', 5); sayLine("·x8cf046", _xdb11f2(c.name)); }
+  if (pick === c) { (S._xb0ef25 ??= {})[c.name] = _x603cc7(c.name) + 2; if (UI._xc28808) UI._xc28808.her = Math.min(100, UI._xc28808.her + 15); S.money += 50; toast("·x279365", '#ffd060', 5); sayLine("·x8cf046", _xdb11f2(c.name)); }
   else { toast("·xcb6633", '#ffb3b3', 5); sayLine("·x35a608", _xdb11f2(c.name)); }
 }
 function wholeHouse() {
@@ -14372,7 +14372,7 @@ const _startSceneRel = _x08c229;
 _x08c229 = function (menu, ...a) {
   const r = _startSceneRel(menu, ...a);
   const name = menu === "_x871ab5" ? _x601af7()?.name : menu === 'affair' ? UI.lover?.name : S.spouse, k = name ? cariño(name) : 0;
-  if (k >= 5 && UI._xc28808) { UI._xc28808.her = Math.max(UI._xc28808.her || 0, k); toast("·x0664c4", '#ffc0d0', 3); }
+  if (k >= 5 && UI._xc28808) { if (UI._xc28808) UI._xc28808.her = Math.max(UI._xc28808.her || 0, k); toast("·x0664c4", '#ffc0d0', 3); }
   return r;
 };
 
@@ -17355,7 +17355,7 @@ const _updateRitoActs = update;
 update = function (dt) {
   _updateRitoActs(dt);
   const def = _xdaa132.find(x => x.id === UI._x108bc2);
-  if (def?.rito && UI._x0c7a68 === "_xab155a" && UI._xc28808 && ritoActual() === def.rito) { UI._xc28808.her = Math.min(100, UI._xc28808.her + dt * 1.5); (UI.ritoActs ??= new Set()).add(def.id); }
+  if (def?.rito && UI._x0c7a68 === "_xab155a" && UI._xc28808 && ritoActual() === def.rito) { if (UI._xc28808) UI._xc28808.her = Math.min(100, UI._xc28808.her + dt * 1.5); (UI.ritoActs ??= new Set()).add(def.id); }
 };
 const _finishRitoActs = _xace719;
 _xace719 = function (...a) {
@@ -17832,7 +17832,7 @@ update = function (dt) {
   if ((UI.ropaEvT = (UI.ropaEvT ?? 12) - dt) > 0) return; UI.ropaEvT = 14 + Math.random() * 8;
   const ropa = [...(UI.wear || [])].map(id => LINGERIE.find(l => l.id === id)).filter(Boolean), toys = [...(UI.toysOn || [])].map(id => TOYS.find(t => t.id === id)).filter(Boolean);
   const cosas = [...ropa.map(l => [l.name, pickOne(["·x7691cb", "·x01fb07", "·x03383f"])]), ...toys.map(t => [t.name, pickOne(["·x35f504", "·x68d8fa", "·xde0221"])])];
-  if (!cosas.length) return; const [n, e] = pickOne(cosas); UI._xc28808.her = Math.min(100, UI._xc28808.her + 6); toast(`✨ ${n}: ${_x15aa92()} ${e}.`, '#ffd0e0', 4);
+  if (!cosas.length) return; const [n, e] = pickOne(cosas); if (UI._xc28808) UI._xc28808.her = Math.min(100, UI._xc28808.her + 6); toast(`✨ ${n}: ${_x15aa92()} ${e}.`, '#ffd0e0', 4);
 };
 
 
@@ -17963,7 +17963,7 @@ update = function (dt) {
   if (UI.menu !== "_x871ab5" || UI._x0c7a68 !== "_xab155a" || !UI._xc28808) return;
   if ((UI.momEspT = (UI.momEspT ?? 10) - dt) > 0) return; UI.momEspT = 16 + Math.random() * 8;
   const txt = UI.especial === 'casa' ? pickOne(MOMENTOS_CASA) : _x601af7() === ITZEL ? pickOne(MOMENTOS_ITZEL) : MAS_ESP[UI.especial]?.[2];
-  if (!txt) return; UI._xc28808.her = Math.min(100, UI._xc28808.her + 4); toast(`✨ ${txt}.`, UI.especial === 'casa' ? '#e8b048' : '#e8a0c0', 4);
+  if (!txt) return; if (UI._xc28808) UI._xc28808.her = Math.min(100, UI._xc28808.her + 4); toast(`✨ ${txt}.`, UI.especial === 'casa' ? '#e8b048' : '#e8a0c0', 4);
 };
 const _startMasReset = _x08c229;
 _x08c229 = function (...a) { UI.accItzel = -1; UI.momEspT = 10; return _startMasReset(...a); };
@@ -18240,7 +18240,7 @@ const _startNochesPropias = _x08c229;
 _x08c229 = function (...a) {
   const r = _startNochesPropias(...a);
   UI.momPropioT = 12;
-  if (_x15aa92() === 'Itzel' && S.itzelPromesa && S.day <= S.itzelPromesa) { S.itzelPromesa = 0; UI._xc28808.her = Math.min(50, UI._xc28808.her + 15); setTimeout(() => toast("·x432540", '#e8a0c0', 4), 1200); }
+  if (_x15aa92() === 'Itzel' && S.itzelPromesa && S.day <= S.itzelPromesa) { S.itzelPromesa = 0; if (UI._xc28808) UI._xc28808.her = Math.min(50, UI._xc28808.her + 15); setTimeout(() => toast("·x432540", '#e8a0c0', 4), 1200); }
   return r;
 };
 
@@ -18370,7 +18370,7 @@ sceneDecor = function (place, ox, fy, winW) {
 const conMetztli = () => UI.menu === "_x871ab5" && _x601af7() === METZTLI;
 function mirarLuna() {
   if (!conMetztli() || UI.lunaVista || !UI._xc28808) return; UI.lunaVista = true;
-  UI._xc28808.her = Math.min(100, UI._xc28808.her + (lunaLlena() ? 20 : 12)); UI._xc28808.me = Math.min(95, UI._xc28808.me + 6);
+  UI._xc28808.her = Math.min(100, UI._xc28808.her + (lunaLlena() ? 20 : 12)); if (UI._xc28808) UI._xc28808.me = Math.min(95, UI._xc28808.me + 6);
   sayLine(lunaLlena() ? "·xe739b9" : "·xec9bae", _xdb11f2('Metztli'));
   toast("·xdb9bac", '#dfe4ff', 4);
 }
@@ -18490,13 +18490,13 @@ sceneDecor = function (place, ox, fy, winW) {
 const conChantico = () => UI.menu === "_x871ab5" && _x601af7() === CHANTICO, conItzpa = () => UI.menu === "_x871ab5" && _x601af7() === ITZPAPALOTL;
 function avivarFuego() {
   if (!conChantico() || UI.fuegoVivo || !UI._xc28808) return; UI.fuegoVivo = true;
-  UI._xc28808.her = Math.min(100, UI._xc28808.her + 15); sayLine("·x46f7ce", _xdb11f2('Chantico')); toast("·x5de783", '#ffc080', 5);
+  if (UI._xc28808) UI._xc28808.her = Math.min(100, UI._xc28808.her + 15); sayLine("·x46f7ce", _xdb11f2('Chantico')); toast("·x5de783", '#ffc080', 5);
 }
 function retoObsidiana() {
   if (!conItzpa() || UI.retoHecho || !UI._xc28808) return; UI.retoHecho = true;
   const gana = Math.random() < Math.min(0.85, 0.35 + (S.honor || 0) / 100);
-  if (gana) { UI._xc28808.her = Math.min(100, UI._xc28808.her + 25); S.favor ??= {}; S.favor['Itzpapálotl'] = Math.min(10, (S.favor['Itzpapálotl'] || 0) + 0.5); sayLine("·xcb70f6", _xdb11f2('Itzpapálotl')); toast("·xa4e661", '#c8b8e8', 5); }
-  else { UI._xc28808.her = Math.min(100, UI._xc28808.her + 10); UI._xc28808.me = Math.min(95, UI._xc28808.me + 10); sayLine("·x5f904c", _xdb11f2('Itzpapálotl')); toast("·x5df1e3", '#c8b8e8', 5); }
+  if (gana) { if (UI._xc28808) UI._xc28808.her = Math.min(100, UI._xc28808.her + 25); S.favor ??= {}; S.favor['Itzpapálotl'] = Math.min(10, (S.favor['Itzpapálotl'] || 0) + 0.5); sayLine("·xcb70f6", _xdb11f2('Itzpapálotl')); toast("·xa4e661", '#c8b8e8', 5); }
+  else { if (UI._xc28808) UI._xc28808.her = Math.min(100, UI._xc28808.her + 10); UI._xc28808.me = Math.min(95, UI._xc28808.me + 10); sayLine("·x5f904c", _xdb11f2('Itzpapálotl')); toast("·x5df1e3", '#c8b8e8', 5); }
 }
 const _updateFuego = update;
 update = function (dt) { _updateFuego(dt); if (conChantico() && UI.fuegoVivo && UI._x0c7a68 === "_xab155a" && UI._xc28808 && (UI._xc9f8eb ?? 1) === 2) UI._xc28808.her = Math.min(100, UI._xc28808.her + dt * 0.8); };
@@ -18679,12 +18679,12 @@ const conChicome = () => UI.menu === "_x871ab5" && _x601af7() === CHICOME, conMa
 function compartirTortillas() {
   if (!conChicome() || UI.tortillasHecho || !UI._xc28808) return; UI.tortillasHecho = true;
   const hay = S.inv.tort_maiz > 0; if (hay) S.inv.tort_maiz--;
-  UI._xc28808.her = Math.min(100, UI._xc28808.her + (hay ? 18 : 8)); S.energy = Math.min(S.maxE, S.energy + 10);
+  if (UI._xc28808) UI._xc28808.her = Math.min(100, UI._xc28808.her + (hay ? 18 : 8)); S.energy = Math.min(S.maxE, S.energy + 10);
   sayLine(hay ? "·x50b278" : "·x5ec430", _xdb11f2('Chicomecóatl')); toast("·xff5922", '#f4d35e', 5);
 }
 function banoCascada() {
   if (!conMatlal() || UI.cascadaHecho || !UI._xc28808) return; UI.cascadaHecho = true;
-  UI._xc28808.her = Math.min(100, UI._xc28808.her + 15); S.energy = Math.min(S.maxE, S.energy + 15); S.hp = Math.min(MAX_HP, S.hp + 15);
+  if (UI._xc28808) UI._xc28808.her = Math.min(100, UI._xc28808.her + 15); S.energy = Math.min(S.maxE, S.energy + 15); S.hp = Math.min(MAX_HP, S.hp + 15);
   sayLine("·xbac6f3", _xdb11f2('Matlalcueye')); toast("·x2894ad", '#bfe8f4', 5);
 }
 const _updateMaiz = update;
@@ -18806,7 +18806,7 @@ function ofrendaLecho() {
   const it = OFRENDA_LECHO[n] || OFRENDA_DIOSA[n] || 'flores';
   if (!(S.inv[it] > 0)) return toast("·x396522", '#ffd9a8', 4);
   S.inv[it]--; UI.ofrendaLecho = true; UI.diosaFx = 1.6;
-  UI._xc28808.her = Math.min(100, UI._xc28808.her + 15); S.favor ??= {}; S.favor[n] = Math.min(10, (S.favor[n] || 0) + 0.5);
+  if (UI._xc28808) UI._xc28808.her = Math.min(100, UI._xc28808.her + 15); S.favor ??= {}; S.favor[n] = Math.min(10, (S.favor[n] || 0) + 0.5);
   sayLine(pickOne(["·xb391ad", "·xca4366", "·xa755b2"]), _xdb11f2(n));
   toast("·x48a9f9", `rgb(${colDiosa(n)})`, 4);
 }
@@ -21946,9 +21946,9 @@ _x08c229 = function(menu, ...a) {
     const r = _xacbd0a(menu, ...a);
     if (menu === "_x871ab5" && UI._xc28808 && deLaCasa(_x601af7())) {
         const lvl = S._xbd00cc || 1;
-        UI._xc28808.her = Math.min(100, UI._xc28808.her + (lvl - 1) * 10);
+        if (UI._xc28808) UI._xc28808.her = Math.min(100, UI._xc28808.her + (lvl - 1) * 10);
         if (UI.vipActive) {
-            UI._xc28808.her = Math.min(100, UI._xc28808.her + 20);
+            if (UI._xc28808) UI._xc28808.her = Math.min(100, UI._xc28808.her + 20);
             toast("·x4b87cd", '#ffd060', 4);
             UI.vipActive = false;
         }
@@ -22649,7 +22649,7 @@ update = function(dt) {
         UI._xc28808.me = Math.max(0, UI._xc28808.me - dt * 3); 
         if (S.hp <= 0) { S.hp = 1; toast("·x15c2bd", '#ff9090'); _x6d5b1f(); return; }
     } else if (UI.relaxed && !UI.prepDone && !UI.oiled) {
-        UI._xc28808.me = Math.min(99, UI._xc28808.me + dt * 1.2); 
+        if (UI._xc28808) UI._xc28808.me = Math.min(99, UI._xc28808.me + dt * 1.2); 
     }
 
     
@@ -22765,7 +22765,7 @@ addEventListener('keydown', e => {
         if (dist < 30) { 
             const streak = UI.prostateFocus ? (UI.prostateStreak = Math.min(6, (UI.prostateStreak || 0) + 1)) : 0;
             const bonus = UI.prostateFocus ? Math.min(15, (streak - 1) * 3) : 0;
-            UI._xc28808.me = Math.min(100, UI._xc28808.me + 15 + bonus);
+            if (UI._xc28808) UI._xc28808.me = Math.min(100, UI._xc28808.me + 15 + bonus);
             UI._xc28808.her = Math.min(100, UI._xc28808.her + 10 + (UI.prostateFocus ? 2 : 0));
             UI._xf71b19 = 0.5; 
             if (SND.on) tone(880, 0.2, { type:'triangle', vol:0.1 });
@@ -22828,10 +22828,10 @@ update = function(dt) {
         sayLine("·x6fcbd5", _xdb11f2(_x15aa92()));
     }
     if (UI.begging) {
-        UI._xc28808.me = Math.min(95, UI._xc28808.me); 
+        if (UI._xc28808) UI._xc28808.me = Math.min(95, UI._xc28808.me); 
         if ((UI.begT -= dt) <= 0) {
             UI.begging = false;
-            UI._xc28808.me = Math.max(0, UI._xc28808.me - 15);
+            if (UI._xc28808) UI._xc28808.me = Math.max(0, UI._xc28808.me - 15);
             UI.begPausa = T + 6; 
             sayLine("·x69efbb", _xdb11f2(_x15aa92()));
             toast("·x385ca7", '#ff9090', 3);
@@ -22908,7 +22908,7 @@ function apretar() {
     if (!(UI._x0c7a68 === "_xab155a" && esRolTe()) || UI.clenchT > 0 || !UI._xc28808) return;
     UI.clenchT = 2; 
     UI._xc28808.me = Math.min(100, UI._xc28808.me + 8);
-    UI._xc28808.her = Math.max(0, UI._xc28808.her - 5); 
+    if (UI._xc28808) UI._xc28808.her = Math.max(0, UI._xc28808.her - 5); 
     UI._x69476e = 0; 
     if (SND.on) tone(150, 0.2, { type:'sawtooth', vol:0.1 });
     toast("·x2348a1", '#ffd0e0', 2);
@@ -23033,7 +23033,7 @@ elegirRitmo = function(i) {
     if (!aguanta) return;
     UI._xc28808.me = 80;
     UI.resistMult = Math.min(3, UI.resistMult + 0.5);
-    UI._xc28808.her = Math.min(100, UI._xc28808.her + 10);
+    if (UI._xc28808) UI._xc28808.her = Math.min(100, UI._xc28808.her + 10);
     if (SND.on) tone(440, 0.3, { type:'triangle', vol:0.1 });
     sayLine(pickOne(["·xb37aa9", "·xe042d8", "·x3ae0b4"]), _xdb11f2(_x15aa92()));
     toast("·xe85e82", '#8affa0', 3);
@@ -23074,13 +23074,13 @@ update = function(dt) {
         if (keys[']']) UI.tension = Math.min(100, UI.tension + dt * 40);
         UI.tension = Math.min(100, UI.tension + dt * 3);
         if (UI.tension >= 40 && UI.tension <= 60) {
-            UI._xc28808.me = Math.min(100, UI._xc28808.me + dt * 2);
+            if (UI._xc28808) UI._xc28808.me = Math.min(100, UI._xc28808.me + dt * 2);
             UI._xc28808.her = Math.min(100, UI._xc28808.her + dt * 2);
         } else if (UI.tension > 70) {
-            UI._xc28808.her = Math.max(0, UI._xc28808.her - dt * 4);
+            if (UI._xc28808) UI._xc28808.her = Math.max(0, UI._xc28808.her - dt * 4);
             if (!UI._x58dc4e && Math.random() < dt * 0.5) sayLine("·x7820d9", _xdb11f2(_x15aa92()));
         } else if (UI.tension < 30) {
-            UI._xc28808.her = Math.max(0, UI._xc28808.her - dt * 2);
+            if (UI._xc28808) UI._xc28808.her = Math.max(0, UI._xc28808.her - dt * 2);
         }
     }
 
@@ -23089,7 +23089,7 @@ update = function(dt) {
         UI._x31b23b += dt;
         S.hp = Math.max(0, S.hp - dt * 5);
         S.energy = Math.max(0, S.energy - dt * 3);
-        UI._xc28808.her = Math.min(100, UI._xc28808.her + dt * 10);
+        if (UI._xc28808) UI._xc28808.her = Math.min(100, UI._xc28808.her + dt * 10);
         if (S.hp <= 1) {
             S.hp = 1; UI._x127229 = false;
             toast("·x7f22ea", '#ff9090', 5);
@@ -23108,7 +23108,7 @@ update = function(dt) {
         UI.divineT += dt;
         if ((UI.divinePace -= dt) <= 0) { UI.divinePace = 1.2; UI._xc9f8eb = (UI._xc9f8eb ?? 1) === 2 ? 0 : 2; }
         UI._xc28808.me = Math.min(99, UI._xc28808.me + dt * 6);
-        UI._xc28808.her = Math.min(100, UI._xc28808.her + dt * 8);
+        if (UI._xc28808) UI._xc28808.her = Math.min(100, UI._xc28808.her + dt * 8);
         if (UI.divineT >= 15) {
             UI.divinePunish = false;
             (S.coronaDiosa ??= {})[_x601af7().name] = true;
@@ -23245,14 +23245,14 @@ update = function(dt) {
     if (!parejaEmbarazada()) return;
     const name = _x15aa92(), pace = UI._xc9f8eb ?? 1;
     if (pace === 2) {
-        UI._xc28808.her = Math.max(0, UI._xc28808.her - dt * 1.5);
+        if (UI._xc28808) UI._xc28808.her = Math.max(0, UI._xc28808.her - dt * 1.5);
         if (!UI.pregWarn) {
             UI.pregWarn = true;
             sayLine("·x1d5afd", _xdb11f2(name));
             toast("·xe346b1", '#ffb3b3', 4);
         }
     } else if (pace === 0) {
-        UI._xc28808.her = Math.min(100, UI._xc28808.her + dt * 1.2);
+        if (UI._xc28808) UI._xc28808.her = Math.min(100, UI._xc28808.her + dt * 1.2);
         if (!UI.pregSafe) {
             UI.pregSafe = true;
             sayLine("·x4ee045", _xdb11f2(name));
@@ -23319,7 +23319,7 @@ update = function(dt) {
 
     
     if (UI.touchingHer) {
-        UI._xc28808.her = Math.min(100, UI._xc28808.her + dt * 6);
+        if (UI._xc28808) UI._xc28808.her = Math.min(100, UI._xc28808.her + dt * 6);
         UI._xc28808.me = Math.min(100, UI._xc28808.me + dt * 1.5);
     }
 
@@ -23336,7 +23336,7 @@ update = function(dt) {
                 if (UI.menu === menu && UI._x108bc2 === 'te_carretilla' && UI._x0c7a68 === "_xab155a" && ["_x871ab5", 'night', 'love', 'affair'].includes(menu)) _xace719();
             }, 1500);
         } else if (UI.balance > 30 && UI.balance < 70) {
-            UI._xc28808.her = Math.min(100, UI._xc28808.her + dt * 1.5);
+            if (UI._xc28808) UI._xc28808.her = Math.min(100, UI._xc28808.her + dt * 1.5);
         }
     }
 };
@@ -23415,7 +23415,7 @@ update = function(dt) {
         R.activo = false; R.nextCmd = 8 + Math.random() * 4;
         if ((UI._xc9f8eb ?? 1) === R.targetPace) {
             R.success++;
-            UI._xc28808.her = Math.min(100, UI._xc28808.her + 15);
+            if (UI._xc28808) UI._xc28808.her = Math.min(100, UI._xc28808.her + 15);
             UI._xc28808.me = Math.min(100, UI._xc28808.me + 10);
             if (R.success % 5 === 0) toast("·x3f9bba", '#ffd060', 5);
         } else {
@@ -23450,7 +23450,7 @@ afirmarla = function() {
     const eraTe = UI._x0c7a68 === "_xab155a" && esRolTe(), antes = UI.afirmT;
     _afirmarlaEuforia();
     if (eraTe && UI.afirmT !== antes && UI._xc28808) {
-        UI._xc28808.her = Math.min(100, UI._xc28808.her + 45);
+        if (UI._xc28808) UI._xc28808.her = Math.min(100, UI._xc28808.her + 45);
         const quien = _x15aa92();
         setTimeout(() => { if (UI._x0c7a68 === "_xab155a" && _x15aa92() === quien) sayLine("·xb46648", _xdb11f2(quien)); }, 1500);
         toast("·x911b07", '#5bcefa', 6);
@@ -23598,7 +23598,7 @@ addEventListener('keydown', e => {
         e.stopImmediatePropagation();
         if (k !== UI.weakPoint.tecla) { toast("·x000781", '#ffb3b3', 2); fallarPuntoDebil(); return; }
         UI.weakPoint = null; UI.weakPointTimer = 5 + Math.random() * 4;
-        UI._xc28808.her = Math.min(100, UI._xc28808.her + 15);
+        if (UI._xc28808) UI._xc28808.her = Math.min(100, UI._xc28808.her + 15);
         UI._xc28808.me = Math.min(100, UI._xc28808.me + 5);
         if (SND.on) SFX.moan({ pitch:400 });
         toast("·x371f99", '#ff90b0', 2);
@@ -23681,7 +23681,7 @@ update = function(dt) {
     _updatePower(dt);
     if (UI.menu !== "_x871ab5" || _x601af7() !== ITZEL || UI._x0c7a68 !== "_xab155a" || !UI._xc28808) return;
     if (UI.itzelPotion) {
-        UI._xc28808.her = Math.min(100, UI._xc28808.her + dt * 2.5);
+        if (UI._xc28808) UI._xc28808.her = Math.min(100, UI._xc28808.her + dt * 2.5);
         S.energy = Math.max(0, S.energy - dt * 1.5);
     }
     if (UI._xca30d0) { 
@@ -23900,14 +23900,14 @@ update = function(dt) {
         UI.cadenaSync = Math.max(0, Math.min(100, UI.cadenaSync + (Math.random() - 0.5) * 50 * dt + (UI.cadenaSync - 50) * 0.35 * dt));
         if (UI.cadenaSync <= 5 || UI.cadenaSync >= 95) {
             UI.cadenaSync = 50;
-            UI._xc28808.her = Math.max(0, UI._xc28808.her - 15);
+            if (UI._xc28808) UI._xc28808.her = Math.max(0, UI._xc28808.her - 15);
             if (!UI._x58dc4e) sayLine("·x46d01a", _xdb11f2(TRANS.name));
         }
     }
 
     
     if (UI._x108bc2 === "_x7e5d59") {
-        if (!UI._xa4005e) { UI._xa4005e = true; UI._xc28808.me = Math.min(UI._xc28808.me, 50); }
+        if (!UI._xa4005e) { UI._xa4005e = true; if (UI._xc28808) UI._xc28808.me = Math.min(UI._xc28808.me, 50); }
         for (const o of others()) if ((UI.groupPl[o.name] || 0) >= 100) UI._xc8b07d.add(o.name);
         if (UI.herCame || UI._xc28808.her >= 100) UI._xc8b07d.add(_x601af7().name);
         if (UI._xc8b07d.size >= others().length + 1 && !UI._xe035f0) {
@@ -23922,7 +23922,7 @@ const _withWomanPower = withWoman;
 withWoman = function(...a) {
     const r = _withWomanPower(...a);
     if (UI._x108bc2 === "_x7e5d59" && !UI._xe035f0 && UI._xc28808) {
-        UI._xc28808.me = Math.min(UI._xc28808.me, 50);
+        if (UI._xc28808) UI._xc28808.me = Math.min(UI._xc28808.me, 50);
         toast("·xbc57ee", '#ffd0e0', 3);
     }
     return r;
@@ -23952,7 +23952,7 @@ addEventListener('keydown', e => {
     if (UI._x0c7a68 !== "_xab155a" || UI._x108bc2 !== 'tt_cadena' || e.repeat || e.key !== ' ') return;
     e.stopImmediatePropagation(); e.preventDefault();
     if (UI.cadenaSync > 40 && UI.cadenaSync < 60) {
-        UI._xc28808.her = Math.min(100, UI._xc28808.her + 5);
+        if (UI._xc28808) UI._xc28808.her = Math.min(100, UI._xc28808.her + 5);
         UI._xc28808.me = Math.min(100, UI._xc28808.me + 5);
         if (SND.on) tone(880, 0.1, { type:'triangle', vol:0.05 });
     } else if (SND.on) tone(220, 0.1, { type:'sawtooth', vol:0.05 });
@@ -24180,13 +24180,13 @@ SHOPS.itzelMenu.rows = (base => () => {
 function adivinarItzel(id) {
     if (!UI.itzelTease || !UI.itzelGuess || !UI._xc28808) return;
     if (id === UI.itzelGuess) {
-        UI._xc28808.me = Math.min(100, UI._xc28808.me + 25);
+        if (UI._xc28808) UI._xc28808.me = Math.min(100, UI._xc28808.me + 25);
         UI._xc28808.her = Math.min(100, UI._xc28808.her + 15);
         toast("·xcbda1b", '#8affa0');
         sayLine("·xcd415e", _xdb11f2('Itzel'));
         if (SND.on) tone(880, 0.2, { type:'triangle' });
     } else {
-        UI._xc28808.me = Math.max(0, UI._xc28808.me - 10);
+        if (UI._xc28808) UI._xc28808.me = Math.max(0, UI._xc28808.me - 10);
         toast("·x9bdc95", '#ff9090');
     }
     UI.itzelGuess = null; UI.itzelTimer = 0;
@@ -24250,7 +24250,7 @@ pointerDown = function(px, py, button) {
     const pt = UI.phantomTouch;
     const enBoton = (UI._x9eddbc || []).some(r => px >= r.x && px <= r.x + r.w && py >= r.y && py <= r.y + r.h);
     if (pt && !enBoton && UI._x0c7a68 === "_xab155a" && Math.hypot(px - pt.x, py - pt.y) < 40) {
-        UI._xc28808.me = Math.min(100, UI._xc28808.me + 20);
+        if (UI._xc28808) UI._xc28808.me = Math.min(100, UI._xc28808.me + 20);
         UI._xc28808.her = Math.min(100, UI._xc28808.her + 10);
         toast("·xfa5953", '#ffd060');
         if (SND.on) tone(1200, 0.3, { type:'sine' });
@@ -24366,7 +24366,7 @@ SHOPS._xcc85d1.rows = () => {
     r.unshift({ icon:emojiIcon('🛏️'), name:"·x946396", price:"·x47a769", desc:"·x53c574", buy:() => {
         if (!pay(500)) return;
         _x94ab39(_x89dbd0); UI._xe58477 = "_x84dd7e"; UI.vipMode = true; UI.liveMusic = true;
-        UI._xc28808.her = Math.min(100, UI._xc28808.her + 25);
+        if (UI._xc28808) UI._xc28808.her = Math.min(100, UI._xc28808.her + 25);
         toast("·xef1e65", '#ffd060', 5);
     }});
     r.unshift({ icon:emojiIcon('🔨'), name:"·xfe9f71", price:S.subastaDia === S.day ? "·x99b2bb" : '', desc:"·x5c3086", buy:() => {
@@ -24436,8 +24436,8 @@ _x08c229 = function(...a) {
     if (name && enSusDias(name)) setTimeout(() => toast("·xd71ab6", '#ffd0e0', 5), 1500);
     if (UI._xc28808 && (UI.menu === "_x871ab5" || UI.menu === 'love' || UI.menu === 'night')) {
         const f = faseLuna();
-        if (f === 4) { UI._xc28808.her = Math.min(100, UI._xc28808.her + 20); setTimeout(() => toast("·x5b3d6a", '#dfe4ff', 4), 1000); }
-        else if (f === 0) { UI._xc28808.her = Math.max(0, UI._xc28808.her - 10); setTimeout(() => toast("·x398b93", '#dfe4ff', 4), 1000); }
+        if (f === 4) { if (UI._xc28808) UI._xc28808.her = Math.min(100, UI._xc28808.her + 20); setTimeout(() => toast("·x5b3d6a", '#dfe4ff', 4), 1000); }
+        else if (f === 0) { if (UI._xc28808) UI._xc28808.her = Math.max(0, UI._xc28808.her - 10); setTimeout(() => toast("·x398b93", '#dfe4ff', 4), 1000); }
     }
     return r;
 };
@@ -24457,7 +24457,7 @@ SHOPS.itzelMenu.rows = (base => () => {
         toast("·xab38e2", '#ffd0e0', 5);
         if (e === "_xfc1fea") { UI._x7bbfb6 = true; S.hp = Math.max(1, S.hp - 20); setTimeout(() => toast("·xa57a62", '#ff9090', 4), 1200); }
         if (e === 'venda') { UI.sub = { ...(UI.sub || {}), s_venda:true }; _x0e4e4f(); UI.routineStep = true; _x0575a2("_x2a7dbc"); UI.routineStep = false; setTimeout(() => toast("·x57a2aa", '#ffd0e0', 4), 1200); }
-        if (e === 'joya') { UI._xc28808.her = Math.max(UI._xc28808.her, 80); setTimeout(() => toast("·x0f1e36", '#ffd0e0', 4), 1200); }
+        if (e === 'joya') { if (UI._xc28808) UI._xc28808.her = Math.max(UI._xc28808.her, 80); setTimeout(() => toast("·x0f1e36", '#ffd0e0', 4), 1200); }
     }});
     return r;
 })(SHOPS.itzelMenu.rows);
@@ -24495,14 +24495,14 @@ SHOPS._xc0e562.rows = (base => () => {
     }});
     if (hoy._xe16daf !== S.day) {
         r.push({ icon:emojiIcon('💆‍♀️'), name:"·x1fa319", price:'', desc:"·x788a24", buy:() => {
-            hoy._xe16daf = S.day; amorConc(c); S.poison = false; S.energy = Math.max(S.energy, S.maxE); UI._xc28808.her = Math.max(UI._xc28808.her, 30);
+            hoy._xe16daf = S.day; amorConc(c); S.poison = false; S.energy = Math.max(S.energy, S.maxE); if (UI._xc28808) UI._xc28808.her = Math.max(UI._xc28808.her, 30);
             toast("·xae0216", '#c8f7a0', 4);
         }});
     }
     if ((S.inv.miel || 0) > 0 || (S.inv.chocolate || 0) > 0) {
         r.push({ icon:emojiIcon('🍽️'), name:"·xf3647c", price:"·x70e446", desc:"·xa3ba40", buy:() => {
             if ((S.inv.miel || 0) > 0) S.inv.miel--; else S.inv.chocolate--;
-            amorConc(c); UI._xc28808.her = Math.max(UI._xc28808.her, 50); UI._xc28808.me = Math.max(UI._xc28808.me, 20);
+            amorConc(c); if (UI._xc28808) UI._xc28808.her = Math.max(UI._xc28808.her, 50); UI._xc28808.me = Math.max(UI._xc28808.me, 20);
             toast("·xa093e6", '#ffd0e0', 4);
         }});
     }
@@ -24512,7 +24512,7 @@ SHOPS._xc0e562.rows = (base => () => {
 
 function usarHielo() {
     if (UI.iceUsed || !(S.inv.hielo > 0) || !UI._xc28808) return;
-    UI.iceUsed = true; S.inv.hielo--; UI._xc28808.me = Math.min(100, UI._xc28808.me + 15); S.hp = Math.max(1, S.hp - 10);
+    UI.iceUsed = true; S.inv.hielo--; if (UI._xc28808) UI._xc28808.me = Math.min(100, UI._xc28808.me + 15); S.hp = Math.max(1, S.hp - 10);
     toast("·xf3c1e5", '#9fd3ff');
 }
 function empezarCaceria() { UI.huntStarted = true; UI.huntProgress = 50; toast('🏃 ¡Corre! (← → rápido para escapar)', '#ffd060'); }
@@ -24644,7 +24644,7 @@ const _reinaUpdate = update;
 update = function(dt) {
     _reinaUpdate(dt);
     if (UI._x0c7a68 !== "_xab155a" || !UI._xc28808) return;
-    if (UI.atHome && others().length && S._x2cf872 && !UI._x944071) { UI._x944071 = true; UI._xc28808.her = Math.min(100, UI._xc28808.her + 20); }
+    if (UI.atHome && others().length && S._x2cf872 && !UI._x944071) { UI._x944071 = true; if (UI._xc28808) UI._xc28808.her = Math.min(100, UI._xc28808.her + 20); }
     if (UI.reinaMode) UI._xc9f8eb = 0;
 };
 const _reinaFinish = _xace719;
@@ -24697,7 +24697,7 @@ const _x8acb80 = susto => {
     _x08c229("_x871ab5"); UI._xe58477 = 'recamara'; UI.atHome = true;
     if (susto) {
         toast("·x4bc6c3", '#ffd0e0', 5);
-        setTimeout(() => { if (UI._x601af7 === a && UI._xc28808) { sayLine(pickOne(["·xa3f342", "·x805e6e", "·x27ccf4"]), _xdb11f2(a.name)); UI._xc28808.her = Math.min(100, UI._xc28808.her + 20); } }, 1000);
+        setTimeout(() => { if (UI._x601af7 === a && UI._xc28808) { sayLine(pickOne(["·xa3f342", "·x805e6e", "·x27ccf4"]), _xdb11f2(a.name)); if (UI._xc28808) UI._xc28808.her = Math.min(100, UI._xc28808.her + 20); } }, 1000);
     } else toast("·x01bc35", '#ffd0e0', 4);
 };
 SHOPS.travesura = { title:"·x19af48", compact:true, sub:() => "·x5abaa2", rows:() => [
@@ -24755,7 +24755,7 @@ SHOPS.spouse.rows = (base => () => {
             const f = S.esposaDiario;
             if (!empezarConEsposa(f.place || null)) return;
             if (f._x2ade22) (UI._xf7639b ??= {})[f._x2ade22] = true;
-            UI.fantasiaEsposa = true; UI._xc28808.her = Math.max(UI._xc28808.her, 80);
+            UI.fantasiaEsposa = true; if (UI._xc28808) UI._xc28808.her = Math.max(UI._xc28808.her, 80);
             toast("·x6f9bc8", '#ffd060', 6);
         }});
     }
@@ -24789,7 +24789,7 @@ SHOPS.nocheElige.rows = (base => () => {
         }});
         r.unshift({ icon:emojiIcon('🌙'), name:"·x051cfe", price:'', desc:"·x2709d1", buy:() => {
             const w = pickOne(casaGente()).c;
-            amorConc(w); UI._xc28808.her = Math.max(UI._xc28808.her, 50);
+            amorConc(w); if (UI._xc28808) UI._xc28808.her = Math.max(UI._xc28808.her, 50);
             toast("·xa0685d", '#ffd060', 6);
         }});
     }
@@ -24802,7 +24802,7 @@ SHOPS._xcc85d1.rows = (base => () => {
         const all = [...casaLibres()].sort(() => Math.random() - 0.5).slice(0, GROUP_MAX);
         if (!all.length) { S.money += 500; return toast("·x3b0084", '#ffd9a8', 4); }
         _x94ab39(all[0]); UI.group = all.slice(1); UI.groupTrans = false; UI._xe58477 = "_x84dd7e";
-        if (UI._xc28808) { UI._xc28808.her = Math.max(UI._xc28808.her, 50); UI._xc28808.me = Math.max(UI._xc28808.me, 30); }
+        if (UI._xc28808) { if (UI._xc28808) UI._xc28808.her = Math.max(UI._xc28808.her, 50); UI._xc28808.me = Math.max(UI._xc28808.me, 30); }
         toast("·xf5cc87", '#ffd060', 6);
     }});
     return r;
@@ -25868,7 +25868,7 @@ update = function (dt) {
   if (!UI.toysOn || !UI._xc28808 || UI._x0c7a68 !== "_xab155a") return;
   if (UI.toysOn.has('abanico_jade') && (UI.abanicoExtraT = (UI.abanicoExtraT || 0) - dt) <= 0) {
     UI.abanicoExtraT = 5;
-    UI._xc28808.her = Math.min(100, UI._xc28808.her + 1);
+    if (UI._xc28808) UI._xc28808.her = Math.min(100, UI._xc28808.her + 1);
   }
   if (UI.toysOn.has('campanillas_oro') && (UI.campanillasT = (UI.campanillasT || 0) - dt) <= 0) {
     UI.campanillasT = 0.9 / Math.max(0.6, _xc9f8eb());
@@ -27627,7 +27627,7 @@ function activateMega16SceneButton(id) {
     UI._x7bbfb6 = true;
     toast("·x23911b", '#ffd0e0', 4);
   } else if (id === "·x54d69a") {
-    UI._xc28808.me = Math.min(100, UI._xc28808.me + 15);
+    if (UI._xc28808) UI._xc28808.me = Math.min(100, UI._xc28808.me + 15);
     UI._xc28808.her = Math.min(100, UI._xc28808.her + 5);
     sayLine("·x436bab", _xdb11f2(_x601af7().name));
   }
@@ -31113,7 +31113,7 @@ for (const [nom, fn] of [['acceptItzel', acceptItzel], ['rejectItzel', rejectItz
     const antes = UI._x108bc2, r = _setAct37(id);
     const R = UI.r37;
     if (R?.pedido && UI._x108bc2 === R.pedido.id && antes !== UI._x108bc2 && UI._xc28808) {
-      UI._xc28808.her = Math.min(100, UI._xc28808.her + 10); sayLine("·x9ed2ef", _xdb11f2(nom())); R.pedido = null;
+      if (UI._xc28808) UI._xc28808.her = Math.min(100, UI._xc28808.her + 10); sayLine("·x9ed2ef", _xdb11f2(nom())); R.pedido = null;
     }
     return r;
   };
@@ -31796,7 +31796,7 @@ for (const [nom, fn] of [['acceptItzel', acceptItzel], ['rejectItzel', rejectItz
     _x08c229("_x871ab5"); UI._xe58477 = 'recamara'; UI.atHome = true; UI.r40Ses = true;
     UI._xf7639b = { _x96d352:true, _x04b748:true, ...(intenso ? { venda:true, collar:true } : {}) };
     if (UI.r36) UI.r36.conf = Math.min(100, UI.r36.conf + 25);
-    UI._xc28808.her = Math.min(100, UI._xc28808.her + 10);
+    if (UI._xc28808) UI._xc28808.her = Math.min(100, UI._xc28808.her + 10);
     setTimeout(() => { if (UI.menu === "_x871ab5") sayLine(intenso ? "·xab5a6c" : "·x53252f", _xdb11f2(c.name)); }, 1200);
   };
   SHOPS.r40Cuarto = { title:"·x4af55f", sub:() => { const c = quien(); return c ? "·xad919c" : "·x58a598"; }, rows:() => {
@@ -31923,7 +31923,7 @@ for (const [nom, fn] of [['acceptItzel', acceptItzel], ['rejectItzel', rejectItz
     const r = _st41(m);
     if (!fiesta() || !UI._xc28808) return r;
     UI.r41 = { fiesta:true };
-    UI._xc28808.her = Math.min(100, UI._xc28808.her + 12);
+    if (UI._xc28808) UI._xc28808.her = Math.min(100, UI._xc28808.her + 12);
     if (UI.r39) { try { if (UI.menu === "_x871ab5" && _x601af7()?.look?.goddess) UI.r39.fiesta = true; } catch (e) {} }
     setTimeout(() => { if (UI.menu === m) toast("·x8e02d4", '#ffd060', 5); }, 1100);
     return r;
@@ -31989,7 +31989,7 @@ for (const [nom, fn] of [['acceptItzel', acceptItzel], ['rejectItzel', rejectItz
       if (!UI.r42) return;
       toast("·xdac4b5", '#ffd0e0', 6);
       if (v < 2) toast("·x5a3c45", '#ffe0a0', 4);
-      if (R.noche) { UI._xc28808.her = Math.min(100, UI._xc28808.her + 20); toast("·x7fc94a", '#ffd060', 5); }
+      if (R.noche) { if (UI._xc28808) UI._xc28808.her = Math.min(100, UI._xc28808.her + 20); toast("·x7fc94a", '#ffd060', 5); }
     }, 1300);
     return r;
   };
@@ -32156,10 +32156,10 @@ for (const [nom, fn] of [['acceptItzel', acceptItzel], ['rejectItzel', rejectItz
     const R = UI.r43;
     if (R?.mut && UI._x0c7a68 === "_xab155a") {
       R.chk -= dt;
-      if (R.chk <= 0) { R.chk = 20; R.trust = Math.min(100, R.trust + 6); UI._xc28808.her = Math.min(100, UI._xc28808.her + 2); UI._xc28808.me = Math.min(100, UI._xc28808.me + 2); sayLine(pickOne(["·x671307", "·x3ca9f4", "·x0af650"]), _xdb11f2(nom43())); }
+      if (R.chk <= 0) { R.chk = 20; R.trust = Math.min(100, R.trust + 6); if (UI._xc28808) UI._xc28808.her = Math.min(100, UI._xc28808.her + 2); UI._xc28808.me = Math.min(100, UI._xc28808.me + 2); sayLine(pickOne(["·x671307", "·x3ca9f4", "·x0af650"]), _xdb11f2(nom43())); }
     }
     
-    if (R?._x2383cc && UI._x0c7a68 === "_xab155a") { R.tT += dt; if (R.tT > 20) { R.tT = 0; UI._xc28808.her = Math.min(100, UI._xc28808.her + 3); } }
+    if (R?._x2383cc && UI._x0c7a68 === "_xab155a") { R.tT += dt; if (R.tT > 20) { R.tT = 0; if (UI._xc28808) UI._xc28808.her = Math.min(100, UI._xc28808.her + 3); } }
     
     const A = UI.r43An;
     if (!A || UI._x0c7a68 !== "_xab155a" || UI.menu !== "_x871ab5") return;
@@ -32175,7 +32175,7 @@ for (const [nom, fn] of [['acceptItzel', acceptItzel], ['rejectItzel', rejectItz
     if (lleva || cansa || tiempo) {
       A.done[n] = lleva ? 'ok' : cansa ? 'pausa' : 'ok'; A.came[n] = !!UI.herCame;
       sayLine(cansa ? "·x062830" : "·x90e3eb", _xdb11f2(n));
-      UI._xc28808.me = Math.min(100, UI._xc28808.me + 4);
+      if (UI._xc28808) UI._xc28808.me = Math.min(100, UI._xc28808.me + 4);
       if (!nextTurn(A)) {
         if (globalThis.R46_finale && R46_finale(A)) return;
         const ok = Object.values(A.done).filter(v => v === 'ok').length, pay = 40 * ok;
@@ -32478,7 +32478,7 @@ for (const [nom, fn] of [['acceptItzel', acceptItzel], ['rejectItzel', rejectItz
       }
     } else if (A.post) {
       const P = A.post; P.t += dt; P.line -= dt;
-      UI.herCame = false; UI._xc28808.me = Math.min(96, UI._xc28808.me);
+      UI.herCame = false; if (UI._xc28808) UI._xc28808.me = Math.min(96, UI._xc28808.me);
       if (P.ph === "_x783cf8") {
         UI._xc28808.her = 85; UI._xc28808.me = 90;
         if (P.t >= 5) {
@@ -32488,7 +32488,7 @@ for (const [nom, fn] of [['acceptItzel', acceptItzel], ['rejectItzel', rejectItz
           toast("·xdb1aac", '#ffe080', 6);
         }
       } else {
-        UI.r43Bulge = 0; UI._xc28808.her = 80; UI._xc28808.me = Math.min(96, 55 + P.t * 0.65);
+        UI.r43Bulge = 0; UI._xc28808.her = 80; if (UI._xc28808) UI._xc28808.me = Math.min(96, 55 + P.t * 0.65);
         if (P.line <= 0) { P.line = 7; sayLine(pickOne(["·xe21153", "·x07899d", "·xeba39c", "·x563a27"]), _xdb11f2(ITZEL.name), ITZEL.name); }
         if (P.t >= 60) {
           A.post = null; A.mouth = true; A.fDone = true; UI._xc28808.me = 100; UI.herCame = true;
@@ -36987,12 +36987,12 @@ const MOMENTOS_ELLA = true;
     pide(name) { if (typeof makeRequest !== 'function') return false; makeRequest(name); return !!UI.request; },
     risa(name, taste) {
       sayLine(pickOne(["·xe2de89", "·x677181", "·x8f99bc", "·x58feac"]), taste);
-      UI.exprRisaT = 2.6; UI._xc28808.her = Math.min(100, UI._xc28808.her + 3);
+      UI.exprRisaT = 2.6; if (UI._xc28808) UI._xc28808.her = Math.min(100, UI._xc28808.her + 3);
       return true;
     },
     beso(name, taste) {
       sayLine(pickOne(["·x700f6d", "·xfbbd83", "·xa76f43", "·x4c816d"]), taste);
-      UI.kissFx = 1; UI._xc28808.her = Math.min(100, UI._xc28808.her + 4); UI._xc28808.me = Math.min(100, UI._xc28808.me + 2);
+      UI.kissFx = 1; if (UI._xc28808) UI._xc28808.her = Math.min(100, UI._xc28808.her + 4); UI._xc28808.me = Math.min(100, UI._xc28808.me + 2);
       return true;
     },
   };
@@ -48576,6 +48576,355 @@ const OCHO_MEJORAS = true;
       return r;
     };
   } catch (e) { console.warn('MEJORAS DEL PUEBLO', e); }
+})();
+
+
+
+
+
+
+
+
+
+
+
+
+const MENTE_ACTIVA = true;
+(function mecanicasMente() {
+  try {
+    const cl = (v, a, b) => Math.max(a, Math.min(b, v));
+    const hm = s => strHash(String(s));
+    const PS = () => {
+      const p = (S.psi ??= {});
+      p.estres ??= 20; p.mem ??= {}; p.hoy ??= {}; p.racha ??= {}; p.chismes ??= []; p.fama ??= {};
+      p.ventas ??= {}; p.pueblo ??= { capaz:55, libre:55, querido:55 }; p.dia ??= S.day; p.hoyPagos ??= 0; p.hoyCharlas ??= 0;
+      return p;
+    };
+    const vecino = n => VILLAGERS.find(v => v.name === n);
+    const avisar = (msg, col = '#fff6d0', t = 5) => { try { if (Array.isArray(UI.colaAvisos)) UI.colaAvisos.push([msg, col, t]); else toast(msg, col, t); } catch (e) {} };
+
+    
+    const pers = name => ({ sociable:hm(name + '|soc') > 0.5, enojon:hm(name + '|gen') > 0.6, curioso:hm(name + '|cur') > 0.5, chismoso:hm(name + '|chis') > 0.66 });
+    const persTexto = name => { const p = pers(name), f = !!vecino(name)?.look?.female; return [p.sociable ? 'sociable' : f ? 'tímida' : 'tímido', p.enojon ? (f ? 'enojona' : 'enojón') : 'paciente', p.curioso ? (f ? 'curiosa' : 'curioso') : 'tradicional', ...(p.chismoso ? [f ? 'chismosa' : 'chismoso'] : [])].join(', '); };
+    globalThis.PERSONALIDAD = persTexto;
+
+    
+    const regionDe = (tx, ty) => tx >= 760 ? 'Vikingos' : tx >= 480 ? 'Mayas' : tx >= 390 ? 'Españoles' : tx >= 325 ? 'Totonacas' : tx >= 275 ? 'Otomíes' : tx >= 230 ? 'Mexicas'
+      : ty >= 40 && tx >= 95 ? 'Apaches' : ty >= 40 ? 'Volcán' : 'Tlaxcallan';
+    const regionVecino = v => { const a = v.area; if (a && typeof a === 'object' && a.x0 != null) return regionDe((a.x0 + a.x1) / 2, (a.y0 + a.y1) / 2); return regionDe(v.x / TS, v.y / TS); };
+
+    
+    const recuerda = (name, t, v) => {
+      if (!name || !vecino(name)) return;
+      const m = (PS().mem[name] ??= []);
+      if (m.some(x => x.t === t && x.d === S.day)) return;
+      m.push({ d:S.day, t, v }); if (m.length > 8) m.shift();
+    };
+    const pesoMemoria = (name, x) => x.v < 0 ? x.v * 2 * (pers(name).enojon ? 1.5 : 0.75) : x.v; 
+    const comentarioMemoria = name => {
+      const m = (PS().mem[name] || []).filter(x => S.day - x.d >= 1 && S.day - x.d <= 20);
+      if (!m.length) return null;
+      const x = m[Math.floor(Math.random() * m.length)];
+      return x.v > 0 ? `${name}: "Todavía me acuerdo de cuando ${x.t}. Eso no se olvida."` : `${name}: "No se me olvida que ${x.t}..."`;
+    };
+
+    
+    const estres = d => { const p = PS(); p.estres = cl(p.estres + d, 0, 100); };
+    const animo = () => { const e = PS().estres; return e >= 70 ? { ico:'😟', n:'Estresado', col:'#ff9a7a' } : e >= 45 ? { ico:'😐', n:'Cansado', col:'#ffd27a' } : e > 25 ? { ico:'🙂', n:'Bien', col:'#c8f7a0' } : { ico:'😌', n:'Tranquilo', col:'#9fe0ff' }; };
+    globalThis.ANIMO = animo;
+
+    
+    const COSTUMBRE = { azada:'Arar la tierra', regadera:'Regar', hacha:'Cortar leña', pico:'Picar piedra', hoz:'Segar', cosechar:'Cosechar', platicar:'Platicar con la gente' };
+    const MINIMO = { platicar:2 };
+    const nivelCostumbre = k => Math.min(5, Math.floor((PS().racha[k] || 0) / 3));
+    const usa = k => { const p = PS(); p.hoy[k] = (p.hoy[k] || 0) + 1; };
+
+    
+    const RUMORES = [
+      { t:'Dicen que viene una sequía: todos quieren guardar maíz y frijol', items:['maiz', 'maiz_azul', 'frijol', 'calabaza'] },
+      { t:'Llegaron pochtecas del sur buscando chile y cacahuate', items:['chile', 'cacahuate', 'vainilla'] },
+      { t:'Hay plaga en las milpas del valle: escasea el jitomate', items:['jitomate', 'tomate_verde', 'huauzontle'] },
+      { t:'Se acerca una boda grande: piden flores y amaranto', items:['flores', 'amaranto', 'girasol'] },
+      { t:'Los guerreros salen de campaña: compran camote y nopal para el camino', items:['camote', 'nopal', 'capulin'] },
+    ];
+    const rumorVale = () => { const r = PS().rumor; return r && S.day <= r.hasta ? r : null; };
+
+    
+    if (typeof talkTo === 'function') {
+      const _talk = talkTo;
+      talkTo = function (v) {
+        const r = rel(v.name), antes = r.pts, ultima = r.talkDay;
+        const out = _talk.apply(this, arguments);
+        try {
+          if (!MENTE_ACTIVA || r.talkDay !== S.day || ultima === S.day) return out;
+          const p = PS(), q = pers(v.name), d = r.pts - antes;
+          let mult = q.sociable ? 1.3 : (r.pts >= 60 ? 1.25 : 0.85);
+          if (p.estres >= 70) mult *= 0.7;
+          mult *= 1 + 0.05 * nivelCostumbre('platicar');
+          if (d > 0) r.pts = Math.min(MAX_PTS, r.pts + Math.round(d * (mult - 1)));
+          usa('platicar'); if (p.hoyCharlas++ < 3) estres(-2);
+          p.pueblo.querido = cl(p.pueblo.querido + 0.6, 0, 100);
+          if (ultima && S.day - ultima >= 7 && antes >= 30) recuerda(v.name, 'volviste a platicar conmigo después de tanto', 1);
+          
+          const ch = p.chismes.filter(c => (p.sabe?.[v.name] || []).includes(c.id));
+          const opciones = [];
+          const cm = comentarioMemoria(v.name); if (cm) opciones.push([cm, '#ffd9a8']);
+          if (ch.length) { const c = ch[Math.floor(Math.random() * ch.length)]; opciones.push([`${v.name}: "Me contaron que ${c.t}." ${c.v > 0 ? '😊' : '😒'}`, c.v > 0 ? '#c8f7a0' : '#ffb3b3']); }
+          const rm = rumorVale(); if (rm && q.chismoso) opciones.push([`${v.name}: "¿Ya oíste? ${rm.t}."`, '#ffe6a0']);
+          if (p.estres >= 70) opciones.push([`${v.name}: "Te ves muy cansado... deberías descansar o ir al temazcal."`, '#ffd9a8']);
+          if (opciones.length && Math.random() < 0.55) { const [s, c] = opciones[Math.floor(Math.random() * opciones.length)]; setTimeout(() => toast(s, c, 5), 900); }
+        } catch (e) {}
+        return out;
+      };
+    }
+
+    
+    if (typeof giveGift === 'function') {
+      const _gift = giveGift;
+      giveGift = function (v, id) {
+        const r = rel(v.name), antes = r.pts, dia = r.giftDay;
+        const out = _gift.apply(this, arguments);
+        try {
+          if (!MENTE_ACTIVA || r.giftDay !== S.day || dia === S.day) return out;
+          const q = pers(v.name), d = r.pts - antes, dados = (r.regalosPsi ??= []), repetido = dados.includes(id);
+          let mult = 1;
+          if (q.curioso) mult = repetido ? 0.8 : 1.25; else if (repetido) mult = 1.2;
+          if (d > 0 && mult !== 1) {
+            r.pts = cl(r.pts + Math.round(d * (mult - 1)), 0, MAX_PTS);
+            setTimeout(() => toast(q.curioso ? (repetido ? `${v.name} sonríe, pero ya le habías dado eso antes.` : `A ${v.name} le encanta probar cosas nuevas.`) : `${v.name} aprecia que le traigas lo de siempre.`, '#ffc0d0', 4), 700);
+          }
+          if (!repetido) { dados.push(id); if (dados.length > 30) dados.shift(); }
+          const nombre = (GIFTS[id]?.name || 'un regalo').toLowerCase();
+          recuerda(v.name, `me regalaste ${nombre}`, 1);
+          PS().pueblo.querido = cl(PS().pueblo.querido + 1, 0, 100);
+        } catch (e) {}
+        return out;
+      };
+    }
+
+    
+    if (typeof addHonor === 'function') {
+      const _honor = addHonor;
+      addHonor = function (n, why, quiet) {
+        const out = _honor.apply(this, arguments);
+        try {
+          if (!MENTE_ACTIVA || !n || !why) return out;
+          const p = PS(), texto = String(why);
+          const quien = VILLAGERS.find(v => v.name.length > 2 && texto.includes(v.name));
+          if (quien) recuerda(quien.name, n > 0 ? texto.replace(quien.name, 'mí').replace(/^ayudaste a mí/, 'me ayudaste') : texto.replace(`${quien.name} se quedó esperando`, 'me dejaste esperando'), n > 0 ? 2 : -2);
+          const id = 'c' + S.day + '_' + Math.floor(Math.random() * 1e6);
+          const frase = texto.replace(/^(\S+) se quedó esperando (.*)$/, 'dejaste esperando a $1 con $2');
+          
+          if (!/^(\S+(aste|iste)\b|te |dejaste esperando)/.test(frase)) return out;
+          if (p.chismes.some(c => c.t === frase && c.d === S.day)) return out;
+          const reg = quien ? regionVecino(quien) : (S.player ? regionDe(S.player.x / TS, S.player.y / TS) : 'Tlaxcallan');
+          p.chismes.push({ id, d:S.day, v:Math.sign(n), t:frase, quien:quien?.name || null, reg });
+          if (p.chismes.length > 20) p.chismes.shift();
+          if (n > 0) p.pueblo.capaz = cl(p.pueblo.capaz + 1.5, 0, 100); else p.pueblo.libre = cl(p.pueblo.libre - 2, 0, 100);
+        } catch (e) {}
+        return out;
+      };
+    }
+
+    
+    if (typeof useTool === 'function') {
+      const _tool = useTool;
+      useTool = function () {
+        const e0 = S.energy;
+        const out = _tool.apply(this, arguments);
+        try {
+          if (!MENTE_ACTIVA) return out;
+          const gasto = e0 - S.energy;
+          if (gasto > 0) {
+            const k = TOOLS[S.sel]?.id; if (k) usa(k);
+            estres(0.12);
+            const p = PS(); let f = 0;
+            if (p.estres >= 70) f += 0.3; else if (p.estres <= 25) f -= 0.2;
+            if (k) f -= 0.05 * nivelCostumbre(k);
+            const extra = gasto * f, entero = Math.trunc(extra), resto = extra - entero;
+            S.energy = cl(S.energy - entero - (Math.random() < Math.abs(resto) ? Math.sign(resto) : 0), 0, S.maxE);
+          }
+        } catch (e) {}
+        return out;
+      };
+    }
+    if (typeof harvest === 'function') {
+      const _harv = harvest;
+      harvest = function () { const out = _harv.apply(this, arguments); try { if (MENTE_ACTIVA) { usa('cosechar'); estres(-0.3); } } catch (e) {} return out; };
+    }
+    if (typeof hurt === 'function') {
+      const _hurt = hurt;
+      hurt = function (n) { const out = _hurt.apply(this, arguments); try { if (MENTE_ACTIVA) estres(Math.min(10, (n || 0) * 0.5)); } catch (e) {} return out; };
+    }
+    if (typeof finishBath === 'function') {
+      const _bath = finishBath;
+      finishBath = function () { const out = _bath.apply(this, arguments); try { if (MENTE_ACTIVA) { estres(-30); avisar('😌 El vapor del temazcal te quitó el estrés.', '#9fe0ff', 4); } } catch (e) {} return out; };
+    }
+    if (typeof pay === 'function') {
+      const _pay = pay;
+      pay = function (cost) {
+        const ok = _pay.apply(this, arguments);
+        try { if (MENTE_ACTIVA && ok && cost > 0) { const p = PS(); if (p.hoyPagos < 5) { p.hoyPagos += Math.min(1, cost / 200); p.pueblo.capaz = cl(p.pueblo.capaz + Math.min(1, cost / 200), 0, 100); } } } catch (e) {}
+        return ok;
+      };
+    }
+
+    
+    const _sleep = sleep;
+    sleep = function (passedOut, killed) {
+      const p = PS(), tarde = S.time, notas = [];
+      
+      const viejos = {};
+      try {
+        if (MENTE_ACTIVA && S.bin) {
+          const rm = rumorVale(), prom = (p.pueblo.capaz + p.pueblo.libre + p.pueblo.querido) / 3;
+          for (const k of Object.keys(S.bin)) {
+            const n = S.bin[k] || 0; if (!n || !(k in ITEM_PRICE)) continue;
+            const total = n + (p.ventas[k] || 0);
+            let m = total > 15 ? Math.max(0.6, 1 - (total - 15) * 0.012) : 1;
+            if (rm && rm.items.includes(k)) m *= 1.4;
+            if (prom >= 70) m *= 1.1; else if (prom <= 35) m *= 0.9;
+            if (Math.abs(m - 1) > 0.02) {
+              viejos[k] = ITEM_PRICE[k]; ITEM_PRICE[k] = Math.max(1, Math.round(ITEM_PRICE[k] * m));
+              if (m <= 0.85) notas.push([`📉 Vendiste mucho ${String(ITEM_NAME?.[k] || k).toLowerCase()}: en el tianguis ya sobra y te pagaron ${Math.round(m * 100)}%.`, '#ffd9a8']);
+              else if (m >= 1.15) notas.push([`📈 Tu ${String(ITEM_NAME?.[k] || k).toLowerCase()} se vendió caro (${Math.round(m * 100)}%).`, '#c8f7a0']);
+            }
+            p.ventas[k] = (p.ventas[k] || 0) + n;
+          }
+        }
+      } catch (e) {}
+      let out;
+      try { out = _sleep.apply(this, arguments); }
+      finally { for (const k in viejos) ITEM_PRICE[k] = viejos[k]; }
+      if (!MENTE_ACTIVA) return out;
+      try {
+        if (p.dia === S.day) return out; 
+        p.dia = S.day;
+        for (const k in p.ventas) { p.ventas[k] = Math.floor(p.ventas[k] * 0.6); if (!p.ventas[k]) delete p.ventas[k]; }
+        
+        let d = 0;
+        if (passedOut || killed) d += 15; else if (tarde < 22 * 60) d -= 12; else if (tarde >= 23 * 60 + 30 || tarde < 5 * 60) d += 6; else d -= 5;
+        if (S.spouse) d -= 4;
+        if ((S.hijos || []).length) d -= 2;
+        if (festivalToday()) d -= 15;
+        estres(d);
+        const a = animo();
+        if (p.estres >= 70) notas.push(['😟 Andas muy estresado: te cansas más y se te nota. Duerme temprano, ve al temazcal o a la fiesta.', '#ff9a7a']);
+        else if (p.estres <= 25 && Math.random() < 0.4) notas.push(['😌 Amaneciste tranquilo: hoy rindes más.', '#9fe0ff']);
+        
+        for (const k of Object.keys(COSTUMBRE)) {
+          const antes = nivelCostumbre(k), hecho = (p.hoy[k] || 0) >= (MINIMO[k] || 3);
+          p.racha[k] = hecho ? (p.racha[k] || 0) + 1 : Math.max(0, (p.racha[k] || 0) - 1);
+          const ahora = nivelCostumbre(k);
+          if (ahora > antes) notas.push([`🔁 ${COSTUMBRE[k]} ya es costumbre (nivel ${ahora}): te cansa menos.`, '#c8f7a0']);
+          else if (ahora < antes) notas.push([`🔁 Estás perdiendo la costumbre de ${COSTUMBRE[k].toLowerCase()} (nivel ${ahora}).`, '#ffd9a8']);
+        }
+        p.hoy = {}; p.hoyPagos = 0; p.hoyCharlas = 0;
+        
+        for (const v of VILLAGERS) {
+          const r = S.romance?.[v.name]; if (!r) continue;
+          const m = (p.mem[v.name] || []).filter(x => S.day - x.d <= 10);
+          const suma = m.reduce((s, x) => s + pesoMemoria(v.name, x), 0);
+          if (suma) r.pts = cl(r.pts + cl(Math.round(suma * 0.4), -6, 4), 0, MAX_PTS);
+          if (r.pts >= 40 && r.talkDay && S.day - r.talkDay >= 7 && (S.day - r.talkDay) % 7 === 0) recuerda(v.name, 'dejaste de hablarme por días', -1);
+        }
+        
+        p.sabe ??= {};
+        const vivos = p.chismes.filter(c => S.day - c.d <= 10);
+        p.chismes = vivos;
+        for (const c of vivos) {
+          const conocen = VILLAGERS.filter(v => (p.sabe[v.name] || []).includes(c.id));
+          const regadores = 2 + conocen.filter(v => pers(v.name).chismoso).length * 2;
+          
+          const lejos = conocen.some(v => pers(v.name).chismoso);
+          const nuevos = VILLAGERS.filter(v => !(p.sabe[v.name] || []).includes(c.id) && (lejos || regionVecino(v) === (c.reg || 'Tlaxcallan')))
+            .sort((x, y) => (regionVecino(x) === c.reg ? 0 : 1) - (regionVecino(y) === c.reg ? 0 : 1) || Math.random() - 0.5).slice(0, regadores);
+          for (const v of nuevos) {
+            (p.sabe[v.name] ??= []).push(c.id); if (p.sabe[v.name].length > 12) p.sabe[v.name].shift();
+            const r = rel(v.name);
+            r.pts = cl(r.pts + (c.v > 0 ? 1 : -Math.round(2 * (pers(v.name).enojon ? 1.5 : 1))), 0, MAX_PTS);
+            const reg = regionVecino(v); p.fama[reg] = cl((p.fama[reg] || 0) + c.v * 0.3, -50, 50);
+          }
+        }
+        for (const n in p.sabe) p.sabe[n] = p.sabe[n].filter(id => vivos.some(c => c.id === id));
+        
+        for (const k of ['capaz', 'libre', 'querido']) p.pueblo[k] = cl(p.pueblo[k] + (55 - p.pueblo[k]) * 0.06, 0, 100);
+        if (festivalToday()) p.pueblo.libre = cl(p.pueblo.libre + 10, 0, 100);
+        const prom = (p.pueblo.capaz + p.pueblo.libre + p.pueblo.querido) / 3;
+        if (prom >= 70 && Math.random() < 0.5) notas.push(['🏘 El pueblo está contento: en el tianguis te pagan un poco más.', '#c8f7a0']);
+        else if (prom <= 35 && Math.random() < 0.5) notas.push(['🏘 Hay malestar en el pueblo: la gente compra menos. Platica con ellos y ayúdales.', '#ffb3b3']);
+        
+        if (!rumorVale() && Math.random() < 0.2) {
+          const opc = RUMORES.map(r => ({ ...r, items:r.items.filter(k => k in ITEM_PRICE) })).filter(r => r.items.length);
+          if (opc.length) { const r = opc[Math.floor(Math.random() * opc.length)]; p.rumor = { t:r.t, items:r.items, hasta:S.day + 2 }; notas.push([`🗣 Rumor en el tianguis: ${r.t}. Pagan +40% por 2 días.`, '#ffe6a0']); }
+        }
+        
+        p.sueno = null;
+        if (Math.random() < 0.35) {
+          const extrana = VILLAGERS.map(v => [v, S.romance?.[v.name]]).filter(([, r]) => r && r.pts >= 60 && r.talkDay && S.day - r.talkDay >= 3).sort((x, y) => y[1].pts - x[1].pts)[0];
+          if (p.estres >= 70) { p.sueno = 'Tuviste una pesadilla: corrías por la milpa y nunca llegabas. Despiertas cansado.'; S.energy = Math.max(0, S.energy - 10); }
+          else if (extrana) p.sueno = `Soñaste con ${extrana[0].name}: te esperaba en la plaza. Te extraña.`;
+          else if (S.request && Math.random() < 0.6) p.sueno = `Soñaste con ${S.request.name}, que miraba el camino esperando ${S.request.n} ${String(ITEM_NAME?.[S.request.item] || S.request.item).toLowerCase()}.`;
+          else if (rumorVale()) p.sueno = `Soñaste con el tianguis lleno de gente gritando: "${rumorVale().items.map(k => String(ITEM_NAME?.[k] || k).toLowerCase()).join(', ')}".`;
+          else { p.sueno = 'Soñaste con tu abuela moliendo maíz y cantando. Despiertas en paz.'; estres(-5); }
+          if (p.sueno) notas.unshift([`🌙 ${p.sueno}`, '#d8c8ff']);
+        }
+        notas.slice(0, 4).forEach(([s, c], i) => setTimeout(() => toast(s, c, 6), 1400 + i * 1100));
+      } catch (e) { console.warn('[mente] mañana', e); }
+      return out;
+    };
+
+    
+    const fila = (ico, name, price, desc, cat) => ({ icon:emojiIcon(ico), name, price, desc, cat, buy:() => {} });
+    const barra = v => `${Math.round(v)}/100`;
+    SHOPS.mente = {
+      title:'Mente y pueblo', verb:'ver', tabs:['Tú', 'Vecinos', 'Pueblo'],
+      sub:() => { const a = animo(); return `${a.ico} ${a.n} · estrés ${Math.round(PS().estres)}/100`; },
+      rows:() => {
+        const p = PS(), a = animo(), out = [];
+        out.push(fila(a.ico, `Ánimo: ${a.n}`, `${Math.round(p.estres)}/100`, p.estres >= 70 ? 'te cansas 30% más y la gente lo nota · duerme temprano, temazcal o fiesta' : p.estres <= 25 ? 'te cansas 20% menos al trabajar' : 'trabajar mucho sube el estrés; descansar lo baja', 'Tú'));
+        if (p.sueno) out.push(fila('🌙', 'Lo que soñaste anoche', '', p.sueno, 'Tú'));
+        for (const [k, n] of Object.entries(COSTUMBRE)) out.push(fila('🔁', n, `nivel ${nivelCostumbre(k)}/5`, `${p.racha[k] || 0} días de racha · hoy ${p.hoy[k] || 0}/${MINIMO[k] || 3} · cada nivel cansa 5% menos`, 'Tú'));
+        const conocidos = VILLAGERS.filter(v => S.romance?.[v.name] || p.mem[v.name]).sort((x, y) => (rel(y.name).pts) - (rel(x.name).pts));
+        for (const v of (conocidos.length ? conocidos : VILLAGERS.slice(0, 12)).slice(0, 40)) {
+          const m = (p.mem[v.name] || []).slice(-1)[0];
+          out.push(fila(m ? (m.v > 0 ? '💛' : '💢') : '🙂', v.name, `❤ ${rel(v.name).pts}`, `${persTexto(v.name)}${m ? ` · recuerda: ${m.t}` : ''}`, 'Vecinos'));
+        }
+        out.push(fila('💪', 'Se sienten capaces', barra(p.pueblo.capaz), 'sube cuando les compras y cuando cumples lo que te piden', 'Pueblo'));
+        out.push(fila('🕊', 'Se sienten libres', barra(p.pueblo.libre), 'sube con las fiestas; baja con lo malo que haces', 'Pueblo'));
+        out.push(fila('🤝', 'Se sienten queridos', barra(p.pueblo.querido), 'sube cuando platicas con ellos y les regalas', 'Pueblo'));
+        const rm = rumorVale(); if (rm) out.push(fila('🗣', 'Rumor del tianguis', `hasta el día ${rm.hasta}`, `${rm.t} · pagan +40%`, 'Pueblo'));
+        for (const [reg, f0] of Object.entries(p.fama).sort((x, y) => y[1] - x[1])) { const f = Math.round(f0); out.push(fila(f >= 0 ? '⭐' : '👎', `Fama en ${reg}`, `${f > 0 ? '+' : ''}${f}`, f >= 10 ? 'te conocen por lo bueno que haces' : f <= -10 ? 'cuentan cosas malas de ti' : 'casi no saben de ti', 'Pueblo')); }
+        for (const c of p.chismes.slice(-6).reverse()) { const n = Object.values(p.sabe || {}).filter(l => l.includes(c.id)).length; out.push(fila(c.v > 0 ? '😊' : '😒', 'Chisme: ' + c.t, `lo saben ${n}`, `del día ${c.d}`, 'Pueblo')); }
+        return out;
+      },
+    };
+    if (SHOPS.diario?.rows) {
+      const _dr = SHOPS.diario.rows;
+      SHOPS.diario.rows = function () {
+        const r = _dr.apply(this, arguments);
+        try { if (MENTE_ACTIVA) { const a = animo(); r.splice(1, 0, { cat:'Pendientes', icon:emojiIcon('🧠'), name:'Mente y pueblo', price:`${a.ico} ${a.n}`, desc:'tu ánimo, tus costumbres, lo que recuerdan los vecinos, los chismes y el tianguis', buy:() => openMenu('mente') }); } } catch (e) {}
+        return r;
+      };
+    }
+
+    
+    const _hud = drawHUD;
+    drawHUD = function () {
+      const r = _hud.apply(this, arguments);
+      try {
+        if (!MENTE_ACTIVA || !S?.player || UI.menu) return r;
+        const a = animo(), s = `${a.ico} ${a.n}`;
+        ctx.save(); ctx.setTransform(cv.width / VW, 0, 0, cv.width / VW, 0, 0);
+        ctx.font = `bold 11px ${FONT}`; const w = ctx.measureText(s).width + 16, x = 12, y = VW < 720 ? 102 : 128;
+        ctx.fillStyle = 'rgba(30,18,10,.72)'; ctx.fillRect(x, y, w, 18);
+        ctx.fillStyle = a.col; ctx.fillRect(x, y + 16, w * (1 - PS().estres / 100), 2);
+        text(s, x + w / 2, y + 13, 11, a.col, 'center', false);
+        ctx.restore();
+      } catch (e) {}
+      return r;
+    };
+  } catch (e) { console.warn('[mente]', e); }
 })();
 
 // Textos retirados de la versión pública: no se dibujan.
