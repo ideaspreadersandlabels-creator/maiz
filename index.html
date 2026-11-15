@@ -2723,7 +2723,7 @@ const TRANS_FIGHT = {
 function fightPick(c) {
   fourTrans();
   if (c !== TRANS) { UI._x601af7 = c; UI.group = [TRANS, ...TRANS_GIRLS.filter(t => t !== c)]; }
-  UI._xc28808.her = Math.min(100, UI._xc28808.her + 20); (S._xb0ef25 ??= {})[c.name] = _x603cc7(c.name) + 1;
+  if (UI._xc28808) UI._xc28808.her = Math.min(100, UI._xc28808.her + 20); (S._xb0ef25 ??= {})[c.name] = _x603cc7(c.name) + 1;
   const loser = pickOne(others());
   toast("·x99c745", '#ffd0e0', 5);
 }
@@ -24800,8 +24800,9 @@ SHOPS._xcc85d1.rows = (base => () => {
     r.unshift({ icon:emojiIcon('🍷'), name:"·x4d54a0", price:"·x47a769", desc:"·xa37d9d", buy:() => {
         if (!pay(500)) return;
         const all = [...casaLibres()].sort(() => Math.random() - 0.5).slice(0, GROUP_MAX);
+        if (!all.length) { S.money += 500; return toast("·x3b0084", '#ffd9a8', 4); }
         _x94ab39(all[0]); UI.group = all.slice(1); UI.groupTrans = false; UI._xe58477 = "_x84dd7e";
-        UI._xc28808.her = Math.max(UI._xc28808.her, 50); UI._xc28808.me = Math.max(UI._xc28808.me, 30);
+        if (UI._xc28808) { UI._xc28808.her = Math.max(UI._xc28808.her, 50); UI._xc28808.me = Math.max(UI._xc28808.me, 30); }
         toast("·xf5cc87", '#ffd060', 6);
     }});
     return r;
@@ -25126,11 +25127,14 @@ addEventListener('keydown', e => {
 
 
 const GEAR_BASE = Object.fromEntries(Object.entries(GEAR).map(([id, g]) => [id, { name:g.name, dmg:g.dmg, reach:g.reach, block:g.block, armor:g.armor }]));
+
+const GEAR_BASE_EXTRA = {};
+const baseEquipo = id => GEAR_BASE[id] || GEAR_BASE_EXTRA[id] || (GEAR[id] ? (GEAR_BASE_EXTRA[id] = { name:GEAR[id].name, dmg:GEAR[id].dmg, reach:GEAR[id].reach, block:GEAR[id].block, armor:GEAR[id].armor }) : null);
 const TEMPLE_COSTO = [{ bar:'lingote_cobre', n:2, mult:0.5 }, { bar:'lingote_obsidiana', n:2, mult:0.8 }, { bar:'lingote_oro', n:1, mult:1.2 }];
 const gearLvl = id => S.gearLvl?.[id] || 0;
 function aplicarTemple() {
   for (const [id, g] of Object.entries(GEAR)) {
-    const b = GEAR_BASE[id]; if (!b) continue; const l = gearLvl(id);
+    const b = baseEquipo(id); if (!b) continue; const l = gearLvl(id);
     g.name = l ? `${b.name} +${l}` : b.name;
     if (b.dmg) { g.dmg = Math.round(b.dmg * (1 + 0.2 * l)); g.reach = b.reach + 2 * l; }
     if (b.block) g.block = Math.round((b.block + 0.05 * l) * 100) / 100;
@@ -25141,7 +25145,7 @@ function templarGear(id) {
   const g = GEAR[id], l = gearLvl(id), c = TEMPLE_COSTO[l];
   if (!S.gear.owned.includes(id)) return toast('Primero tienes que comprarlo.', '#ffb3b3');
   if (!c) return toast(`${g.name} ya está templado al máximo.`, '#ffd9a8');
-  const precio = Math.round(GEAR_BASE[id] ? (GEAR[id].price * c.mult) : 300);
+  const precio = Math.round(baseEquipo(id) ? (GEAR[id].price * c.mult) : 300);
   if (!payMats({ [c.bar]:c.n }, precio, 'Yaotl: "Para templarlo necesito')) return;
   (S.gearLvl ??= {})[id] = l + 1; aplicarTemple(); sfx('coin');
   toast(`⚒ Yaotl templó tu equipo: ¡${GEAR[id].name}! (${gearStat(GEAR[id])})`, '#c8f7a0', 5);
@@ -25164,8 +25168,8 @@ SHOPS.armeria.rows = (base => () => {
   const rows = base().map((r, i) => ({ ...r, icon:(cx, cy) => vistaEquipo(ids[i], cx, cy) }));
   for (const id of S.gear.owned) {
     const g = GEAR[id], l = gearLvl(id), c = TEMPLE_COSTO[l];
-    rows.push({ icon:(cx, cy) => vistaEquipo(id, cx, cy), name:c ? `⚒ Templar: ${GEAR_BASE[id]?.name || g.name} +${l + 1}` : `⚒ ${g.name}`, price:c ? `${Math.round(g.price * c.mult)} cacao + ${matsText({ [c.bar]:c.n })}` : '✔ al máximo',
-      desc:c ? (g.dmg ? `daño ${g.dmg} → ${Math.round(GEAR_BASE[id].dmg * (1 + 0.2 * (l + 1)))}` : g.block ? `bloquea ${Math.round(g.block * 100)}% → ${Math.round((GEAR_BASE[id].block + 0.05 * (l + 1)) * 100)}%` : `protege ${Math.round(g.armor * 100)}% → ${Math.round((GEAR_BASE[id].armor + 0.05 * (l + 1)) * 100)}%`) : 'ya no se puede templar más', buy:() => templarGear(id) });
+    rows.push({ icon:(cx, cy) => vistaEquipo(id, cx, cy), name:c ? `⚒ Templar: ${baseEquipo(id)?.name || g.name} +${l + 1}` : `⚒ ${g.name}`, price:c ? `${Math.round(g.price * c.mult)} cacao + ${matsText({ [c.bar]:c.n })}` : '✔ al máximo',
+      desc:c ? (g.dmg ? `daño ${g.dmg} → ${Math.round(baseEquipo(id).dmg * (1 + 0.2 * (l + 1)))}` : g.block ? `bloquea ${Math.round(g.block * 100)}% → ${Math.round((baseEquipo(id).block + 0.05 * (l + 1)) * 100)}%` : `protege ${Math.round(g.armor * 100)}% → ${Math.round((baseEquipo(id).armor + 0.05 * (l + 1)) * 100)}%`) : 'ya no se puede templar más', buy:() => templarGear(id) });
   }
   return rows;
 })(SHOPS.armeria.rows);
