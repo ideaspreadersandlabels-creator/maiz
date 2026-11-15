@@ -34136,7 +34136,7 @@ function r37CacheSprite(x,y,look,dir,step,name) {
   const bobIndex=Math.round((bobRaw+.8)/1.6*4), qBob=-.8+bobIndex*.4;
   const phase=((T*1.35+x*.07)%(Math.PI*2)+Math.PI*2)%(Math.PI*2);
   const idleIndex=walking?0:Math.round(phase/(Math.PI*2)*8)%8;
-  const key=`${r37LookKey(look)}|${dir}|${stepIndex}|${bobIndex}|${idleIndex}|${name||''}`;
+  const key=`${r37LookKey(look)}|${dir}|${stepIndex}|${bobIndex}|${idleIndex}|${name||''}|${globalThis.CARA_ACTUAL||''}`;
   let sprite=R37.cache.get(key);
   if (sprite) { R37.cache.delete(key); R37.cache.set(key,sprite); R37.cacheHits++; return sprite; }
 
@@ -47738,7 +47738,7 @@ drawShop = function (...a) {
   drawPerson = function (x, y, o, dir = 'down', step = 0, name = '', bob = 0) {
     const id = o && MJ_DE.get(o);
     const enMundo = typeof R37 !== 'undefined' && R37.inWorld && !R37.rendering;
-    if (!id || !enMundo || (typeof inking !== 'undefined' && inking) || MJ_FILA[dir] === undefined) return _drawPersonMj.apply(this, arguments);
+    if (!id || !enMundo || !globalThis.VECINOS_HOJAS || (typeof inking !== 'undefined' && inking) || MJ_FILA[dir] === undefined) return _drawPersonMj.apply(this, arguments);
     const hoja = mjImg(`personajes/${id}/hoja_caminar.png`);
     if (!hoja) return _drawPersonMj.apply(this, arguments);
     const cuadro = Math.abs(step) > 0.015 ? Math.floor(T * 8 + x * 0.05) % 4 : 0;
@@ -48632,6 +48632,7 @@ const MENTE_ACTIVA = true;
     const estres = d => { const p = PS(); p.estres = cl(p.estres + d, 0, 100); };
     const animo = () => { const e = PS().estres; return e >= 70 ? { ico:'😟', n:'Estresado', col:'#ff9a7a' } : e >= 45 ? { ico:'😐', n:'Cansado', col:'#ffd27a' } : e > 25 ? { ico:'🙂', n:'Bien', col:'#c8f7a0' } : { ico:'😌', n:'Tranquilo', col:'#9fe0ff' }; };
     globalThis.ANIMO = animo;
+    globalThis.MENTE = { recuerda, estres, pers, PS, regionVecino, regionDe, vecino };
 
     
     const COSTUMBRE = { azada:'Arar la tierra', regadera:'Regar', hacha:'Cortar leña', pico:'Picar piedra', hoz:'Segar', cosechar:'Cosechar', platicar:'Platicar con la gente' };
@@ -48926,6 +48927,663 @@ const MENTE_ACTIVA = true;
     };
   } catch (e) { console.warn('[mente]', e); }
 })();
+ 
+(function mapaZoom() {
+  try {
+    if (window.__mapaZoomOk) return;
+    window.__mapaZoomOk = true;
+
+    const _drawMapBase = typeof _drawMapChicas === 'function' ? _drawMapChicas : drawMap; 
+    const _mapKeyBase = null;
+
+    function camInit() { 
+      if (!UI.mapCam) { const [tx, ty] = playerTile(); UI.mapCam = { x: tx, y: ty }; }
+      return UI.mapCam;
+    }
+    function camClamp(v, c) {
+      const mw = v.mw, mh = v.mh, sc = v.sc;
+      const hw = mw / sc / 2, hh = mh / sc / 2;
+      c.x = Math.max(hw - 6, Math.min(MW - hw + 6, c.x));
+      c.y = Math.max(hh - 6, Math.min(WORLD_H - hh + 6, c.y));
+    }
+
+    drawMap = function () {
+      const z = UI.mapZoom || 1;
+      if (z <= 1) { UI.mapCam = null; return _drawMapBase(); }
+      const w = VW - 30, h = VH - 110, [x, y] = dialog(w, h);
+      text('Mapa de Tlaxcallan y sus alrededores', x + w/2, y + 40, VW < 500 ? 17 : 20, '#4a2f18', 'center');
+      const mx = x + 20, my = y + 56, mw = w - 40, mh = h - 56 - 96;
+      const sc = Math.min(4 * z, TS); 
+      const c = camInit(), v = { mx, my, mw, mh, sc };
+      camClamp(v, c);
+      const P = (tx, ty) => [mx + mw/2 + (tx - c.x) * sc, my + mh/2 + (ty - c.y) * sc];
+      UI.mapGeomZoom = { mx, my, mw, mh, sc, P, c };
+
+      ctx.save(); ctx.beginPath(); ctx.rect(mx, my, mw, mh); ctx.clip();
+      
+      const pxT = MAP_CV.width / MW;
+      const wx0 = c.x - mw / sc / 2, wy0 = c.y - mh / sc / 2;
+      ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
+      ctx.drawImage(MAP_CV, wx0 * pxT, wy0 * pxT, (mw / sc) * pxT, (mh / sc) * pxT, mx, my, mw, mh);
+      
+      const sx0 = Math.max(0, Math.floor(wx0 / SEEN)), sx1 = Math.min(SEEN_W - 1, Math.floor((wx0 + mw / sc) / SEEN));
+      const sy0 = Math.max(0, Math.floor(wy0 / SEEN)), sy1 = Math.min(SEEN_H - 1, Math.floor((wy0 + mh / sc) / SEEN));
+      for (let cy = sy0; cy <= sy1; cy++) for (let cx = sx0; cx <= sx1; cx++) {
+        if (S.seen?.[cy * SEEN_W + cx]) continue;
+        const [px, py] = P(cx * SEEN, cy * SEEN);
+        rect('#d8c49a', px - .5, py - .5, SEEN * sc + 1, SEEN * sc + 1);
+      }
+      
+      const seenAt = (tx, ty) => !!S.seen?.[Math.floor(ty / SEEN) * SEEN_W + Math.floor(tx / SEEN)];
+      for (const [name, lx, ly] of MAP_LABELS) if (seenAt(lx, ly)) {
+        const [px, py] = P(lx, ly);
+        if (px < mx - 40 || px > mx + mw + 40 || py < my - 20 || py > my + mh + 20) continue;
+        ctx.font = `bold 11px ${FONT}`; const lw = ctx.measureText(name).width + 8;
+        const lx2 = Math.max(mx + lw/2, Math.min(mx + mw - lw/2, px));
+        rect('rgba(42,26,12,.75)', lx2 - lw/2, py - 10, lw, 14); text(name, lx2, py + 1, 11, '#fff6d0', 'center');
+      }
+      
+      if (!UI.mapHide?.has('postas')) for (const b of postaList()) if (S.postas?.[b.id]) {
+        const [px, py] = P(b.x, b.y); rect('#c0392b', px - 2, py - 8, 2, 9); rect('#f2c94c', px, py - 8, 6, 4);
+      }
+      
+      if (!UI.mapHide?.has('templos')) for (const sh of S.shrines || []) {
+        if (!sh.found && !sh.revealed) continue;
+        const [sx, sy] = P(sh.x + 1.5, sh.y + 1.5);
+        if (!sh.found) { circ('#5a3a1e', sx, sy, 7); text('?', sx, sy + 5, 13, '#fff6d0', 'center'); }
+        else { circ(GODS[sh.god].col, sx, sy, 6); ctx.save(); ctx.translate(sx, sy); ctx.scale(.3, .3); GOD_ICON[sh.god](0, 0); ctx.restore(); }
+      }
+      
+      if (!UI.mapHide?.has('marcador') && S.marcador) {
+        const [sx, sy] = P(S.marcador.x + .5, S.marcador.y + .5);
+        circ('#ff6f3a', sx, sy, 8); text('🚩', sx, sy + 4, 12, '#fff', 'center');
+      }
+      
+      const [ptx, pty] = playerTile(), inMine = pty >= WORLD_H;
+      if (!UI.mapHide?.has('player') && !inMine && Math.sin(T * 6) > -.3) {
+        const [px, py] = P(ptx, pty); circ('#fff', px, py, 6); circ('#d9483b', px, py, 4);
+      }
+      ctx.restore();
+      ctx.strokeStyle = '#5a3a1e'; ctx.lineWidth = 2; ctx.strokeRect(mx, my, mw, mh);
+      
+      UI.mapFilterBtns = [];
+      const filters = [['postas', '🚩 Postas'], ['templos', '⛩ Templos'], ['marcador', '🚩 Marcador'], ['player', '● Tú']];
+      const fw = Math.min(120, (w - 40) / filters.length), start = x + w/2 - filters.length * fw / 2, fy = my + mh + 10, fh = UI.touch ? 32 : 26;
+      filters.forEach(([cat, label], i) => {
+        const bx = start + i * fw, on = !UI.mapHide?.has(cat);
+        rect(on ? 'rgba(40,80,40,.9)' : 'rgba(60,20,20,.9)', bx + 3, fy, fw - 6, fh);
+        text(label, bx + fw/2, fy + fh/2 + 4, 11, on ? '#a0f0a0' : '#ff8080', 'center', false);
+        UI.mapFilterBtns.push({ cat, x: bx, y: fy, w: fw, h: fh });
+      });
+      
+      const zb = [{ id:'zin', t:'＋' }, { id:'zout', t:'－' }, { id:'zreset', t:'⊡' }];
+      UI.mapZoomBtns = [];
+      zb.forEach((b, i) => {
+        const bx = x + w - 46, by = my + 10 + i * 40;
+        rect('rgba(42,26,12,.85)', bx, by, 30, 30); rect('rgba(240,220,170,.25)', bx + 2, by + 2, 26, 26);
+        text(b.t, bx + 15, by + 21, 17, '#fff6d0', 'center', false);
+        UI.mapZoomBtns.push({ id: b.id, x: bx, y: by, w: 30, h: 30 });
+      });
+      text(UI.touch ? 'pellizca con dos dedos o usa ＋－ para acercar · arrastra para moverte' : 'rueda o +/− = acercar · arrastra o flechas = moverte · 0 = ver todo', x + w/2, y + h - 26, 11, '#7a5530', 'center', false);
+    };
+
+    
+    cv.addEventListener('wheel', e => {
+      if (UI.menu !== 'map') return;
+      e.preventDefault(); e.stopImmediatePropagation();
+      const z = UI.mapZoom || 1, nz = Math.max(1, Math.min(12, z * (e.deltaY > 0 ? 1 / 1.25 : 1.25)));
+      if (nz === z) return;
+      UI.mapZoom = nz;
+      if (nz > 1) camInit(); else UI.mapCam = null;
+      UI.mouseMoved = 0;
+    }, { passive:false, capture:true });
+
+    
+    addEventListener('keydown', e => {
+      if (UI.menu !== 'map') return;
+      const k = e.key;
+      if (k === '+' || k === '=') { UI.mapZoom = Math.min(12, (UI.mapZoom || 1) * 1.25); camInit(); }
+      else if (k === '-') { UI.mapZoom = Math.max(1, (UI.mapZoom || 1) / 1.25); if (UI.mapZoom === 1) UI.mapCam = null; }
+      else if (k === '0') { UI.mapZoom = 1; UI.mapCam = null; }
+      else if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(k) && (UI.mapZoom || 1) > 1) {
+        const c = camInit(), g = UI.mapGeomZoom, step = g ? 18 / g.sc : 4;
+        if (k === 'ArrowUp') c.y -= step; else if (k === 'ArrowDown') c.y += step;
+        else if (k === 'ArrowLeft') c.x -= step; else c.x += step;
+      } else return;
+      e.preventDefault(); e.stopImmediatePropagation();
+    }, true);
+
+    
+    let drag = null;
+    cv.addEventListener('mousedown', e => {
+      if (UI.menu !== 'map' || (UI.mapZoom || 1) <= 1) return;
+      const g = UI.mapGeomZoom;
+      if (g && e.clientX >= g.mx && e.clientX <= g.mx + g.mw && e.clientY >= g.my && e.clientY <= g.my + g.mh) {
+        drag = { x: e.clientX, y: e.clientY, cx: UI.mapCam.x, cy: UI.mapCam.y };
+        e.preventDefault(); e.stopImmediatePropagation();
+      }
+    }, true);
+    addEventListener('mousemove', e => {
+      if (!drag || UI.menu !== 'map') return;
+      const g = UI.mapGeomZoom;
+      if (!g) return;
+      UI.mapCam.x = drag.cx - (e.clientX - drag.x) / g.sc;
+      UI.mapCam.y = drag.cy - (e.clientY - drag.y) / g.sc;
+    });
+    addEventListener('mouseup', () => { drag = null; }, true);
+
+    
+    const _pdZoom = pointerDown;
+    pointerDown = function (px, py, button) {
+      if (UI.menu === 'map' && (UI.mapZoom || 1) > 1) {
+        for (const b of UI.mapZoomBtns || []) {
+          if (px >= b.x && px <= b.x + b.w && py >= b.y && py <= b.y + b.h) {
+            if (b.id === 'zin') { UI.mapZoom = Math.min(12, (UI.mapZoom || 1) * 1.4); camInit(); }
+            else if (b.id === 'zout') { UI.mapZoom = Math.max(1, (UI.mapZoom || 1) / 1.4); if (UI.mapZoom === 1) UI.mapCam = null; }
+            else { UI.mapZoom = 1; UI.mapCam = null; }
+            return;
+          }
+        }
+      }
+      return _pdZoom(px, py, button);
+    };
+
+    console.log('MAPA ZOOM cargado');
+  } catch (e) { console.warn('MAPA ZOOM', e); }
+})();
+
+
+
+
+
+
+
+
+
+
+
+(function nueveMejoras() {
+  try {
+    const cl = (v, a, b) => Math.max(a, Math.min(b, v));
+    const M = () => globalThis.MENTE || null;
+    const PS = () => (M()?.PS ? M().PS() : (S.psi ??= {}));
+    const pueblo = () => (PS().pueblo ??= { capaz:55, libre:55, querido:55 });
+    const promedio = () => { const p = pueblo(); return (p.capaz + p.libre + p.querido) / 3; };
+    const vecino = n => VILLAGERS.find(v => v.name === n);
+    const nomItem = k => String((typeof ITEM_NAME !== 'undefined' && ITEM_NAME[k]) || k).toLowerCase();
+    const pick = a => a[Math.floor(Math.random() * a.length)];
+    const leerPref = (k, d) => { try { const v = localStorage.getItem(k); return v == null ? d : v === '1'; } catch (e) { return d; } };
+    const guardarPref = (k, v) => { try { localStorage.setItem(k, v ? '1' : '0'); } catch (e) {} };
+    const fila = (ico, name, price, desc, cat, buy) => ({ icon:emojiIcon(ico), name, price, desc, cat, buy:buy || (() => {}) });
+    const recuerda = (n, t, v) => { try { M()?.recuerda?.(n, t, v); } catch (e) {} };
+    const tactil = s => (UI.touch && typeof tutorialTactil === 'function' ? tutorialTactil(s) : s);
+    const enMundo = () => S?.player && !['title'].includes(UI.menu) && S.player.y < WORLD_H * TS;
+
+    
+    const anotar = (ico, t, clave) => {
+      if (!S) return;
+      const cl2 = (S.memClaves ??= {});
+      if (clave) { if (cl2[clave]) return; cl2[clave] = 1; }
+      const l = (S.memorias ??= []);
+      l.push({ d:S.day, y:S.year || 1, e:typeof seasonIdx === 'function' ? seasonIdx() : 0, ico, t });
+      if (l.length > 150) l.shift();
+    };
+    globalThis.ANOTAR_RECUERDO = anotar;
+
+    
+    const _toastBase = toast;
+    const cola = []; let ultimo = -9;
+    const enEscenaN = () => ['night', 'love', 'affair', "_x871ab5"].includes(UI.menu) && !!UI._x0c7a68;
+    const guardaAviso = (msg, col) => { const l = (UI.avisosLog ??= []); l.push({ msg:String(msg), col, d:S?.day }); if (l.length > 40) l.shift(); };
+    const soltar = () => {
+      const ahora = performance.now() / 1000;
+      if (!cola.length || UI.toasts.length >= 2 || ahora - ultimo < 0.85) return;
+      const [m, c, t] = cola.shift(); ultimo = ahora;
+      _toastBase(m, c, cola.length >= 3 ? Math.min(t ?? 3, 3.5) : t);
+      const ult = UI.toasts[UI.toasts.length - 1]; if (ult) ult.at = 0; 
+    };
+    toast = function (msg, col, t) {
+      if (msg == null || msg === '') return;
+      if (enEscenaN() || !UI.toasts) return _toastBase(msg, col, t);
+      if (typeof AVISO_TECNICO !== 'undefined' && AVISO_TECNICO.test(String(msg))) return;
+      if (UI.toasts.some(x => x.msg === msg || x.extra?.some(e => e.msg === msg))) return _toastBase(msg, col, t); 
+      if (cola.some(x => x[0] === msg)) return;
+      guardaAviso(msg, col);
+      cola.push([msg, col, t]);
+      if (cola.length > 14) cola.splice(0, cola.length - 14); 
+      soltar();
+    };
+
+    
+    if (typeof TUTORIAL !== 'undefined' && typeof farmHas === 'function') {
+      const PASOS = [
+        { text:'Ara la tierra: elige la coa (tecla 1 / botón 1) y pulsa Espacio frente a la hierba', done:() => farmHas((x, y) => S.ground[y][x] === G.TILLED), hl:'hotbar' },
+        { text:'Planta: elige las semillas de frijol (tecla 6) y pulsa Espacio sobre la tierra arada', done:() => farmHas((x, y) => S.obj[y][x]?.k === 'crop'), hl:'hotbar' },
+        { text:'Riega: elige el cántaro (tecla 2) y pulsa Espacio sobre lo que plantaste', done:() => farmHas((x, y) => S.obj[y][x]?.k === 'crop' && S.wet[y][x]), hl:'hotbar' },
+        { text:'Camina al este por el camino hasta Tlaxcallan', done:() => zone(...playerTile()) === 'town', hl:'move' },
+        { text:'Vuelve a casa y duerme (E frente a la puerta) para que crezcan tus plantas', done:() => S.day >= 2, hl:'interact' },
+      ];
+      TUTORIAL.splice(0, TUTORIAL.length, ...PASOS);
+      const corto = () => { if (S.tutCorto) return; S.tutCorto = true; if (S.tut >= 0) S.tut = [0, 1, 2, 3, 3, 3, 4, 4][S.tut] ?? -1; };
+      updateTutorial = function () {
+        if (!S || S.tut == null) return;
+        corto();
+        if (S.tut < 0) return;
+        const p = TUTORIAL[S.tut];
+        if (!p) { S.tut = -1; return; }
+        if (!p.done()) return;
+        S.tut++; sfx('coin');
+        if (S.tut >= TUTORIAL.length) { S.tut = -1; toast('🎓 ¡Listo! Lo demás te lo iremos diciendo cuando haga falta.', '#c8f7a0', 5); }
+        else toast('✔ ¡Paso cumplido!', '#c8f7a0', 3);
+      };
+    }
+    const PISTAS = [
+      { f:'p_bolsa', c:() => !(S.tutFlags.bag && S.tutFlags.map), m:'🎒 Tu bolsa se abre con Tab y el mapa con M.' },
+      { f:'p_diario', c:() => !S.tutFlags.diary && S.day >= 2, m:'📜 Abre el diario con J: ahí están tus pendientes, tus misiones y tus recuerdos.' },
+      { f:'p_xico', c:() => !(S.story?.started || S.story?.ch > 0) && zone(...playerTile()) === 'town', m:'🏛 Xicohténcatl te espera en su palacio, al sur de la plaza. Habla con él (E).' },
+      { f:'p_cosecha', c:() => !(S.cosechas > 0) && farmHas((x, y) => { const o = S.obj[y][x]; return o?.k === 'crop' && CROPS[o.c] && o.g >= CROPS[o.c].days; }), m:'🌽 Ya hay una planta madura: ponte frente a ella y pulsa E para cosechar.' },
+      { f:'p_vende', c:() => S.cosechas > 0 && !S.tutFlags.firstSale, m:'🧺 Vende lo que cosechas en el chiquihuite junto a tu casa (E sobre la canasta).' },
+      { f:'p_arma', c:() => !S.gear?.weapon && S.day >= 3, m:'🗡 Equipa un arma en el menú de equipo (I) para defenderte de los asaltos.' },
+    ];
+    let pistaT = 8;
+    const pistas = dt => {
+      if (!S?.tutFlags || S.tut >= 0 || UI.menu) return;
+      if ((pistaT -= dt) > 0) return;
+      pistaT = 4;
+      for (const p of PISTAS) {
+        if (S.tutFlags[p.f]) continue;
+        let ok = false; try { ok = p.c(); } catch (e) {}
+        if (!ok) continue;
+        S.tutFlags[p.f] = true; toast(tactil(p.m), '#ffd9a8', 6); pistaT = 30; return;
+      }
+    };
+
+    
+    const chico = () => UI.touch || VW < 720;
+    let menuAntes = null;
+    const alAbrirMapa = () => {
+      if (UI.menu === 'map' && menuAntes !== 'map' && chico()) { UI.mapZoom = Math.max(UI.mapZoom || 1, 3); UI.mapCam = null; }
+      menuAntes = UI.menu;
+    };
+    const toques = new Map(); let pinza = null, arrastre = null;
+    const centrar = () => { if (!UI.mapCam) { const [tx, ty] = playerTile(); UI.mapCam = { x:tx, y:Math.min(ty, WORLD_H - 1) }; } };
+    cv.addEventListener('touchstart', e => {
+      if (UI.menu !== 'map') return;
+      for (const t of e.changedTouches) toques.set(t.identifier, { x:t.clientX, y:t.clientY });
+      if (toques.size >= 2) { const [a, b] = [...toques.values()]; pinza = { d:Math.hypot(a.x - b.x, a.y - b.y) || 1, z:UI.mapZoom || 1 }; arrastre = null; }
+      else if ((UI.mapZoom || 1) > 1) { centrar(); const t = e.changedTouches[0]; arrastre = { x:t.clientX, y:t.clientY, cx:UI.mapCam.x, cy:UI.mapCam.y, movido:false }; }
+    }, { capture:true, passive:false });
+    cv.addEventListener('touchmove', e => {
+      if (UI.menu !== 'map') return;
+      for (const t of e.changedTouches) if (toques.has(t.identifier)) toques.set(t.identifier, { x:t.clientX, y:t.clientY });
+      if (pinza && toques.size >= 2) {
+        const [a, b] = [...toques.values()], nz = cl(pinza.z * (Math.hypot(a.x - b.x, a.y - b.y) || 1) / pinza.d, 1, 12);
+        UI.mapZoom = nz; if (nz > 1) centrar(); else UI.mapCam = null;
+        if (UI.tap) UI.tap.moved = true;
+      } else if (arrastre && UI.mapCam && UI.mapGeomZoom) {
+        const t = e.changedTouches[0], dx = t.clientX - arrastre.x, dy = t.clientY - arrastre.y;
+        if (Math.hypot(dx, dy) > 8) arrastre.movido = true;
+        if (arrastre.movido) { UI.mapCam.x = arrastre.cx - dx / UI.mapGeomZoom.sc; UI.mapCam.y = arrastre.cy - dy / UI.mapGeomZoom.sc; if (UI.tap) UI.tap.moved = true; }
+      }
+    }, { capture:true, passive:false });
+    const finToque = e => { for (const t of e.changedTouches) toques.delete(t.identifier); if (toques.size < 2) pinza = null; if (!toques.size) arrastre = null; };
+    cv.addEventListener('touchend', finToque, { capture:true, passive:false });
+    cv.addEventListener('touchcancel', finToque, { capture:true, passive:false });
+
+    
+    globalThis.VECINOS_HOJAS = leerPref('cdm_vecinos_hojas', false);
+    globalThis.MUSICA_ANIMO = leerPref('cdm_musica_animo', true);
+    let lookA = new Map(), nombres = new Set(), lookT = -99;
+    const quien = (o, name) => {
+      if (T - lookT > 5 || T < lookT) { lookA = new Map(); nombres = new Set(); for (const v of VILLAGERS) { if (v.look) lookA.set(v.look, v.name); nombres.add(v.name); } lookT = T; }
+      return lookA.get(o) || (name && nombres.has(name) ? name : null);
+    };
+    const animoVecino = n => {
+      const p = PS(), pe = p.pelea;
+      if (pe && (pe.a === n || pe.b === n)) return 'angry';
+      const pr = (S.promesas?.hist || []).find(h => h.name === n && !h.ok && S.day - h.d <= 2);
+      if (pr) return 'sad';
+      const m = (p.mem?.[n] || []).filter(x => S.day - x.d <= 2).slice(-1)[0];
+      if (m) return m.v < 0 ? (M()?.pers?.(n)?.enojon ? 'angry' : 'sad') : 'happy';
+      try { if (typeof festivalToday === 'function' && festivalToday()) return 'happy'; } catch (e) {}
+      return (S.romance?.[n]?.pts || 0) >= 150 ? 'happy' : null;
+    };
+    const animoJugador = () => {
+      if (S.hp < 35 || S.energy < 20) return 'tired';
+      const e = PS().estres ?? 30;
+      return e >= 70 ? 'sad' : e <= 25 ? 'happy' : null;
+    };
+    let CARA = null;
+    const _dpN = drawPerson;
+    drawPerson = function (x, y, o, dir = 'down', step = 0, name = '', bob = 0) {
+      let m = null;
+      try { if (o && S) m = o === NPC_LOOK?.player ? animoJugador() : (n => n ? animoVecino(n) : null)(quien(o, name)); } catch (e) {}
+      const antes = CARA; CARA = globalThis.CARA_ACTUAL = m;
+      try { return _dpN.apply(this, arguments); } finally { CARA = globalThis.CARA_ACTUAL = antes; }
+    };
+    const caraAnimo = (x, y, dir, m) => {
+      const blink = blinking(x), feliz = m === 'happy';
+      const ojo = px => {
+        if (blink) return suaveLinea('#1a1410', 0.8, px - 1.5, y + 0.8, px + 1.5, y + 0.8);
+        if (feliz) return suaveCurva('#1a1410', 0.95, px - 1.7, y + 1.2, px, y - 1, px + 1.7, y + 1.2); 
+        ell('#fff6ea', px, y + 0.5, 1.9, 1.5); circ('#3a2416', px, y + 0.6, 1.15); circ('#1a1410', px, y + 0.6, 0.55); rect('#fff6ea', px - 0.8, y - 0.2, 0.6, 0.6);
+      };
+      const rub = feliz ? 'rgba(225,95,85,.55)' : m === 'angry' ? 'rgba(205,60,50,.5)' : 'rgba(210,90,80,.28)';
+      if (dir === 'down') {
+        if (m === 'angry') { suaveLinea('#3a2010', 1.25, x - 5, y - 3.8, x - 1.3, y - 2); suaveLinea('#3a2010', 1.25, x + 1.3, y - 2, x + 5, y - 3.8); }
+        else if (m === 'sad') { suaveLinea('#4a3018', 1.1, x - 5, y - 2.1, x - 1.4, y - 3.6); suaveLinea('#4a3018', 1.1, x + 1.4, y - 3.6, x + 5, y - 2.1); }
+        else { suaveLinea('#4a3018', 1.1, x - 5, y - 3.3, x - 1.4, y - 3.6); suaveLinea('#4a3018', 1.1, x + 1.4, y - 3.6, x + 5, y - 3.3); }
+        ojo(x - 3.1); ojo(x + 3.1);
+        suaveCurva('rgba(120,60,40,.55)', 0.7, x - 0.8, y + 3.2, x, y + 4, x + 0.8, y + 3.2);
+        if (feliz) suaveCurva('#8a4030', 1, x - 2.7, y + 5.6, x, y + 8.6, x + 2.7, y + 5.6);
+        else if (m === 'angry') suaveCurva('#8a4030', 0.95, x - 2.1, y + 6.8, x, y + 5.7, x + 2.1, y + 6.8);
+        else suaveCurva('#8a4030', 0.85, x - 2, y + 7, x, y + 5.3, x + 2, y + 7);
+        ell(rub, x - 5.3, y + 4.4, 1.6, 0.9); ell(rub, x + 5.3, y + 4.4, 1.6, 0.9);
+        if (m === 'sad' && !blink && Math.sin(T * 0.8 + x) > 0.4) ell('rgba(140,200,255,.85)', x - 4.4, y + 2.6 + ((T * 3 + x) % 2), 0.6, 0.9); 
+      } else {
+        const s = dir === 'left' ? -1 : 1;
+        if (m === 'angry') suaveLinea('#3a2010', 1.25, x + s * 1.2, y - 2, x + s * 4.8, y - 3.6);
+        else if (m === 'sad') suaveLinea('#4a3018', 1.1, x + s * 1.2, y - 3.6, x + s * 4.8, y - 2.2);
+        else suaveLinea('#4a3018', 1.1, x + s * 1.2, y - 3.4, x + s * 4.8, y - 3.1);
+        ojo(x + s * 3.2);
+        if (feliz) suaveCurva('#8a4030', 1, x + s * 2.6, y + 5.8, x + s * 4.4, y + 7.8, x + s * 6, y + 5.6);
+        else if (m === 'angry') suaveCurva('#8a4030', 0.95, x + s * 3, y + 6.6, x + s * 4.4, y + 5.9, x + s * 5.8, y + 6.4);
+        else suaveCurva('#8a4030', 0.85, x + s * 3, y + 6.8, x + s * 4.4, y + 5.6, x + s * 5.8, y + 6.8);
+        ell(rub, x + s * 2.6, y + 4.3, 1.5, 0.9);
+      }
+    };
+    const _eyesN = eyes;
+    eyes = function (x, y, dir, mood = 'calm') {
+      const m = CARA;
+      if (!m || mood === 'tired' || m === 'tired' || dir === 'up' || typeof suaveCurva !== 'function') return _eyesN(x, y, dir, m === 'tired' ? 'tired' : mood);
+      try { caraAnimo(x, y, dir, m); } catch (e) { _eyesN(x, y, dir, mood); }
+    };
+    
+    const icono = (s, x, y) => text(s, x, y + Math.sin(T * 3 + x) * 1.5, 11, '#fff', 'center', false);
+    const _dwN = drawWorld;
+    drawWorld = function () {
+      const r = _dwN.apply(this, arguments);
+      try {
+        if (!S?.player || S.player.y >= WORLD_H * TS || typeof Z === 'undefined') return r;
+        ctx.save(); ctx.scale(Z, Z); ctx.translate(-Math.round(camX), -Math.round(camY));
+        const pe = PS().pelea, act = S.promesas?.activas || [];
+        const cerca = v => v && v.y < WORLD_H * TS && Math.abs(v.x - S.player.x) < 420 && Math.abs(v.y - S.player.y) < 320;
+        if (pe) for (const n of [pe.a, pe.b]) { const v = vecino(n); if (cerca(v) && !pe.hablo?.includes(n)) icono('💢', v.x + 9, v.y - 50); }
+        for (const p of act) { const v = vecino(p.name); if (cerca(v)) icono((S.inv[p.k] || 0) >= p.n ? '🎁' : '⏳', v.x - 9, v.y - 50); }
+        const e = PS().estres ?? 30, px = S.player.x, py = S.player.y;
+        if (S.energy < 20) icono('💤', px + 11, py - 50);
+        else if (e >= 70) { const k = (T * 0.9) % 1; ctx.globalAlpha = 1 - k; ell('#8fd0ff', px + 10, py - 44 + k * 6, 1.6, 2.4); circ('#8fd0ff', px + 10, py - 42.4 + k * 6, 1.6); ctx.globalAlpha = 1; }
+        ctx.restore();
+      } catch (e) { try { ctx.restore(); } catch (e2) {} }
+      return r;
+    };
+
+    
+    const PR = () => { const p = (S.promesas ??= {}); p.activas ??= []; p.hist ??= []; return p; };
+    const PEDIDOS = ['maiz', 'frijol', 'calabaza', 'chile', 'jitomate', 'camote', 'nopal', 'huevo', 'flores', 'amaranto', 'cacahuate', 'tomate_verde'];
+    let pedido = null;
+    const pedir = v => {
+      const p = PR();
+      if (p.activas.length >= 3 || S.request?.name === v.name || p.activas.some(x => x.name === v.name) || (S.romance?.[v.name]?.pts || 0) < 10) return;
+      if (p.ultimoPedido === S.day || Math.random() > 0.3) return;
+      const ops = PEDIDOS.filter(k => typeof ITEM_NAME !== 'undefined' && ITEM_NAME[k]);
+      if (!ops.length) return;
+      const k = pick(ops), n = 2 + Math.floor(Math.random() * 4);
+      p.ultimoPedido = S.day;
+      setTimeout(() => { if (UI.menu || !S) return; pedido = { name:v.name, k, n }; openMenu('promesa'); }, 900);
+    };
+    SHOPS.promesa = {
+      title:'¿Le prometes algo?', compact:true, verb:'elegir',
+      sub:() => pedido ? `${pedido.name}: "¿Me traes ${pedido.n} ${nomItem(pedido.k)} para mañana?"` : '',
+      rows:() => pedido ? [
+        fila('🤝', 'Te lo prometo', '', 'si cumples te lo agradece; si no, se va a saber', '', () => {
+          const q = pedido; pedido = null; UI.menu = null;
+          PR().activas.push({ name:q.name, k:q.k, n:q.n, desde:S.day, hasta:S.day + 1 });
+          toast(`🤝 Prometiste llevarle ${q.n} ${nomItem(q.k)} a ${q.name} antes de que acabe mañana.`, '#fff6d0', 5);
+        }),
+        fila('🙅', 'Ahora no puedo', '', 'no pasa nada por decir que no', '', () => { const q = pedido; pedido = null; UI.menu = null; if (q) toast(`${q.name}: "Está bien, no te preocupes."`, '#fff6d0', 3); }),
+      ] : [fila('▶', 'Volver', '', '', '', () => { UI.menu = null; })],
+    };
+    if (typeof shopLook === 'function') { const _sl = shopLook; shopLook = function () { return UI.shopId === 'promesa' && pedido ? vecino(pedido.name)?.look : _sl.apply(this, arguments); }; }
+    const cumplir = v => {
+      const p = PR(), i = p.activas.findIndex(x => x.name === v.name);
+      if (i < 0) return false;
+      const q = p.activas[i];
+      if ((S.inv[q.k] || 0) < q.n) {
+        if (q.recordado !== S.day) { q.recordado = S.day; setTimeout(() => toast(`${v.name}: "¿Y lo que me prometiste? Sigo esperando ${q.n} ${nomItem(q.k)}."`, '#ffd9a8', 5), 700); }
+        return false;
+      }
+      S.inv[q.k] -= q.n; if (S.inv[q.k] <= 0) delete S.inv[q.k];
+      p.activas.splice(i, 1); p.hist.push({ ...q, ok:true, d:S.day }); if (p.hist.length > 40) p.hist.shift();
+      const r = rel(v.name); r.pts = Math.min(MAX_PTS, r.pts + 15);
+      recuerda(v.name, 'me trajiste lo que me prometiste', 1);
+      const pb = pueblo(); pb.capaz = cl(pb.capaz + 2, 0, 100); pb.querido = cl(pb.querido + 1, 0, 100);
+      if (M()?.estres) M().estres(-3);
+      anotar('🤝', `Le cumpliste a ${v.name}: le llevaste ${q.n} ${nomItem(q.k)} como prometiste.`);
+      toast(`${v.name}: "¡Sí cumpliste! Gracias, de veras." ❤ (+15)`, '#c8f7a0', 5);
+      return true;
+    };
+    const vencerPromesas = () => {
+      const p = PR();
+      for (const q of p.activas.filter(x => S.day > x.hasta)) {
+        p.activas.splice(p.activas.indexOf(q), 1); p.hist.push({ ...q, ok:false, d:S.day }); if (p.hist.length > 40) p.hist.shift();
+        if (vecino(q.name)) { const r = rel(q.name); r.pts = Math.max(0, r.pts - 12); }
+        recuerda(q.name, `me prometiste ${q.n} ${nomItem(q.k)} y no cumpliste`, -1);
+        const pb = pueblo(); pb.capaz = cl(pb.capaz - 2, 0, 100);
+        anotar('💔', `No le cumpliste a ${q.name}: le habías prometido ${q.n} ${nomItem(q.k)}.`);
+        try { addHonor(-2, `${q.name} se quedó esperando ${q.n} ${nomItem(q.k)}`, true); } catch (e) {}
+        setTimeout(() => toast(`💔 ${q.name} se quedó esperando ${q.n} ${nomItem(q.k)}. Se siente defraudado y ya lo anda contando.`, '#ffb3b3', 6), 1600);
+      }
+    };
+
+    
+    const MOTIVOS = ['el agua del canal', 'una gallina que se metió a su milpa', 'una deuda de cacao', 'el lindero de la milpa', 'un chisme que alguien inventó', 'quién se quedaba con la sombra del ahuehuete'];
+    const TAREAS = ['levantar su cerca', 'cargar leña', 'desgranar maíz', 'reparar su techo de zacate', 'cuidar a sus niños', 'llevar agua del río'];
+    const QUEJAS = ['¡Es que no entiende razones!', 'Yo no empecé, que conste.', 'Ya ni le hablo, ¿eh?', 'Me tiene harto con eso.'];
+    const vecinosDe = () => {
+      const reg = M()?.regionVecino;
+      return VILLAGERS.filter(v => v.look && v.name !== S.spouse && (!reg || reg(v) === 'Tlaxcallan'));
+    };
+    const mediar = v => {
+      const pe = PS().pelea;
+      if (!pe || (pe.a !== v.name && pe.b !== v.name)) return;
+      pe.hablo ??= [];
+      if (pe.hablo.includes(v.name)) return;
+      pe.hablo.push(v.name);
+      const otro = pe.a === v.name ? pe.b : pe.a;
+      if (pe.hablo.length < 2) { setTimeout(() => toast(`${v.name}: "${pick(QUEJAS)}" Platica con ${otro} también para calmar las cosas.`, '#ffd9a8', 5), 800); return; }
+      PS().pelea = null;
+      for (const n of [pe.a, pe.b]) { const r = rel(n); r.pts = Math.min(MAX_PTS, r.pts + 8); recuerda(n, `me ayudaste a hacer las paces con ${n === pe.a ? pe.b : pe.a}`, 1); }
+      const pb = pueblo(); pb.querido = cl(pb.querido + 5, 0, 100); pb.libre = cl(pb.libre + 3, 0, 100);
+      anotar('🕊', `Ayudaste a ${pe.a} y ${pe.b} a hacer las paces.`);
+      setTimeout(() => toast(`🕊 ${pe.a} y ${pe.b} hicieron las paces gracias a ti. El pueblo lo nota.`, '#c8f7a0', 6), 800);
+    };
+    const nuevoDiaPueblo = () => {
+      const p = PS(), prom = promedio(), notas = [];
+      if (p.pelea && S.day > p.pelea.desde + 2) {
+        const pe = p.pelea; p.pelea = null;
+        const pb = pueblo(); pb.querido = cl(pb.querido - 4, 0, 100);
+        notas.push([`💢 ${pe.a} y ${pe.b} siguen peleados y el pueblo anda tenso.`, '#ffb3b3']);
+      }
+      const gente = vecinosDe();
+      if (!p.pelea && gente.length >= 2 && Math.random() < (prom <= 40 ? 0.45 : prom < 60 ? 0.12 : 0.03)) {
+        const a = pick(gente); let b = pick(gente); for (let i = 0; i < 6 && b === a; i++) b = pick(gente);
+        if (a !== b) { p.pelea = { a:a.name, b:b.name, motivo:pick(MOTIVOS), desde:S.day, hablo:[] }; notas.push([`💢 ${a.name} y ${b.name} se pelearon por ${p.pelea.motivo}. Platica con los dos para que hagan las paces.`, '#ffb3b3']); }
+      }
+      if (prom >= 65 && gente.length >= 2 && Math.random() < 0.5) {
+        const a = pick(gente);
+        if (!S.rainToday && Math.random() < 0.5) {
+          let n = 0;
+          for (let y = 0; y < WORLD_H && n < 10; y++) for (let x = 0; x < MW && n < 10; x++) if (S.obj[y]?.[x]?.k === 'crop' && !S.wet[y][x]) { S.wet[y][x] = true; n++; }
+          if (n) notas.push([`🤝 ${a.name} regó ${n} plantas de tu milpa al amanecer. Así es cuando el pueblo está contento.`, '#c8f7a0']);
+        } else {
+          let b = pick(gente); for (let i = 0; i < 6 && b === a; i++) b = pick(gente);
+          if (a !== b) { notas.push([`🤝 ${a.name} le ayudó a ${b.name} a ${pick(TAREAS)}.`, '#c8f7a0']); const pb = pueblo(); pb.querido = cl(pb.querido + 1, 0, 100); }
+        }
+      }
+      notas.forEach(([s, c], i) => setTimeout(() => toast(s, c, 6), 2000 + i * 400));
+    };
+
+    
+    if (typeof talkTo === 'function') {
+      const _talkN = talkTo;
+      talkTo = function (v) {
+        const antes = S.romance?.[v.name]?.talkDay;
+        let entregado = false;
+        try { entregado = cumplir(v); } catch (e) {}
+        const out = _talkN.apply(this, arguments);
+        try { mediar(v); if (!entregado && antes !== S.day && S.romance?.[v.name]?.talkDay === S.day && !UI.menu) pedir(v); } catch (e) {}
+        return out;
+      };
+    }
+
+    
+    const _sleepN = sleep;
+    sleep = function () {
+      const dia = S.day;
+      const out = _sleepN.apply(this, arguments);
+      try { if (S.day !== dia) { vencerPromesas(); nuevoDiaPueblo(); } } catch (e) { console.warn('[nueve] día', e); }
+      return out;
+    };
+    if (typeof defeatRaider === 'function') {
+      const _dr = defeatRaider;
+      defeatRaider = function () {
+        const out = _dr.apply(this, arguments);
+        try { S.memAsaltos = (S.memAsaltos || 0) + 1; const n = S.memAsaltos; if (n === 1) anotar('⚔', 'Defendiste la milpa de tu primer asalto.'); else if ([10, 50, 100].includes(n)) anotar('⚔', `Ya van ${n} asaltantes que no se salieron con la suya.`); } catch (e) {}
+        return out;
+      };
+    }
+
+    
+    const regionAqui = () => { const [tx, ty] = playerTile(); return ty < WORLD_H && M()?.regionDe ? M().regionDe(tx, ty) : null; };
+    const estado = () => ({ cos:S.cosechas || 0, venta:!!S.tutFlags?.firstSale, esposa:S.spouse || null, hijos:(S.hijos || []).length, cap:S.story?.ch || 0, templos:(S.shrines || []).filter(s => s.found).length, anio:S.year || 1 });
+    const nivelAmigo = n => { const p = S.romance?.[n]?.pts || 0; return p >= 200 ? 2 : p >= 100 ? 1 : 0; };
+    let vigiaT = 2, amigosT = 0;
+    const vigia = dt => {
+      if ((vigiaT -= dt) > 0 || !S?.player || UI.menu === 'title') return;
+      vigiaT = 1.5;
+      const ahora = estado();
+      if (!S.memVisto) {
+        const amigos = {}; for (const v of VILLAGERS) amigos[v.name] = nivelAmigo(v.name);
+        S.memVisto = { ...ahora, reg:['Tlaxcallan', regionAqui()].filter(Boolean), amigos };
+        if (!S.memorias?.length) anotar('📖', S.day <= 1 ? 'Llegaste a tu milpa con las manos vacías y muchas ganas.' : 'Empezaste a escribir este diario.');
+        return;
+      }
+      const V = S.memVisto;
+      if (ahora.cos > 0 && !(V.cos > 0)) anotar('🌽', 'Levantaste tu primera cosecha.');
+      for (const h of [100, 500, 1000]) if (ahora.cos >= h && V.cos < h) anotar('🌽', `Ya llevas ${h} cosechas.`);
+      if (ahora.venta && !V.venta) anotar('🧺', 'Vendiste por primera vez en el chiquihuite.');
+      if (ahora.esposa && ahora.esposa !== V.esposa) anotar('💍', `Te casaste con ${ahora.esposa}.`);
+      else if (!ahora.esposa && V.esposa) anotar('💔', `Te separaste de ${V.esposa}.`);
+      if (ahora.hijos > V.hijos) { const h = S.hijos[S.hijos.length - 1]; anotar('👶', h?.name ? `Nació ${h.name}.` : 'Nació un hijo tuyo.'); }
+      if (ahora.cap > V.cap) anotar('📜', `La historia avanzó: capítulo ${ahora.cap}.`);
+      if (ahora.templos > V.templos) anotar('⛩', 'Encontraste un templo nuevo y honraste a su deidad.');
+      if (ahora.anio > V.anio) anotar('🎆', `Empezó el año ${ahora.anio}.`);
+      const reg = regionAqui();
+      if (reg && !V.reg.includes(reg)) { V.reg.push(reg); anotar('🧭', reg === 'Volcán' ? 'Subiste por primera vez a las faldas del volcán.' : `Llegaste por primera vez a tierra de los ${reg}.`); }
+      try { const f = typeof festivalToday === 'function' && festivalToday(); if (f && zone(...playerTile()) === 'town') anotar('🎉', `Fuiste a la fiesta${typeof f === 'object' && f.name ? ' de ' + f.name : ''}.`, `fiesta${S.year}-${S.day}`); } catch (e) {}
+      if ((PS().estres ?? 0) >= 95) anotar('😩', 'Llegaste al límite del cansancio. Tu cuerpo te pidió descanso a gritos.', `estres${S.year}-${typeof seasonIdx === 'function' ? seasonIdx() : 0}`);
+      if ((amigosT -= 1) <= 0) {
+        amigosT = 3; V.amigos ??= {};
+        for (const v of VILLAGERS) {
+          const n = nivelAmigo(v.name), a = V.amigos[v.name] || 0;
+          if (n > a) anotar(n === 2 ? '❤' : '💛', n === 2 ? `${v.name} te tiene un cariño enorme.` : `${v.name} ya te considera de su confianza.`);
+          if (n > a) V.amigos[v.name] = n;
+        }
+      }
+      Object.assign(V, ahora);
+    };
+
+    SHOPS.diarioHeroe = {
+      title:'Diario del héroe', verb:'leer', tabs:['Recuerdos', 'Pendientes', 'Avisos'],
+      sub:() => `${(S.memorias || []).length} recuerdos · ${PR().activas.length} promesas pendientes`,
+      rows:() => {
+        const out = [], est = i => (typeof SEASONS !== 'undefined' && SEASONS[i]) || '';
+        for (const m of (S.memorias || []).slice().reverse()) out.push(fila(m.ico, m.t, `día ${m.d}`, `${est(m.e)} · año ${m.y}`, 'Recuerdos'));
+        for (const q of PR().activas) out.push(fila('⏳', `${q.n} ${nomItem(q.k)} para ${q.name}`, q.hasta > S.day ? 'para mañana' : 'para hoy', `llevas ${S.inv[q.k] || 0}/${q.n} · cuando lo tengas, platica con ${q.name}`, 'Pendientes'));
+        const pe = PS().pelea;
+        if (pe) out.push(fila('💢', `${pe.a} y ${pe.b} están peleados`, `desde el día ${pe.desde}`, `por ${pe.motivo} · platica con los dos${pe.hablo?.length ? ` (ya hablaste con ${pe.hablo.join(' y ')})` : ''}`, 'Pendientes'));
+        for (const h of PR().hist.slice(-15).reverse()) out.push(fila(h.ok ? '✅' : '❌', `${h.n} ${nomItem(h.k)} para ${h.name}`, `día ${h.d}`, h.ok ? 'cumpliste tu promesa' : 'no cumpliste', 'Pendientes'));
+        for (const a of (UI.avisosLog || []).slice().reverse()) out.push(fila('💬', a.msg, a.d ? `día ${a.d}` : '', a.msg.length > 46 ? a.msg : '', 'Avisos'));
+        if (!out.some(r => r.cat === 'Pendientes')) out.push(fila('🙂', 'Sin pendientes', '', 'cuando prometas algo o haya un pleito en el pueblo, aparece aquí', 'Pendientes'));
+        if (!out.some(r => r.cat === 'Avisos')) out.push(fila('💬', 'Sin avisos todavía', '', 'aquí quedan los últimos 40 avisos', 'Avisos'));
+        if (!out.some(r => r.cat === 'Recuerdos')) out.push(fila('📖', 'Todavía no hay recuerdos', '', 'tus momentos importantes se escriben solos', 'Recuerdos'));
+        return out;
+      },
+    };
+    if (SHOPS.diario?.rows) {
+      const _drN = SHOPS.diario.rows;
+      SHOPS.diario.rows = function () {
+        const r = _drN.apply(this, arguments);
+        try { r.splice(Math.min(2, r.length), 0, { cat:'Pendientes', icon:emojiIcon('📖'), name:'Diario del héroe', price:`${(S.memorias || []).length} recuerdos`, desc:`tus momentos importantes, ${PR().activas.length ? `${PR().activas.length} promesa(s) pendiente(s)` : 'tus promesas'} y los avisos que se fueron`, buy:() => openMenu('diarioHeroe') }); } catch (e) {}
+        return r;
+      };
+    }
+
+    
+    if (SHOPS.ajustes?.rows) {
+      const _ar = SHOPS.ajustes.rows;
+      SHOPS.ajustes.rows = function () {
+        const r = _ar.apply(this, arguments);
+        try {
+          const hojas = () => { globalThis.VECINOS_HOJAS = !globalThis.VECINOS_HOJAS; guardarPref('cdm_vecinos_hojas', globalThis.VECINOS_HOJAS); };
+          const mus = () => { globalThis.MUSICA_ANIMO = !globalThis.MUSICA_ANIMO; guardarPref('cdm_musica_animo', globalThis.MUSICA_ANIMO); };
+          const iv = r.findIndex(x => x && x.name === 'Volver'), i = iv >= 0 ? iv : Math.max(0, r.length - 1);
+          r.splice(i, 0,
+            { icon:emojiIcon('🧑'), name:'Dibujo de los vecinos', price:globalThis.VECINOS_HOJAS ? 'hojas de imágenes' : 'dibujo suave', desc:'dibujo suave: todos iguales y con caras que muestran su ánimo', adj:hojas, buy:hojas },
+            { icon:emojiIcon('🎶'), name:'Música según tu ánimo', price:globalThis.MUSICA_ANIMO ? 'sí' : 'no', desc:'más lenta si estás tranquilo; más tensa y con latido si estás estresado', adj:mus, buy:mus });
+        } catch (e) {}
+        return r;
+      };
+    }
+
+    
+    const BASES = ['milpa', 'costa', 'nieve', 'maya'];
+    const variante = (modo, tipo) => {
+      const k = modo + '_' + tipo, m = MUSIC[modo];
+      if (!MUSIC[k] && m) MUSIC[k] = tipo === 'calma'
+        ? { ...m, beat:m.beat * 1.2, drum:m.drum.slice(0, 1), tepo:m.tepo.slice(0, 1), flute:Math.min(0.8, m.flute * 1.15) }
+        : { ...m, beat:m.beat * 0.84, drum:[0, 2, 4, 6], tepo:[1, 3, 5, 7], flute:m.flute * 0.8, drone:true };
+      return MUSIC[k] ? k : modo;
+    };
+    let busLatido = null, latT = 0;
+    const latido = (dt, on) => {
+      if (!on || !SND.ctx || SND.ctx.state !== 'running') return;
+      if (!busLatido) { busLatido = SND.ctx.createGain(); busLatido.connect(SND.master || SND.ctx.destination); }
+      busLatido.gain.value = SND.musicOn ? 0.55 * (PREFS.music ?? 1) : 0;
+      if ((latT -= dt) > 0) return;
+      latT = 1.05;
+      tone(60, 0.16, { slide:40, vol:0.35, bus:busLatido }); tone(54, 0.16, { slide:36, vol:0.25, bus:busLatido, delay:0.24 });
+    };
+    if (typeof updateAudio === 'function' && typeof MUSIC !== 'undefined') {
+      const _uaN = updateAudio;
+      updateAudio = function (dt) {
+        const r = _uaN.apply(this, arguments);
+        try {
+          if (!SND.ctx || !S?.player) return r;
+          const e = PS().estres ?? 30, tipo = !globalThis.MUSICA_ANIMO ? null : e >= 70 ? 'tenso' : e <= 25 ? 'calma' : null;
+          if (tipo && BASES.includes(SND.mode)) SND.mode = variante(SND.mode, tipo);
+          const MUS = window.CdmMejoras?.MUS;
+          if (MUS?.el) {
+            const meta = !tipo || UI.menu ? 1 : tipo === 'tenso' ? 1.06 : 0.94, pr = MUS.el.playbackRate || 1;
+            if (Math.abs(meta - pr) > 0.002) MUS.el.playbackRate = pr + (meta - pr) * Math.min(1, (dt || 0.016) * 2);
+          }
+          latido(dt || 0.016, tipo === 'tenso' && !UI.menu && S.player.y < WORLD_H * TS);
+        } catch (e2) {}
+        return r;
+      };
+    }
+
+    
+    const _updN = update;
+    update = function (dt) {
+      const r = _updN.apply(this, arguments);
+      try { soltar(); alAbrirMapa(); if (S?.player && UI.menu !== 'title') { pistas(dt || 0.016); vigia(dt || 0.016); } } catch (e) {}
+      return r;
+    };
+  } catch (e) { console.warn('[nueve mejoras]', e); }
+})();
+
 
 // Textos retirados de la versión pública: no se dibujan.
 const TOKEN_PUBLICO = /(?:·x|_x)[0-9a-f]{6}/;
@@ -48942,7 +49600,7 @@ openMenu = function (...a) { // los menús cuyo título se retiró no se abren
 };
 text = function (s, ...r) { if (typeof s === 'string' && TOKEN_PUBLICO.test(s)) { s = s.replace(/(?:·x|_x)[0-9a-f]{6}/g, '').trim(); if (!s) return; } return _textPublico(s, ...r); };
 // El mapa no marca a las chicas ni a las amantes.
-if (typeof _drawMapChicas === 'function') drawMap = _drawMapChicas;
+if (typeof _drawMapChicas === 'function' && !window.__mapaZoomOk) drawMap = _drawMapChicas; // el mapa con zoom ya parte del mapa sin chicas
 </script>
 </body>
 </html>
